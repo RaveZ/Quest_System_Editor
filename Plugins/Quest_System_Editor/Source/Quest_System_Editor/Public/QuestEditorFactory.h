@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "QuestSystemGraph.h"
 #include "Factories/Factory.h"
 #include "QuestEditorFactory.generated.h"
 
@@ -16,6 +17,11 @@ class QUEST_SYSTEM_EDITOR_API UQuestEditorFactory : public UFactory
 public:
 	UQuestEditorFactory();
 	virtual ~UQuestEditorFactory();
-	//virtual UObject* FactoryCreateNew(UClass* Class, UObject* InParent, FName Name, EObjectFlags Flags, UObject* Context, FFeedbackContext* Warn) override;
+
+	UPROPERTY(EditAnywhere, Category = DataAsset)	
+		TSubclassOf<UQuestSystemGraph> QuestSystemGraphClass;
+
+	virtual bool ConfigureProperties() override;
+	virtual UObject* FactoryCreateNew(UClass* Class, UObject* InParent, FName Name, EObjectFlags Flags, UObject* Context, FFeedbackContext* Warn) override;
 
 };

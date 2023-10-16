@@ -6,6 +6,7 @@
 #include "Modules/ModuleManager.h"
 #include <EdGraphUtilities.h>
 #include "QuestDetailPanel.h"
+#include <IAssetTools.h>
 
 class FToolBarBuilder;
 class FMenuBuilder;
@@ -29,6 +30,7 @@ private:
 	void AddToolbarExtension(FToolBarBuilder& Builder);
 	void AddMenuExtension(FMenuBuilder& Builder);
 
+	void RegisterAssetTypeAction(IAssetTools& AssetTools, TSharedRef<IAssetTypeActions> Action);
 
 	TSharedRef<class SDockTab> OnSpawnPluginTab(const class FSpawnTabArgs& SpawnTabArgs);
 
@@ -36,5 +38,8 @@ private:
 	TSharedPtr<class FUICommandList> PluginCommands;
 	TSharedPtr<FGraphPanelNodeFactory> GraphPanelNodeFactory_QuestEditor;
 	TSharedPtr<class IDetailsView> PropertyWidget;
+
+	EAssetTypeCategories::Type QuestEditorAssetCategoryBit;
+	TArray< TSharedPtr<IAssetTypeActions> > CreatedAssetTypeActions;
 	UQuestDetailPanel* CustomSettings;
 };

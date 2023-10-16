@@ -3,6 +3,8 @@
 #include "Quest_System_Editor.h"
 #include "Quest_System_EditorStyle.h"
 #include "Quest_System_EditorCommands.h"
+#include "AssetTypeActions_QuestEditor.h"
+#include "IAssetTools.h"
 #include "LevelEditor.h"
 #include "Widgets/Docking/SDockTab.h"
 #include "Widgets/Layout/SBox.h"
@@ -10,6 +12,7 @@
 #include "ToolMenus.h"
 #include <SWidgetProperty.h>
 #include "GraphNodeFactory.h"
+#include <IAssetTools.h>
 
 static const FName Quest_System_EditorTabName("Quest_System_Editor");
 
@@ -38,13 +41,27 @@ void FQuest_System_EditorModule::StartupModule()
 	FGlobalTabmanager::Get()->RegisterNomadTabSpawner(Quest_System_EditorTabName, FOnSpawnTab::CreateRaw(this, &FQuest_System_EditorModule::OnSpawnPluginTab))
 		.SetDisplayName(LOCTEXT("FQuest_System_EditorTabTitle", "Quest_System_Editor"))
 		.SetMenuType(ETabSpawnerMenuType::Hidden);
+
+	//register asset type to advanced asset(may be able to create new asset in content drawer)
+	IAssetTools& AssetTools = FModuleManager::LoadModuleChecked<FAssetToolsModule>("AssetTools").Get();
+
+	QuestEditorAssetCategoryBit = AssetTools.RegisterAdvancedAssetCategory(FName(TEXT("QuestSystemGraph")), LOCTEXT("QuestSystemAssetCategory", "QuestSystemGraph"));
+
+	RegisterAssetTypeAction(AssetTools, MakeShareable(new FAssetTypeActions_QuestEditor(QuestEditorAssetCategoryBit)));
 }
 
 void FQuest_System_EditorModule::ShutdownModule()
 {
 	// This function may be called during shutdown to clean up your module.  For modules that support dynamic reloading,
 	// we call this function before unloading the module.
-
+	if (FModuleManager::Get().IsModuleLoaded("AssetTools"))
+	{
+		IAssetTools& AssetTools = FModuleManager::GetModuleChecked<FAssetToolsModule>("AssetTools").Get();
+		for (int32 Index = 0; Index < CreatedAssetTypeActions.Num(); ++Index)
+		{
+			AssetTools.UnregisterAssetTypeActions(CreatedAssetTypeActions[Index].ToSharedRef());
+		}
+	}
 	UToolMenus::UnRegisterStartupCallback(this);
 
 	UToolMenus::UnregisterOwner(this);
@@ -54,6 +71,12 @@ void FQuest_System_EditorModule::ShutdownModule()
 	FQuest_System_EditorCommands::Unregister();
 
 	FGlobalTabmanager::Get()->UnregisterNomadTabSpawner(Quest_System_EditorTabName);
+}
+
+void FQuest_System_EditorModule::RegisterAssetTypeAction(IAssetTools& AssetTools, TSharedRef<IAssetTypeActions> Action)
+{
+	AssetTools.RegisterAssetTypeActions(Action);
+	CreatedAssetTypeActions.Add(Action);
 }
 
 TSharedRef<SDockTab> FQuest_System_EditorModule::OnSpawnPluginTab(const FSpawnTabArgs& SpawnTabArgs)

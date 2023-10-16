@@ -3,7 +3,6 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "UObject/NoExportTypes.h"
 #include "QuestSystemGraph.generated.h"
 
 /**
@@ -19,4 +18,15 @@ public:
 
 	UPROPERTY(EditDefaultsOnly, Category = "QuestSystemGraph")
 		FString Name;
+
+#if WITH_EDITORONLY_DATA
+	UPROPERTY()
+		class UEdGraph* EdGraph;
+
+	UPROPERTY(EditDefaultsOnly, Category = "QuestSystemGraph")
+		bool bCanRenameNode;
+
+	UPROPERTY(EditDefaultsOnly, Category = "QuestSystemGraph")
+		bool bCanBeCyclical;
+#endif
 };

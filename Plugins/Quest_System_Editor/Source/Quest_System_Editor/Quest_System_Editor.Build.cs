@@ -17,6 +17,8 @@ public class Quest_System_Editor : ModuleRules
 		
 		PrivateIncludePaths.AddRange(
 			new string[] {
+                "Quest_System_Editor/Private",
+                "Quest_System_Editor/Public",
 				// ... add other private include paths required here ...
 			}
 			);
@@ -25,7 +27,11 @@ public class Quest_System_Editor : ModuleRules
 		PublicDependencyModuleNames.AddRange(
 			new string[]
 			{
-				"Core",
+                "Quest_System_Runtime",
+                "Core",
+                "CoreUObject",
+                "Engine",
+                "UnrealEd",
 				// ... add other public dependencies that you statically link with here ...
 			}
 			);
@@ -34,7 +40,16 @@ public class Quest_System_Editor : ModuleRules
 		PrivateDependencyModuleNames.AddRange(
 			new string[]
 			{
-				"Projects",
+                "Quest_System_Runtime",
+                "AssetTools",
+                "GraphEditor",
+                "PropertyEditor",
+                "EditorStyle",
+                "Kismet",
+                "KismetWidgets",
+                "ApplicationCore",
+                "ToolMenus",
+                "Projects",
 				"InputCore",
 				"EditorFramework",
 				"UnrealEd",

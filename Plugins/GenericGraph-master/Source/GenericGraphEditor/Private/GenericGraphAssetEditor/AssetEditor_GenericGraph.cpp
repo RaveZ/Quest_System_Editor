@@ -64,24 +64,24 @@ FAssetEditor_GenericGraph::~FAssetEditor_GenericGraph()
 void FAssetEditor_GenericGraph::InitGenericGraphAssetEditor(const EToolkitMode::Type Mode, const TSharedPtr< IToolkitHost >& InitToolkitHost, UGenericGraph* Graph)
 {
 	EditingGraph = Graph;
-	CreateEdGraph();
+	//CreateEdGraph();
 
 	FGenericCommands::Register();
 	FGraphEditorCommands::Register();
 	FEditorCommands_GenericGraph::Register();
 
-	if (!ToolbarBuilder.IsValid())
+	/*if (!ToolbarBuilder.IsValid())
 	{
 		ToolbarBuilder = MakeShareable(new FAssetEditorToolbar_GenericGraph(SharedThis(this)));
-	}
+	}*/
 
-	BindCommands();
+	//BindCommands();
 
 	CreateInternalWidgets();
 
-	TSharedPtr<FExtender> ToolbarExtender = MakeShareable(new FExtender);
+	//TSharedPtr<FExtender> ToolbarExtender = MakeShareable(new FExtender);
 
-	ToolbarBuilder->AddGenericGraphToolbar(ToolbarExtender);
+	//ToolbarBuilder->AddGenericGraphToolbar(ToolbarExtender);
 
 	// Layout
 	const TSharedRef<FTabManager::FLayout> StandaloneDefaultLayout = FTabManager::NewLayout("Standalone_GenericGraphEditor_Layout_v1")
@@ -128,7 +128,7 @@ void FAssetEditor_GenericGraph::InitGenericGraphAssetEditor(const EToolkitMode::
 	const bool bCreateDefaultToolbar = true;
 	FAssetEditorToolkit::InitAssetEditor(Mode, InitToolkitHost, GenericGraphEditorAppName, StandaloneDefaultLayout, bCreateDefaultStandaloneMenu, bCreateDefaultToolbar, EditingGraph, false);
 
-	RegenerateMenusAndToolbars();
+	//RegenerateMenusAndToolbars();
 }
 
 void FAssetEditor_GenericGraph::RegisterTabSpawners(const TSharedRef<FTabManager>& InTabManager)

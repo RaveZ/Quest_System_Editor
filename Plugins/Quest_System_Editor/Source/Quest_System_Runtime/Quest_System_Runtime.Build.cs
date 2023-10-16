@@ -16,6 +16,7 @@ public class Quest_System_Runtime : ModuleRules
 
         PrivateIncludePaths.AddRange(
             new string[] {
+                "Quest_System_Runtime/Private",
 				// ... add other private include paths required here ...
 			}
             );
