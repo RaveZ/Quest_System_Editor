@@ -6,9 +6,12 @@
 #include "EdGraph/EdGraph.h"
 #include "EdGraph_QuestSystemGraph.generated.h"
 
-/**
- * 
- */
+class UQuestSystemGraph;
+class UQuestSystemGraphNode;
+class UQuestSystemGraphEdge;
+class UEdNode_QuestSystemNode;
+class UEdNode_QuestSystemEdge;
+
 UCLASS()
 class QUEST_SYSTEM_EDITOR_API UEdGraph_QuestSystemGraph : public UEdGraph
 {
@@ -18,4 +21,20 @@ public:
 	virtual ~UEdGraph_QuestSystemGraph();
 
 	virtual void RebuildQuestSystemGraph();
+
+	UQuestSystemGraph* GetQuestSystemGraph() const;
+
+	virtual bool Modify(bool bAlwaysMarkDirty = true) override;
+	virtual void PostEditUndo() override;
+
+	UPROPERTY(Transient)
+		TMap<UQuestSystemGraphNode*, UEdNode_QuestSystemNode*> NodeMap;
+
+	UPROPERTY(Transient)
+		TMap<UQuestSystemGraphEdge*, UEdNode_QuestSystemEdge*> EdgeMap;
+
+protected:
+	void Clear();
+
+	void SortNodes(UQuestSystemGraphNode* RootNode);
 };

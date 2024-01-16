@@ -257,6 +257,7 @@ void UAssetGraphSchema_GenericGraph::GetGraphContextActions(FGraphContextMenuBui
 
 void UAssetGraphSchema_GenericGraph::GetContextMenuActions(UToolMenu* Menu, UGraphNodeContextMenuContext* Context) const
 {
+	
 	if (Context->Pin)
 	{
 		{

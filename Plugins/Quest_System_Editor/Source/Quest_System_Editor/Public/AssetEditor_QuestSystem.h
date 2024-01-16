@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "Setting_QuestEditor.h"
 #include "QuestSystemGraph.h"
 /**
  * 
@@ -53,16 +54,17 @@ protected:
 
 	void CreateEdGraph();
 
-	/*void CreateCommandList();
-
+	void CreateCommandList();
+	
+	
 	TSharedPtr<SGraphEditor> GetCurrGraphEditor() const;
 
-	FGraphPanelSelectionSet GetSelectedNodes() const;*/
+	FGraphPanelSelectionSet GetSelectedNodes() const;
 
 	void RebuildQuestSystemGraph();
 
 	// Delegates for graph editor commands
-	/*void SelectAllNodes();
+	void SelectAllNodes();
 	bool CanSelectAllNodes();
 	void DeleteSelectedNodes();
 	bool CanDeleteNodes();
@@ -82,9 +84,9 @@ protected:
 
 	void AutoArrange();
 	bool CanAutoArrange() const;
-
+	
 	void OnRenameNode();
-	bool CanRenameNodes() const;*/
+	bool CanRenameNodes() const;
 
 	//////////////////////////////////////////////////////////////////////////
 	// graph editor event
@@ -100,7 +102,7 @@ protected:
 	void OnPackageSavedWithContext(const FString& PackageFileName, UPackage* Package, FObjectPostSaveContext ObjectSaveContext);
 #endif // #else // #if ENGINE_MAJOR_VERSION < 5
 protected:
-	//UGenericGraphEditorSettings* GenricGraphEditorSettings;
+	UQuestEditorSettings* GenricGraphEditorSettings;
 
 	UQuestSystemGraph* EditingGraph;
 
