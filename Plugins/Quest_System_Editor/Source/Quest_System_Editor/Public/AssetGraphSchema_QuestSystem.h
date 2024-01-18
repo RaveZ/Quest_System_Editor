@@ -52,8 +52,11 @@ class UAssetGraphSchema_QuestSystem : public UEdGraphSchema
 {
 	GENERATED_BODY()
 	public:
+
 	void GetBreakLinkToSubMenuActions(class UToolMenu* Menu, class UEdGraphPin* InGraphPin);
 
+	//~ Begin EdGraphSchema Interface
+	virtual void CreateDefaultNodesForGraph(UEdGraph& Graph) const override;
 	virtual EGraphType GetGraphType(const UEdGraph* TestEdGraph) const override;
 
  	virtual void GetGraphContextActions(FGraphContextMenuBuilder& ContextMenuBuilder) const override;

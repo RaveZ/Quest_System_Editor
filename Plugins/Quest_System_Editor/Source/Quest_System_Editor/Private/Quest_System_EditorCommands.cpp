@@ -7,7 +7,7 @@
 void FQuest_System_EditorCommands::RegisterCommands()
 {
 	UI_COMMAND(OpenPluginWindow, "Quest_System_Editor", "Bring up Quest_System_Editor window", EUserInterfaceActionType::Button, FInputChord());
-	UI_COMMAND(GraphSettings, "Graph Settings", "Graph Settings", EUserInterfaceActionType::Button, FInputChord());
+	UI_COMMAND(NewTask, "Graph Settings", "Graph Settings", EUserInterfaceActionType::Button, FInputChord());
 	UI_COMMAND(AutoArrange, "Auto Arrange", "Auto Arrange", EUserInterfaceActionType::Button, FInputChord());
 }
 

@@ -5,14 +5,14 @@
 #include "CoreMinimal.h"
 #include "QuestSystemGraphNode.h"
 #include "UObject/NoExportTypes.h"
-#include "QuestSystem_TaskNode.generated.h"
+#include "QuestSystemGraphNode_Task.generated.h"
 
 /**
  * 
  */
 UCLASS()
-class QUEST_SYSTEM_RUNTIME_API UQuestSystem_TaskNode : public UQuestSystemGraphNode
+class QUEST_SYSTEM_RUNTIME_API UQuestSystemGraphNode_Task : public UQuestSystemGraphNode
 {
 	GENERATED_BODY()
-	
+public:
 };

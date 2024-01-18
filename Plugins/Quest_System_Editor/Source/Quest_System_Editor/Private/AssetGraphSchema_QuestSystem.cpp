@@ -8,6 +8,7 @@
 #include "EdNode_QuestSystemEdge.h"
 #include "GraphEditorActions.h"
 #include "QuestSystemGraph.h"
+#include <QuestSystemGraphNode_Root.h>
 
 
 #define LOCTEXT_NAMESPACE "AssetSchema_QuestSystemGraph"
@@ -182,6 +183,14 @@ void UAssetGraphSchema_QuestSystem::GetBreakLinkToSubMenuActions(UToolMenu* Menu
 		Section.AddMenuEntry(NAME_None, Description, Description, FSlateIcon(), FUIAction(
 			FExecuteAction::CreateUObject(this, &UAssetGraphSchema_QuestSystem::BreakSinglePinLink, const_cast<UEdGraphPin*>(InGraphPin), *Links)));
 	}
+}
+
+void UAssetGraphSchema_QuestSystem::CreateDefaultNodesForGraph(UEdGraph& Graph) const
+{
+	FGraphNodeCreator<UEdNode_QuestSystemNode> NodeCreator(Graph);
+	UEdNode_QuestSystemNode* MyNode = NodeCreator.CreateNode();
+	NodeCreator.Finalize();
+	SetNodeMetaData(MyNode, FNodeMetadata::DefaultGraphNode);
 }
 
 EGraphType UAssetGraphSchema_QuestSystem::GetGraphType(const UEdGraph* TestEdGraph) const

@@ -542,6 +542,7 @@ void FAssetEditor_GenericGraph::CopySelectedNodes()
 
 	FString ExportedText;
 
+	
 	for (FGraphPanelSelectionSet::TIterator SelectedIter(SelectedNodes); SelectedIter; ++SelectedIter)
 	{
 		UEdGraphNode* Node = Cast<UEdGraphNode>(*SelectedIter);
@@ -693,6 +694,7 @@ void FAssetEditor_GenericGraph::GraphSettings()
 
 bool FAssetEditor_GenericGraph::CanGraphSettings() const
 {
+	
 	return true;
 }
 

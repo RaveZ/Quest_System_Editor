@@ -20,6 +20,6 @@ public:
 
 public:
 	TSharedPtr< FUICommandInfo > OpenPluginWindow;
-	TSharedPtr<FUICommandInfo> GraphSettings;
+	TSharedPtr<FUICommandInfo> NewTask;
 	TSharedPtr<FUICommandInfo> AutoArrange;
 };

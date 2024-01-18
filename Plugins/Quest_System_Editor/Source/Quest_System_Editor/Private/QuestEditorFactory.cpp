@@ -69,37 +69,40 @@ UQuestEditorFactory::~UQuestEditorFactory()
 
 bool UQuestEditorFactory::ConfigureProperties()
 {
-	// nullptr the GenericGraphClass so we can check for selection
-	QuestSystemGraphClass = nullptr;
+	//add class picker
+//	// nullptr the GenericGraphClass so we can check for selection
+//	QuestSystemGraphClass = nullptr;
+//
+//	// Load the classviewer module to display a class picker
+//	FClassViewerModule& ClassViewerModule = FModuleManager::LoadModuleChecked<FClassViewerModule>("ClassViewer");
+//
+//	// Fill in options
+//	FClassViewerInitializationOptions Options;
+//	Options.Mode = EClassViewerMode::ClassPicker;
+//
+//#if ENGINE_MAJOR_VERSION < 5
+//	TSharedPtr<FAssetClassParentFilter> Filter = MakeShareable(new FAssetClassParentFilter);
+//	Options.ClassFilter = Filter;
+//#else // #if ENGINE_MAJOR_VERSION < 5
+//	TSharedRef<FAssetClassParentFilter> Filter = MakeShareable(new FAssetClassParentFilter);
+//	Options.ClassFilters.Add(Filter);
+//#endif // #else // #if ENGINE_MAJOR_VERSION < 5
+//
+//	Filter->DisallowedClassFlags = CLASS_Abstract | CLASS_Deprecated | CLASS_NewerVersionExists | CLASS_HideDropDown;
+//	Filter->AllowedChildrenOfClasses.Add(UQuestSystemGraph::StaticClass());
+//
+//	const FText TitleText = LOCTEXT("CreateQuestSystemGraphAssetOptions", "Pick Quest System Class");
+//	UClass* ChosenClass = nullptr;
+//	const bool bPressedOk = SClassPickerDialog::PickClass(TitleText, Options, ChosenClass, UQuestSystemGraph::StaticClass());
+//
+//	if (bPressedOk)
+//	{
+//		QuestSystemGraphClass = ChosenClass;
+//	}
+//
+//	return bPressedOk;
 
-	// Load the classviewer module to display a class picker
-	FClassViewerModule& ClassViewerModule = FModuleManager::LoadModuleChecked<FClassViewerModule>("ClassViewer");
-
-	// Fill in options
-	FClassViewerInitializationOptions Options;
-	Options.Mode = EClassViewerMode::ClassPicker;
-
-#if ENGINE_MAJOR_VERSION < 5
-	TSharedPtr<FAssetClassParentFilter> Filter = MakeShareable(new FAssetClassParentFilter);
-	Options.ClassFilter = Filter;
-#else // #if ENGINE_MAJOR_VERSION < 5
-	TSharedRef<FAssetClassParentFilter> Filter = MakeShareable(new FAssetClassParentFilter);
-	Options.ClassFilters.Add(Filter);
-#endif // #else // #if ENGINE_MAJOR_VERSION < 5
-
-	Filter->DisallowedClassFlags = CLASS_Abstract | CLASS_Deprecated | CLASS_NewerVersionExists | CLASS_HideDropDown;
-	Filter->AllowedChildrenOfClasses.Add(UQuestSystemGraph::StaticClass());
-
-	const FText TitleText = LOCTEXT("CreateQuestSystemGraphAssetOptions", "Pick Quest System Class");
-	UClass* ChosenClass = nullptr;
-	const bool bPressedOk = SClassPickerDialog::PickClass(TitleText, Options, ChosenClass, UQuestSystemGraph::StaticClass());
-
-	if (bPressedOk)
-	{
-		QuestSystemGraphClass = ChosenClass;
-	}
-
-	return bPressedOk;
+	return true;
 }
 
 UObject* UQuestEditorFactory::FactoryCreateNew(UClass* Class, UObject* InParent, FName Name, EObjectFlags Flags, UObject* Context, FFeedbackContext* Warn)

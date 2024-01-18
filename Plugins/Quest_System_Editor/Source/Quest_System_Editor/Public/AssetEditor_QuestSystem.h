@@ -31,13 +31,13 @@ public:
 	virtual FString GetDocumentationLink() const override;
 	virtual void SaveAsset_Execute() override;
 	// End of FAssetEditorToolkit
-
+	
 	//Toolbar
-	/*void UpdateToolbar();
-	TSharedPtr<class FAssetEditorToolbar_GenericGraph> GetToolbarBuilder() { return ToolbarBuilder; }
-	void RegisterToolbarTab(const TSharedRef<class FTabManager>& TabManager);*/
+	void UpdateToolbar();
+	TSharedPtr<class FAssetEditorToolbar_QuestSystem> GetToolbarBuilder() { return ToolbarBuilder; }
+	void RegisterToolbarTab(const TSharedRef<class FTabManager>& TabManager);
 
-
+	
 	// FSerializableObject interface
 	virtual void AddReferencedObjects(FReferenceCollector& Collector) override;
 	// End of FSerializableObject interface
@@ -49,8 +49,8 @@ protected:
 	void CreateInternalWidgets();
 	TSharedRef<SGraphEditor> CreateViewportWidget();
 
-
-	//void BindCommands();
+	
+	void BindCommands();
 
 	void CreateEdGraph();
 
@@ -79,8 +79,11 @@ protected:
 	void DuplicateNodes();
 	bool CanDuplicateNodes();
 
-	void GraphSettings();
-	bool CanGraphSettings() const;
+	//New Task Functions from toolbar
+	void CreateNewTask();
+	void HandleNewNodeClassPicked(UClass* InClass) const;
+	bool CanCreateNewTask() const;
+	bool IsNewTaskButtonVisible() const;
 
 	void AutoArrange();
 	bool CanAutoArrange() const;
@@ -102,12 +105,12 @@ protected:
 	void OnPackageSavedWithContext(const FString& PackageFileName, UPackage* Package, FObjectPostSaveContext ObjectSaveContext);
 #endif // #else // #if ENGINE_MAJOR_VERSION < 5
 protected:
-	UQuestEditorSettings* GenricGraphEditorSettings;
+	UQuestEditorSettings* QuestGraphEditorSettings;
 
 	UQuestSystemGraph* EditingGraph;
 
 	//Toolbar
-	TSharedPtr<class FAssetEditorToolbar_GenericGraph> ToolbarBuilder;
+	TSharedPtr<class FAssetEditorToolbar_QuestSystem> ToolbarBuilder;
 
 	/** Handle to the registered OnPackageSave delegate */
 	FDelegateHandle OnPackageSavedDelegateHandle;

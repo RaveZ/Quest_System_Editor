@@ -3,7 +3,7 @@
 #include "Quest_System_Editor.h"
 #include "Quest_System_EditorStyle.h"
 #include "Quest_System_EditorCommands.h"
-#include "AssetTypeActions_QuestEditor.h"
+#include "AssetTypeActions_QuestSystem.h"
 #include "IAssetTools.h"
 #include "LevelEditor.h"
 #include "Widgets/Docking/SDockTab.h"
@@ -47,7 +47,7 @@ void FQuest_System_EditorModule::StartupModule()
 
 	QuestEditorAssetCategoryBit = AssetTools.RegisterAdvancedAssetCategory(FName(TEXT("QuestSystemGraph")), LOCTEXT("QuestSystemAssetCategory", "QuestSystemGraph"));
 
-	RegisterAssetTypeAction(AssetTools, MakeShareable(new FAssetTypeActions_QuestEditor(QuestEditorAssetCategoryBit)));
+	RegisterAssetTypeAction(AssetTools, MakeShareable(new FAssetTypeActions_QuestSystem(QuestEditorAssetCategoryBit)));
 }
 
 void FQuest_System_EditorModule::ShutdownModule()

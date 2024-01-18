@@ -49,6 +49,8 @@ public:
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "QuestSystemGraphNode")
 		FText GetDescription() const;
 
+	UFUNCTION(BlueprintImplementableEvent)
+	void ReceiveExecute(AActor* OwnerActor);
 	virtual FText GetDescription_Implementation() const;
 
 	//////////////////////////////////////////////////////////////////////////
