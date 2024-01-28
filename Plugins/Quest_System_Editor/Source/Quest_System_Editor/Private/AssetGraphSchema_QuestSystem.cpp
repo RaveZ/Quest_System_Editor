@@ -3,12 +3,14 @@
 
 #include "AssetGraphSchema_QuestSystem.h"
 #include "ToolMenus.h"
+#include "ConnectionDrawPolicy_QuestSystem.h"
 #include "Framework/Commands/GenericCommands.h"
 #include "EdNode_QuestSystemNode.h"
 #include "EdNode_QuestSystemEdge.h"
 #include "GraphEditorActions.h"
 #include "QuestSystemGraph.h"
 #include <QuestSystemGraphNode_Root.h>
+#include <EdNode_QuestSystemRoot.h>
 
 
 #define LOCTEXT_NAMESPACE "AssetSchema_QuestSystemGraph"
@@ -187,7 +189,7 @@ void UAssetGraphSchema_QuestSystem::GetBreakLinkToSubMenuActions(UToolMenu* Menu
 
 void UAssetGraphSchema_QuestSystem::CreateDefaultNodesForGraph(UEdGraph& Graph) const
 {
-	FGraphNodeCreator<UEdNode_QuestSystemNode> NodeCreator(Graph);
+	FGraphNodeCreator<UEdNode_QuestSystemRoot> NodeCreator(Graph);
 	UEdNode_QuestSystemNode* MyNode = NodeCreator.CreateNode();
 	NodeCreator.Finalize();
 	SetNodeMetaData(MyNode, FNodeMetadata::DefaultGraphNode);
@@ -419,7 +421,7 @@ bool UAssetGraphSchema_QuestSystem::CreateAutomaticConversionNodeAndConnections(
 
 FConnectionDrawingPolicy* UAssetGraphSchema_QuestSystem::CreateConnectionDrawingPolicy(int32 InBackLayerID, int32 InFrontLayerID, float InZoomFactor, const FSlateRect& InClippingRect, FSlateWindowElementList& InDrawElements, UEdGraph* InGraphObj) const
 {
-	return nullptr;
+	return new FConnectionDrawPolicy_QuestSystem(InBackLayerID, InFrontLayerID, InZoomFactor, InClippingRect, InDrawElements, InGraphObj);
 }
 
 FLinearColor UAssetGraphSchema_QuestSystem::GetPinTypeColor(const FEdGraphPinType& PinType) const

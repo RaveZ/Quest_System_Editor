@@ -7,6 +7,7 @@
 #include <EdGraphUtilities.h>
 #include "QuestDetailPanel.h"
 #include <IAssetTools.h>
+#include <QuestSystemNodeFactory.h>
 
 class FToolBarBuilder;
 class FMenuBuilder;
@@ -36,7 +37,7 @@ private:
 
 private:
 	TSharedPtr<class FUICommandList> PluginCommands;
-	TSharedPtr<FGraphPanelNodeFactory> GraphPanelNodeFactory_QuestEditor;
+	TSharedPtr<FQuestSystemNodeFactory> GraphPanelNodeFactory_QuestEditor;
 	TSharedPtr<class IDetailsView> PropertyWidget;
 
 	EAssetTypeCategories::Type QuestEditorAssetCategoryBit;

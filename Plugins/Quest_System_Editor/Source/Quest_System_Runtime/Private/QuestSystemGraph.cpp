@@ -11,7 +11,7 @@ UQuestSystemGraph::UQuestSystemGraph()
 	NodeType = UQuestSystemGraphNode::StaticClass();
 	EdgeType = UQuestSystemGraphEdge::StaticClass();
 
-	bEdgeEnabled = true;
+	bEdgeEnabled = false;
 #if WITH_EDITORONLY_DATA
 	EdGraph = nullptr;
 

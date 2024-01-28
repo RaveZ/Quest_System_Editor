@@ -796,6 +796,19 @@ void FAssetEditor_QuestSystem::OnSelectedNodesChanged(const TSet<class UObject*>
 }
 void FAssetEditor_QuestSystem::OnNodeDoubleClicked(UEdGraphNode* Node)
 {
+	UEdNode_QuestSystemNode* MyNode = Cast<UEdNode_QuestSystemNode>(Node);
+	if (MyNode && MyNode->QuestSystemGraphNode &&
+		MyNode->QuestSystemGraphNode->GetClass()->HasAnyClassFlags(CLASS_CompiledFromBlueprint))
+	{
+		UClass* NodeClass = MyNode->QuestSystemGraphNode->GetClass();
+		UPackage* Pkg = NodeClass->GetOuterUPackage();
+		FString ClassName = NodeClass->GetName().LeftChop(2);
+		UBlueprint* BlueprintOb = FindObject<UBlueprint>(Pkg, *ClassName);
+		if (BlueprintOb)
+		{
+			GEditor->GetEditorSubsystem<UAssetEditorSubsystem>()->OpenEditorForAsset(BlueprintOb);
+		}
+	}
 }
 void FAssetEditor_QuestSystem::OnFinishedChangingProperties(const FPropertyChangedEvent& PropertyChangedEvent)
 {

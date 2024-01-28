@@ -23,20 +23,25 @@ public:
 
 	UPROPERTY(VisibleAnywhere, Instanced, Category = "GenericGraph")
 		UQuestSystemGraphNode* QuestSystemGraphNode;
-
+	
 	void SetQuestSystemGraphNode(UQuestSystemGraphNode* InNode);
 	UEdGraph_QuestSystemGraph* GetQuestSystemGraphEdGraph();
 
 	SGraphNode_QuestSystemNode* SGraphNode;
 
+	//UedGraphnode interface
 	virtual void AllocateDefaultPins() override;
 	virtual FText GetNodeTitle(ENodeTitleType::Type TitleType) const override;
 	virtual void PrepareForCopying() override;
 	virtual void AutowireNewNode(UEdGraphPin* FromPin) override;
+	virtual FText GetDescription() const;
 
 	virtual FLinearColor GetBackgroundColor() const;
 	virtual UEdGraphPin* GetInputPin() const;
 	virtual UEdGraphPin* GetOutputPin() const;
+
+	/** Check if node instance uses blueprint for its implementation */
+	bool UsesBlueprint() const;
 
 #if WITH_EDITOR
 	virtual void PostEditUndo() override;

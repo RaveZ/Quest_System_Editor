@@ -5,13 +5,9 @@
 #include "SlateOptMacros.h"
 
 BEGIN_SLATE_FUNCTION_BUILD_OPTIMIZATION
-void SGraphNode_QuestSystemEdge::Construct(const FArguments& InArgs)
+void SGraphNode_QuestSystemEdge::Construct(const FArguments& InArgs, UEdNode_QuestSystemEdge* InNode)
 {
-	/*
-	ChildSlot
-	[
-		// Populate the widget
-	];
-	*/
 }
+
 END_SLATE_FUNCTION_BUILD_OPTIMIZATION
+

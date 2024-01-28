@@ -22,6 +22,8 @@ UEdGraph_QuestSystemGraph* UEdNode_QuestSystemNode::GetQuestSystemGraphEdGraph()
 	return Cast<UEdGraph_QuestSystemGraph>(GetGraph());
 }
 
+
+
 void UEdNode_QuestSystemNode::AllocateDefaultPins()
 {
 	CreatePin(EGPD_Input, "MultipleNodes", FName(), TEXT("In"));
@@ -57,6 +59,11 @@ void UEdNode_QuestSystemNode::AutowireNewNode(UEdGraphPin* FromPin)
 	}
 }
 
+FText UEdNode_QuestSystemNode::GetDescription() const
+{
+	return FText();
+}
+
 FLinearColor UEdNode_QuestSystemNode::GetBackgroundColor() const
 {
 	return QuestSystemGraphNode == nullptr ? FLinearColor::Black : QuestSystemGraphNode->GetBackgroundColor();
@@ -70,6 +77,11 @@ UEdGraphPin* UEdNode_QuestSystemNode::GetInputPin() const
 UEdGraphPin* UEdNode_QuestSystemNode::GetOutputPin() const
 {
 	return Pins[1];
+}
+
+bool UEdNode_QuestSystemNode::UsesBlueprint() const
+{
+	return QuestSystemGraphNode && QuestSystemGraphNode->GetClass()->HasAnyClassFlags(CLASS_CompiledFromBlueprint);
 }
 
 void UEdNode_QuestSystemNode::PostEditUndo()

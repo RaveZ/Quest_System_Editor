@@ -27,20 +27,9 @@ void FQuest_System_EditorModule::StartupModule()
 
 	FQuest_System_EditorCommands::Register();
 	
-	GraphPanelNodeFactory_QuestEditor = MakeShareable(new FGraphPanelNodeFactory_GenericGraph());
-
-	PluginCommands = MakeShareable(new FUICommandList);
-
-	PluginCommands->MapAction(
-		FQuest_System_EditorCommands::Get().OpenPluginWindow,
-		FExecuteAction::CreateRaw(this, &FQuest_System_EditorModule::PluginButtonClicked),
-		FCanExecuteAction());
-
-	UToolMenus::RegisterStartupCallback(FSimpleMulticastDelegate::FDelegate::CreateRaw(this, &FQuest_System_EditorModule::RegisterMenus));
+	GraphPanelNodeFactory_QuestEditor = MakeShareable(new FQuestSystemNodeFactory());
+	FEdGraphUtilities::RegisterVisualNodeFactory(GraphPanelNodeFactory_QuestEditor);
 	
-	FGlobalTabmanager::Get()->RegisterNomadTabSpawner(Quest_System_EditorTabName, FOnSpawnTab::CreateRaw(this, &FQuest_System_EditorModule::OnSpawnPluginTab))
-		.SetDisplayName(LOCTEXT("FQuest_System_EditorTabTitle", "Quest_System_Editor"))
-		.SetMenuType(ETabSpawnerMenuType::Hidden);
 
 	//register asset type to advanced asset(may be able to create new asset in content drawer)
 	IAssetTools& AssetTools = FModuleManager::LoadModuleChecked<FAssetToolsModule>("AssetTools").Get();
@@ -62,6 +51,12 @@ void FQuest_System_EditorModule::ShutdownModule()
 			AssetTools.UnregisterAssetTypeActions(CreatedAssetTypeActions[Index].ToSharedRef());
 		}
 	}
+	if (GraphPanelNodeFactory_QuestEditor.IsValid())
+	{
+		FEdGraphUtilities::UnregisterVisualNodeFactory(GraphPanelNodeFactory_QuestEditor);
+		GraphPanelNodeFactory_QuestEditor.Reset();
+	}
+
 	UToolMenus::UnRegisterStartupCallback(this);
 
 	UToolMenus::UnregisterOwner(this);
