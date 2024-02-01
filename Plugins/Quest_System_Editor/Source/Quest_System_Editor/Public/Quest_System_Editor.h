@@ -5,7 +5,6 @@
 #include "CoreMinimal.h"
 #include "Modules/ModuleManager.h"
 #include <EdGraphUtilities.h>
-#include "QuestDetailPanel.h"
 #include <IAssetTools.h>
 #include <QuestSystemNodeFactory.h>
 
@@ -42,5 +41,4 @@ private:
 
 	EAssetTypeCategories::Type QuestEditorAssetCategoryBit;
 	TArray< TSharedPtr<IAssetTypeActions> > CreatedAssetTypeActions;
-	UQuestDetailPanel* CustomSettings;
 };

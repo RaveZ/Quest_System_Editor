@@ -14,6 +14,7 @@
 #include "HAL/PlatformApplicationMisc.h"
 #include "AssetGraphSchema_QuestSystem.h"
 #include "Kismet2/BlueprintEditorUtils.h"
+#include "SMyQuest.h"
 #include <Quest_System_Editor.h>
 #include <ContentBrowserFrontEndFilterExtension.h>
 #include <ContentBrowserModule.h>
@@ -24,6 +25,7 @@
 struct FQuestSystemAssetEditorTabs
 {
 	// Tab identifiers
+	static const FName MyQuestDetailID;
 	static const FName GenericGraphPropertyID;
 	static const FName ViewportID;
 	static const FName GenericGraphEditorSettingsID;
@@ -31,6 +33,7 @@ struct FQuestSystemAssetEditorTabs
 
 //////////////////////////////////////////////////////////////////////////
 
+const FName FQuestSystemAssetEditorTabs::MyQuestDetailID(TEXT("MyQuestDetail"));
 const FName FQuestSystemAssetEditorTabs::GenericGraphPropertyID(TEXT("GenericGraphProperty"));
 const FName FQuestSystemAssetEditorTabs::ViewportID(TEXT("Viewport"));
 const FName FQuestSystemAssetEditorTabs::GenericGraphEditorSettingsID(TEXT("GenericGraphEditorSettings"));
@@ -42,7 +45,6 @@ const FName GenericGraphEditorAppName = FName(TEXT("GenericGraphEditorApp"));
 FAssetEditor_QuestSystem::FAssetEditor_QuestSystem()
 {
 	EditingGraph = nullptr;
-
 	QuestGraphEditorSettings = NewObject<UQuestEditorSettings>(UQuestEditorSettings::StaticClass());
 
 #if ENGINE_MAJOR_VERSION < 5
@@ -67,6 +69,7 @@ void FAssetEditor_QuestSystem::InitQuestSystemGraphAssetEditor(const EToolkitMod
 	CreateEdGraph();
 	FGenericCommands::Register();
 	FGraphEditorCommands::Register();
+	FMyQuestCommands::Register();
 	FQuest_System_EditorCommands::Register();
 
 	if (!ToolbarBuilder.IsValid())
@@ -101,22 +104,28 @@ void FAssetEditor_QuestSystem::InitQuestSystemGraphAssetEditor(const EToolkitMod
 				->Split
 				(
 					FTabManager::NewStack()
-					->SetSizeCoefficient(0.65f)
-					->AddTab(FQuestSystemAssetEditorTabs::ViewportID, ETabState::OpenedTab)->SetHideTabWell(true)
+					->SetSizeCoefficient(0.2f)
+					->AddTab(FQuestSystemAssetEditorTabs::MyQuestDetailID, ETabState::OpenedTab)
 				)
 				->Split
 				(
-					FTabManager::NewSplitter()->SetOrientation(Orient_Vertical)
+					FTabManager::NewStack()
+					->SetSizeCoefficient(0.55f)
+					->AddTab(FQuestSystemAssetEditorTabs::ViewportID, ETabState::OpenedTab)
+				)
+				->Split
+				(
+					FTabManager::NewSplitter()->SetOrientation(Orient_Vertical)->SetSizeCoefficient(0.25f)
 					->Split
 					(
 						FTabManager::NewStack()
-						->SetSizeCoefficient(0.7f)
-						->AddTab(FQuestSystemAssetEditorTabs::GenericGraphPropertyID, ETabState::OpenedTab)->SetHideTabWell(true)
+						->SetSizeCoefficient(0.55f)
+						->AddTab(FQuestSystemAssetEditorTabs::GenericGraphPropertyID, ETabState::OpenedTab)
 					)
 					->Split
 					(
 						FTabManager::NewStack()
-						->SetSizeCoefficient(0.3f)
+						->SetSizeCoefficient(0.45f)
 						->AddTab(FQuestSystemAssetEditorTabs::GenericGraphEditorSettingsID, ETabState::OpenedTab)
 					)
 				)
@@ -136,6 +145,11 @@ void FAssetEditor_QuestSystem::RegisterTabSpawners(const TSharedRef<FTabManager>
 	auto WorkspaceMenuCategoryRef = WorkspaceMenuCategory.ToSharedRef();
 
 	FAssetEditorToolkit::RegisterTabSpawners(InTabManager);
+
+	InTabManager->RegisterTabSpawner(FQuestSystemAssetEditorTabs::MyQuestDetailID, FOnSpawnTab::CreateSP(this, &FAssetEditor_QuestSystem::SpawnTab_MyQuest))
+		.SetDisplayName(LOCTEXT("Quest Details", "My Quest"))
+		.SetGroup(WorkspaceMenuCategoryRef)
+		.SetIcon(FSlateIcon(FAppStyle::GetAppStyleSetName(), "LevelEditor.Tabs.Details"));
 
 	InTabManager->RegisterTabSpawner(FQuestSystemAssetEditorTabs::ViewportID, FOnSpawnTab::CreateSP(this, &FAssetEditor_QuestSystem::SpawnTab_Viewport))
 		.SetDisplayName(LOCTEXT("GraphCanvasTab", "Viewport"))
@@ -157,6 +171,7 @@ void FAssetEditor_QuestSystem::UnregisterTabSpawners(const TSharedRef<FTabManage
 {
 	FAssetEditorToolkit::UnregisterTabSpawners(InTabManager);
 
+	InTabManager->UnregisterTabSpawner(FQuestSystemAssetEditorTabs::MyQuestDetailID);
 	InTabManager->UnregisterTabSpawner(FQuestSystemAssetEditorTabs::ViewportID);
 	InTabManager->UnregisterTabSpawner(FQuestSystemAssetEditorTabs::GenericGraphPropertyID);
 	InTabManager->UnregisterTabSpawner(FQuestSystemAssetEditorTabs::GenericGraphEditorSettingsID);
@@ -330,6 +345,11 @@ void FAssetEditor_QuestSystem::AddReferencedObjects(FReferenceCollector& Collect
 	Collector.AddReferencedObject(EditingGraph->EdGraph);
 }
 
+UQuestSystemGraph* FAssetEditor_QuestSystem::GetQuestSystemObj() const
+{
+	return EditingGraph;
+}
+
 TSharedRef<SDockTab> FAssetEditor_QuestSystem::SpawnTab_Viewport(const FSpawnTabArgs& Args)
 {
 	check(Args.GetTabId() == FQuestSystemAssetEditorTabs::ViewportID);
@@ -373,6 +393,20 @@ TSharedRef<SDockTab> FAssetEditor_QuestSystem::SpawnTab_EditorSettings(const FSp
 		];
 }
 
+TSharedRef<SDockTab> FAssetEditor_QuestSystem::SpawnTab_MyQuest(const FSpawnTabArgs& Args)
+{
+	check(Args.GetTabId() == FQuestSystemAssetEditorTabs::MyQuestDetailID);
+
+	return SNew(SDockTab)
+#if ENGINE_MAJOR_VERSION < 5
+		.Icon(FAppStyle::GetBrush("LevelEditor.Tabs.Details"))
+#endif // #if ENGINE_MAJOR_VERSION < 5
+		.Label(LOCTEXT("MyQuest_Title", "My Quest"))
+		[
+			MyQuestWidget.ToSharedRef()
+		];
+}
+
 void FAssetEditor_QuestSystem::CreateInternalWidgets()
 {
 	ViewportWidget = CreateViewportWidget();
@@ -388,6 +422,8 @@ void FAssetEditor_QuestSystem::CreateInternalWidgets()
 
 	EditorSettingsWidget = PropertyModule.CreateDetailView(Args);
 	EditorSettingsWidget->SetObject(QuestGraphEditorSettings);
+
+	this->MyQuestWidget = SNew(SMyQuest, SharedThis(this));
 }
 
 TSharedRef<SGraphEditor> FAssetEditor_QuestSystem::CreateViewportWidget()

@@ -11,7 +11,7 @@ void FAssetEditorToolbar_QuestSystem::AddQuestSystemToolbar(TSharedPtr<FExtender
 {
 	check(QuestSystemEditor.IsValid());
 	TSharedPtr<FAssetEditor_QuestSystem> QuestSystemEditorPtr = QuestSystemEditor.Pin();
-
+	
 	TSharedPtr<FExtender> ToolbarExtender = MakeShareable(new FExtender);
 	ToolbarExtender->AddToolBarExtension("Asset", EExtensionHook::After, QuestSystemEditorPtr->GetToolkitCommands(), FToolBarExtensionDelegate::CreateSP(this, &FAssetEditorToolbar_QuestSystem::FillQuestSystemToolbar));
 	QuestSystemEditorPtr->AddToolbarExtender(ToolbarExtender);
@@ -28,7 +28,7 @@ void FAssetEditorToolbar_QuestSystem::FillQuestSystemToolbar(FToolBarBuilder& To
 		const FText NewTaskTooltip = LOCTEXT("NewTask_ToolTip", "Create a new task node Blueprint from a base class");
 		const FSlateIcon NewTaskIcon = FSlateIcon(FAppStyle::GetAppStyleSetName(), "BTEditor.Graph.NewTask");
 
-
+		
 		ToolbarBuilder.AddToolBarButton(FQuest_System_EditorCommands::Get().NewTask,
 			NAME_None,
 			NewTaskLabel,

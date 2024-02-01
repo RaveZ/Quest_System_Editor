@@ -11,4 +11,5 @@ void UEdNode_QuestSystemRoot::AllocateDefaultPins()
 FText UEdNode_QuestSystemRoot::GetNodeTitle(ENodeTitleType::Type TitleType) const
 {
 	return NSLOCTEXT("BehaviorTreeEditor", "Root", "ROOT");
+	
 }

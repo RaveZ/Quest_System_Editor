@@ -10,7 +10,6 @@
 #include "Widgets/Layout/SBox.h"
 #include "Widgets/Text/STextBlock.h"
 #include "ToolMenus.h"
-#include <SWidgetProperty.h>
 #include "GraphNodeFactory.h"
 #include <IAssetTools.h>
 
@@ -83,45 +82,25 @@ TSharedRef<SDockTab> FQuest_System_EditorModule::OnSpawnPluginTab(const FSpawnTa
 		FDetailsViewArgs Args;
 		Args.bHideSelectionTip = true;
 
-		//Create the widget and store it in the PropertyWidget pointer
-		PropertyWidget = PropertyModule.CreateDetailView(Args);
-
-		//Important! We set our new Details View to a mutable version of our custom settings.
-		PropertyWidget->SetObject(GetMutableDefault<UQuestDetailPanel>());
-
-		return SNew(SDockTab)
-			.TabRole(ETabRole::NomadTab)
-			[
-				//Use our newly created Widget here!
-				PropertyWidget.ToSharedRef()
-			];
-
-
-		/*TSharedRef<SWidgetProperty> PropertyWidget = SNew(SWidgetProperty);
-		return SNew(SDockTab)
-			.TabRole(ETabRole::NomadTab)
-			[
-				PropertyWidget
-			];*/
 	// Return the property widget as the content of the tab
-		//FText WidgetText = FText::Format(
-		//	LOCTEXT("WindowWidgetText", "Add code to {0} in {1} to override this window's contents"),
-		//	FText::FromString(TEXT("FQuest_System_EditorModule::OnSpawnPluginTab")),
-		//	FText::FromString(TEXT("Quest_System_Editor.cpp"))
-		//	);
+		FText WidgetText = FText::Format(
+			LOCTEXT("WindowWidgetText", "Add code to {0} in {1} to override this window's contents"),
+			FText::FromString(TEXT("FQuest_System_EditorModule::OnSpawnPluginTab")),
+			FText::FromString(TEXT("Quest_System_Editor.cpp"))
+			);
 
-		//return SNew(SDockTab)
-		//	.TabRole(ETabRole::NomadTab)
-		//	[
-		//		// Put your tab content here!
-		//		SNew(SBox)
-		//		.HAlign(HAlign_Center)
-		//		.VAlign(VAlign_Center)
-		//		[
-		//			SNew(STextBlock)
-		//			.Text(WidgetText)
-		//		]
-		//	];
+		return SNew(SDockTab)
+			.TabRole(ETabRole::NomadTab)
+			[
+				// Put your tab content here!
+				SNew(SBox)
+				.HAlign(HAlign_Center)
+				.VAlign(VAlign_Center)
+				[
+					SNew(STextBlock)
+					.Text(WidgetText)
+				]
+			];
 }
 
 void FQuest_System_EditorModule::PluginButtonClicked()

@@ -5,9 +5,17 @@
 #include "CoreMinimal.h"
 #include "Setting_QuestEditor.h"
 #include "QuestSystemGraph.h"
-/**
- * 
- */
+
+namespace QuestSectionID
+{
+	enum Type
+	{
+		NONE = 0,
+		QUESTGRAPH,					// Quest Graph
+		//Add More to populate the section
+	};
+};
+
 class QUEST_SYSTEM_EDITOR_API FAssetEditor_QuestSystem : public FAssetEditorToolkit, public FNotifyHook, public FGCObject
 {
 public:
@@ -41,11 +49,15 @@ public:
 	// FSerializableObject interface
 	virtual void AddReferencedObjects(FReferenceCollector& Collector) override;
 	// End of FSerializableObject interface
+
+	/** Returns a pointer to the Quest graph object we are currently editing, as long as we are editing exactly one */
+	virtual UQuestSystemGraph* GetQuestSystemObj() const;
 protected:
 	TSharedRef<SDockTab> SpawnTab_Viewport(const FSpawnTabArgs& Args);
 	TSharedRef<SDockTab> SpawnTab_Details(const FSpawnTabArgs& Args);
-	TSharedRef<SDockTab> SpawnTab_EditorSettings(const FSpawnTabArgs& Args);
-
+	TSharedRef<SDockTab> SpawnTab_EditorSettings(const FSpawnTabArgs& Args); 
+	TSharedRef<SDockTab> SpawnTab_MyQuest(const FSpawnTabArgs& Args);
+	
 	void CreateInternalWidgets();
 	TSharedRef<SGraphEditor> CreateViewportWidget();
 
@@ -118,8 +130,10 @@ protected:
 	TSharedPtr<SGraphEditor> ViewportWidget;
 	TSharedPtr<class IDetailsView> PropertyWidget;
 	TSharedPtr<class IDetailsView> EditorSettingsWidget;
+	TSharedPtr<class SMyQuest> MyQuestWidget;
 
 	/** The command list for this editor */
 	TSharedPtr<FUICommandList> GraphEditorCommands;
+
 
 };
