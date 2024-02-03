@@ -20,6 +20,11 @@ public:
 
 public:
 	TSharedPtr< FUICommandInfo > OpenPluginWindow;
+
+	// New documents
+	TSharedPtr< FUICommandInfo > AddNewQuestGraph;
+	
+	//Toolbar
 	TSharedPtr<FUICommandInfo> NewTask;
 	TSharedPtr<FUICommandInfo> AutoArrange;
 };

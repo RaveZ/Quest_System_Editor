@@ -5,7 +5,10 @@
 #include "Framework/Commands/GenericCommands.h"
 #include "GraphEditorActions.h"
 #include "SGraphActionMenu.h"
+#include "AssetGraphSchema_QuestSystem.h"
+#include "SGraphPalette.h"
 #include "Widgets/Input/SSearchBox.h"
+#include "Quest_System_EditorCommands.h"
 #include "SlateOptMacros.h"
 
 
@@ -199,7 +202,7 @@ void SMyQuest::Construct(const FArguments& InArgs, TWeakPtr<FAssetEditor_QuestSy
 
 	if (!QuestEditorPtr.IsValid())
 	{
-		//Refresh();
+		Refresh();
 	}
 
 	TMap<int32, bool> ExpandedSections;
@@ -215,6 +218,19 @@ SMyQuest::~SMyQuest()
 {
 
 }
+void SMyQuest::Tick(const FGeometry& AllottedGeometry, const double InCurrentTime, const float InDeltaTime)
+{
+	SCompoundWidget::Tick(AllottedGeometry, InCurrentTime, InDeltaTime);
+
+	if (bNeedsRefresh)
+	{
+		Refresh();
+	}
+}
+FReply SMyQuest::OnKeyDown(const FGeometry& MyGeometry, const FKeyEvent& InKeyEvent)
+{
+	return FReply::Handled();
+}
 void SMyQuest::OnRequestRenameOnActionNode()
 {
 }
@@ -225,12 +241,60 @@ bool SMyQuest::CanPasteGeneric()
 {
 	return false;
 }
+void SMyQuest::Refresh()
+{
+	bNeedsRefresh = false;
+
+	// Conform to our interfaces here to ensure we catch any newly added functions
+	//FBlueprintEditorUtils::ConformImplementedInterfaces(GetQuestSystemObj());
+
+	GraphActionMenu->RefreshAllActions(/*bPreserveExpansion=*/ true);
+}
+
 TSharedRef<SWidget> SMyQuest::OnCreateWidgetForAction(FCreateWidgetForActionData* const InCreateData)
 {
-	return SNew(SBox);
+	return QuestEditorPtr.IsValid() ? SNew(SGraphPaletteItem, InCreateData) : SNew(SGraphPaletteItem, InCreateData);
 }
 void SMyQuest::CollectAllActions(FGraphActionListBuilderBase& OutAllActions)
 {
+	const UAssetGraphSchema_QuestSystem* QuestSystemSchema = GetDefault<UAssetGraphSchema_QuestSystem>();
+
+	UQuestSystemGraph* QuestSystemObj = GetQuestSystemObj();
+	check(QuestSystemObj);
+
+	TSharedPtr<FAssetEditor_QuestSystem> QuestSystemEditor = QuestEditorPtr.Pin();
+
+	EFieldIteratorFlags::SuperClassFlags FieldIteratorSuperFlag = EFieldIteratorFlags::IncludeSuper;
+	/*if (ShowUserVarsOnly())
+	{
+		FieldIteratorSuperFlag = EFieldIteratorFlags::ExcludeSuper;
+	}*/
+
+	//bool bShowReplicatedOnly = IsShowingReplicatedVariablesOnly();
+
+	// Initialise action sorting instance
+	//FGraphActionSort SortList(QuestSystemObj->CategorySorting);
+
+	if (QuestSystemEditor.IsValid())
+	{
+		// Grab ubergraph pages
+		for (int32 i = 0; i < QuestSystemObj->QuestGraphPages.Num(); i++)
+		{
+			UEdGraph* Graph = QuestSystemObj->QuestGraphPages[i];
+			check(Graph);
+
+			FGraphDisplayInfo DisplayInfo;
+			Graph->GetSchema()->GetGraphDisplayInformation(*Graph, DisplayInfo);
+
+			TSharedPtr<FAssetSchemaAction_QuestSystemGraph> NeUbergraphAction = MakeShareable(new FAssetSchemaAction_QuestSystemGraph(FText::GetEmpty(), DisplayInfo.PlainName, DisplayInfo.Tooltip, 2, QuestSectionID::QUESTGRAPH));
+			NeUbergraphAction->FuncName = Graph->GetFName();
+			NeUbergraphAction->EdGraph = Graph;
+			OutAllActions.AddAction(NeUbergraphAction);
+
+			//GetChildGraphs(Graph, NeUbergraphAction->GetSectionID(), SortList);
+			//GetChildEvents(Graph, NeUbergraphAction->GetSectionID(), SortList);
+		}
+	}
 }
 void SMyQuest::CollectStaticSections(TArray<int32>& StaticSectionIDs)
 {
@@ -249,6 +313,34 @@ void SMyQuest::OnGlobalActionSelected(const TArray<TSharedPtr<FEdGraphSchemaActi
 }
 void SMyQuest::OnActionDoubleClicked(const TArray<TSharedPtr<FEdGraphSchemaAction>>& InActions)
 {
+	if (!QuestEditorPtr.IsValid())
+	{
+		return;
+	}
+
+	TSharedPtr<FEdGraphSchemaAction> InAction(InActions.Num() > 0 ? InActions[0] : NULL);
+	ExecuteAction(InAction);
+
+}
+void SMyQuest::ExecuteAction(TSharedPtr<FEdGraphSchemaAction> InAction)
+{
+	// Force it to open in a new document if shift is pressed
+	const bool bIsShiftPressed = FSlateApplication::Get().GetModifierKeys().IsShiftDown();
+	FDocumentTracker::EOpenDocumentCause OpenMode = bIsShiftPressed ? FDocumentTracker::ForceOpenNewDocument : FDocumentTracker::OpenNewDocument;
+
+	UQuestSystemGraph* QuestSystemObj = QuestEditorPtr.Pin()->GetQuestSystemObj();
+	if (InAction.IsValid())
+	{
+		if (InAction->GetTypeId() == FAssetSchemaAction_QuestSystemGraph::StaticGetTypeId())
+		{
+			FAssetSchemaAction_QuestSystemGraph* GraphAction = (FAssetSchemaAction_QuestSystemGraph*)InAction.Get();
+
+			if (GraphAction->EdGraph)
+			{
+				QuestEditorPtr.Pin()->JumpToHyperlink(GraphAction->EdGraph);
+			}
+		}
+	}
 }
 TSharedPtr<SWidget> SMyQuest::OnContextMenuOpening()
 {
@@ -315,11 +407,20 @@ TSharedRef<SWidget> SMyQuest::OnGetSectionWidget(TSharedRef<SWidget> RowWidget, 
 }
 FReply SMyQuest::OnAddButtonClickedOnSection(int32 InSectionID)
 {
+	TSharedPtr<FAssetEditor_QuestSystem> QuestEditor = QuestEditorPtr.Pin();
+
+	switch (InSectionID)
+	{
+	case QuestSectionID::QUESTGRAPH:
+		CommandList->ExecuteAction(FQuest_System_EditorCommands::Get().AddNewQuestGraph.ToSharedRef());
+		break;
+	}
+
 	return FReply::Handled();
 }
 bool SMyQuest::CanAddNewElementToSection(int32 InSectionID) const
 {
-	return false;
+	return true;
 }
 bool SMyQuest::HandleActionMatchesName(FEdGraphSchemaAction* InAction, const FName& InName) const
 {
@@ -405,6 +506,14 @@ void SMyQuest::OnCut()
 bool SMyQuest::CanCut() const
 {
 	return false;
+}
+
+void SMyQuest::OnObjectPropertyChanged(UObject* InObject, FPropertyChangedEvent& InPropertyChangedEvent)
+{
+	if (InObject == QuestSystemGraph && (InPropertyChangedEvent.ChangeType != EPropertyChangeType::ValueSet && InPropertyChangedEvent.ChangeType != EPropertyChangeType::ArrayClear))
+	{
+		bNeedsRefresh = true;
+	}
 }
 
 void SMyQuest::OnFilterTextChanged(const FText& InFilterText)

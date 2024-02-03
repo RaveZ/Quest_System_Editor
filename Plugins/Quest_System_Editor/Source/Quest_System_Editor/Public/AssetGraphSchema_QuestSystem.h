@@ -46,6 +46,44 @@ public:
 	UEdNode_QuestSystemEdge* NodeTemplate;
 };
 
+/** Reference to a  event graph (only used in 'docked' palette) */
+USTRUCT()
+struct QUEST_SYSTEM_EDITOR_API FAssetSchemaAction_QuestSystemGraph : public FEdGraphSchemaAction
+{
+	GENERATED_USTRUCT_BODY()
+
+	// Simple type info
+	static FName StaticGetTypeId() { static FName Type("FAssetSchemaAction_QuestSystemGraph"); return Type; }
+	virtual FName GetTypeId() const override { return StaticGetTypeId(); }
+
+	/** Name of function or class */
+	FName FuncName;
+
+
+	/** The associated editor graph for this schema */
+	UEdGraph* EdGraph;
+
+	FAssetSchemaAction_QuestSystemGraph()
+		: FEdGraphSchemaAction()
+	{}
+
+	FAssetSchemaAction_QuestSystemGraph(FText InNodeCategory, FText InMenuDesc, FText InToolTip, const int32 InGrouping, const int32 InSectionID = 0)
+		: FEdGraphSchemaAction(MoveTemp(InNodeCategory), MoveTemp(InMenuDesc), MoveTemp(InToolTip), InGrouping, FText(), InSectionID)
+		, EdGraph(nullptr)
+	{}
+
+	// FEdGraphSchemaAction interface
+	//virtual bool IsParentable() const override { return true; }
+	//virtual void MovePersistentItemToCategory(const FText& NewCategoryName) override;
+	//virtual int32 GetReorderIndexInContainer() const override;
+	//virtual bool ReorderToBeforeAction(TSharedRef<FEdGraphSchemaAction> OtherAction) override;
+	//virtual FEdGraphSchemaActionDefiningObject GetPersistentItemDefiningObject() const override;
+	// End of FEdGraphSchemaAction interface
+
+	//UFunction* GetFunction() const;
+	//UBlueprint* GetSourceBlueprint() const;
+};
+
 
 UCLASS(MinimalAPI)
 class UAssetGraphSchema_QuestSystem : public UEdGraphSchema

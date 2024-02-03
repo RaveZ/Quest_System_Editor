@@ -4,6 +4,9 @@
 
 #include "CoreMinimal.h"
 #include "Setting_QuestEditor.h"
+#include "SSubobjectEditor.h"
+#include "Quest_System_Editor.h"
+#include "WorkflowOrientedApp/WorkflowTabManager.h"
 #include "QuestSystemGraph.h"
 
 namespace QuestSectionID
@@ -16,13 +19,27 @@ namespace QuestSectionID
 	};
 };
 
-class QUEST_SYSTEM_EDITOR_API FAssetEditor_QuestSystem : public FAssetEditorToolkit, public FNotifyHook, public FGCObject
+struct FQuestSystemAssetEditorTabs
+{
+	// Tab identifiers
+	static const FName MyQuestDetailID;
+	static const FName GenericGraphPropertyID;
+	static const FName ViewportID;
+	static const FName GenericGraphEditorSettingsID;
+};
+
+
+
+class QUEST_SYSTEM_EDITOR_API FAssetEditor_QuestSystem : public IQuestEditor, public FNotifyHook, public FGCObject
 {
 public:
 	FAssetEditor_QuestSystem();
 	virtual	~FAssetEditor_QuestSystem();
 
 	void InitQuestSystemGraphAssetEditor(const EToolkitMode::Type Mode, const TSharedPtr< IToolkitHost >& InitToolkitHost, UQuestSystemGraph* Graph);
+
+	// Should be called when initializing any editor built off this foundation
+	void CommonInitialization(const UQuestSystemGraph* Graph, bool bShouldOpenInDefaultsMode);
 
 	// IToolkit interface
 	virtual void RegisterTabSpawners(const TSharedRef<FTabManager>& TabManager) override;
@@ -40,6 +57,19 @@ public:
 	virtual void SaveAsset_Execute() override;
 	// End of FAssetEditorToolkit
 	
+	//IQuestEditor
+	virtual void RefreshEditors() override;
+	virtual void RefreshMyQuest();
+	virtual void RefreshInspector();
+	virtual void AddToSelection(UEdGraphNode* InNode) override;
+	virtual void JumpToHyperlink(const UObject* ObjectReference, bool bRequestRename = false) override;
+	virtual void JumpToPin(const class UEdGraphPin* Pin) override;
+	virtual void SummonSearchUI(bool bSetFindWithinBlueprint, FString NewSearchTerms = FString(), bool bSelectFirstResult = false) override;
+	virtual void SummonFindAndReplaceUI() override;
+	virtual TSharedPtr<SGraphEditor> OpenGraphAndBringToFront(UEdGraph* Graph, bool bSetFocus = true) override;
+
+
+
 	//Toolbar
 	void UpdateToolbar();
 	TSharedPtr<class FAssetEditorToolbar_QuestSystem> GetToolbarBuilder() { return ToolbarBuilder; }
@@ -52,6 +82,60 @@ public:
 
 	/** Returns a pointer to the Quest graph object we are currently editing, as long as we are editing exactly one */
 	virtual UQuestSystemGraph* GetQuestSystemObj() const;
+
+	// Type of new document/graph being created by a menu item
+	enum ECreatedQuestDocumentType
+	{
+		CGT_None,
+		CGT_NewQuestGraph,
+	};
+
+	// Called to see if the new document menu items is visible for this type
+	virtual bool IsSectionVisible(QuestSectionID::Type InSectionID) const { return true; }
+	virtual bool NewDocument_IsVisibleForType(ECreatedQuestDocumentType GraphType) const;
+	EVisibility NewDocument_GetVisibilityForType(ECreatedQuestDocumentType GraphType) const
+	{
+		return NewDocument_IsVisibleForType(GraphType) ? EVisibility::Visible : EVisibility::Collapsed;
+	}
+
+	/** Called when New Function button is clicked */
+	virtual void NewDocument_OnClicked(ECreatedQuestDocumentType GraphType);
+	FReply NewDocument_OnClick(ECreatedQuestDocumentType GraphType) { NewDocument_OnClicked(GraphType); return FReply::Handled(); }
+
+	/** Returns true if in editing mode */
+	bool InEditingMode() const;
+
+	TSharedPtr<SDockTab> OpenDocument(const UObject* DocumentID, FDocumentTracker::EOpenDocumentCause Cause);
+	
+	/** Utility function to handle all steps required to rename a newly added action */
+	void RenameNewlyAddedAction(FName InActionName);
+
+	/** Throw a simple message into the log */
+	void LogSimpleMessage(const FText& MessageText);
+
+	/** Create a graph title bar widget */
+	TSharedRef<SWidget> CreateGraphTitleBarWidget(TSharedRef<FTabInfo> InTabInfo, UEdGraph* InGraph);
+
+	/** Creates the widgets that go into the tabs (note: does not create the tabs themselves) **/
+	virtual void CreateDefaultTabContents(const UQuestSystemGraph* Graph);
+
+	/**
+	 * Util for finding a glyph for a graph
+	 *
+	 * @param Graph - The graph to evaluate
+	 * @param bInLargeIcon - if true the icon returned is 22x22 pixels, else it is 16x16
+	 * @return An appropriate brush to use to represent the graph, if the graph is an unknown type the function will return the default "function" glyph
+	 */
+	static const FSlateBrush* GetGlyphForGraph(const UEdGraph* Graph, bool bInLargeIcon = false);
+
+	// Finds any open tabs containing the specified document and adds them to the specified array; returns true if at least one is found
+	bool FindOpenTabsContainingDocument(const UObject* DocumentID, /*inout*/ TArray< TSharedPtr<SDockTab> >& Results);
+
+private:
+	/** Helper to move focused graph when clicking on graph breadcrumb */
+	void OnChangeBreadCrumbGraph(class UEdGraph* InGraph);
+
+
 protected:
 	TSharedRef<SDockTab> SpawnTab_Viewport(const FSpawnTabArgs& Args);
 	TSharedRef<SDockTab> SpawnTab_Details(const FSpawnTabArgs& Args);
@@ -59,7 +143,9 @@ protected:
 	TSharedRef<SDockTab> SpawnTab_MyQuest(const FSpawnTabArgs& Args);
 	
 	void CreateInternalWidgets();
-	TSharedRef<SGraphEditor> CreateViewportWidget();
+
+	// Create new graph editor widget for the supplied document container
+	virtual TSharedRef<SGraphEditor> CreateGraphEditorWidget(TSharedRef<class FTabInfo> InTabInfo, class UEdGraph* InGraph);
 
 	
 	void BindCommands();
@@ -86,8 +172,9 @@ protected:
 	void CopySelectedNodes();
 	bool CanCopyNodes();
 	void PasteNodes();
-	void PasteNodesHere(const FVector2D& Location);
-	bool CanPasteNodes();
+	virtual void PasteNodesHere(class UEdGraph* DestinationGraph, const FVector2D& Location) override;
+
+	virtual bool CanPasteNodes() const override;
 	void DuplicateNodes();
 	bool CanDuplicateNodes();
 
@@ -116,7 +203,13 @@ protected:
 #else // #if ENGINE_MAJOR_VERSION < 5
 	void OnPackageSavedWithContext(const FString& PackageFileName, UPackage* Package, FObjectPostSaveContext ObjectSaveContext);
 #endif // #else // #if ENGINE_MAJOR_VERSION < 5
+
+public:
+	TSharedPtr<FDocumentTracker> DocumentManager;
 protected:
+	/** Factory that spawns graph editors; used to look up all tabs spawned by it. */
+	TWeakPtr<FDocumentTabFactory> GraphEditorTabFactoryPtr;
+
 	UQuestEditorSettings* QuestGraphEditorSettings;
 
 	UQuestSystemGraph* EditingGraph;

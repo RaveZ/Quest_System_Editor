@@ -54,6 +54,10 @@ public:
 	void Construct(const FArguments& InArgs, TWeakPtr<FAssetEditor_QuestSystem> InQuestEditor, const UQuestSystemGraph* InQuestSystemGraph = nullptr);
 	~SMyQuest();
 
+	/* SWidget interface */
+	virtual void Tick(const FGeometry& AllottedGeometry, const double InCurrentTime, const float InDeltaTime);
+	virtual FReply OnKeyDown(const FGeometry& MyGeometry, const FKeyEvent& InKeyEvent);
+
 	/** Accessor the blueprint object from the main editor */
 	UQuestSystemGraph* GetQuestSystemObj() const { return QuestSystemGraph; }
 
@@ -63,6 +67,10 @@ public:
 	/** Callbacks for Paste Commands */
 	void OnPasteGeneric();
 	bool CanPasteGeneric();
+
+	/** Refreshes the graph action menu */
+	void Refresh();
+	void SetFocusedGraph(UEdGraph* InEdGraph) { EdGraph = InEdGraph; }
 private:
 	/** Creates widgets for the graph schema actions */
 	TSharedRef<SWidget> OnCreateWidgetForAction(struct FCreateWidgetForActionData* const InCreateData);
@@ -82,7 +90,7 @@ private:
 	//void OnActionSelectedHelper(TSharedPtr<FEdGraphSchemaAction> InAction, TWeakPtr<FAssetEditor_QuestSystem> InQuestEditor, UQuestSystemGraph* InQuestSystemGraph, TSharedRef<SKismetInspector> Inspector);
 	void OnGlobalActionSelected(const TArray< TSharedPtr<FEdGraphSchemaAction> >& InActions, ESelectInfo::Type InSelectionType);
 	void OnActionDoubleClicked(const TArray< TSharedPtr<FEdGraphSchemaAction> >& InActions);
-	//void ExecuteAction(TSharedPtr<FEdGraphSchemaAction> InAction);
+	void ExecuteAction(TSharedPtr<FEdGraphSchemaAction> InAction);
 	TSharedPtr<SWidget> OnContextMenuOpening();
 
 	//TSharedRef<SWidget> CreateAddNewMenuWidget();
@@ -125,6 +133,10 @@ private:
 	bool CanCopy() const;
 	void OnCut();
 	bool CanCut() const;
+
+
+	/** Delegate to hook us into non-structural Blueprint object post-change events */
+	void OnObjectPropertyChanged(UObject* InObject, FPropertyChangedEvent& InPropertyChangedEvent);
 
 	/** Callback when the filter is changed, forces the action tree(s) to filter */
 	void OnFilterTextChanged(const FText& InFilterText);

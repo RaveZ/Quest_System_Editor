@@ -50,6 +50,10 @@ public:
 	void ClearGraph();
 
 #if WITH_EDITORONLY_DATA
+	/** Set of pages that combine into a single uber-graph */
+	UPROPERTY()
+	TArray<TObjectPtr<UEdGraph>> QuestGraphPages;
+
 	UPROPERTY()
 		class UEdGraph* EdGraph;
 

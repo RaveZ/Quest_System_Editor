@@ -3,6 +3,7 @@
 #include "QuestEditorFactory.h"
 #include "QuestSystemGraph.h"
 
+#include "AssetEditor_QuestSystem.h"
 #include "ClassViewerModule.h"
 #include "ClassViewerFilter.h"
 #include "Kismet2/KismetEditorUtilities.h"
@@ -118,4 +119,44 @@ UObject* UQuestEditorFactory::FactoryCreateNew(UClass* Class, UObject* InParent,
 	}
 }
 
+FQuestGraphEditorSummoner::FQuestGraphEditorSummoner(TSharedPtr<class FAssetEditor_QuestSystem> InQuestEditorPtr, FOnCreateGraphEditorWidget CreateGraphEditorWidgetCallback) : FDocumentTabFactoryForObjects<UEdGraph>(FQuestSystemAssetEditorTabs::ViewportID, InQuestEditorPtr)
+, QuestEditorPtr(InQuestEditorPtr)
+, OnCreateGraphEditorWidget(CreateGraphEditorWidgetCallback)
+{
+}
+
+void FQuestGraphEditorSummoner::OnTabActivated(TSharedPtr<SDockTab> Tab) const
+{
+}
+
+void FQuestGraphEditorSummoner::OnTabBackgrounded(TSharedPtr<SDockTab> Tab) const
+{
+}
+
+void FQuestGraphEditorSummoner::OnTabRefreshed(TSharedPtr<SDockTab> Tab) const
+{
+}
+
+void FQuestGraphEditorSummoner::SaveState(TSharedPtr<SDockTab> Tab, TSharedPtr<FTabPayload> Payload) const
+{
+}
+
+TSharedRef<SWidget> FQuestGraphEditorSummoner::CreateTabBodyForObject(const FWorkflowTabSpawnInfo& Info, UEdGraph* DocumentID) const
+{
+	check(Info.TabInfo.IsValid());
+	return OnCreateGraphEditorWidget.Execute(Info.TabInfo.ToSharedRef(), DocumentID);
+}
+
+const FSlateBrush* FQuestGraphEditorSummoner::GetTabIconForObject(const FWorkflowTabSpawnInfo& Info, UEdGraph* DocumentID) const
+{
+	return FAssetEditor_QuestSystem::GetGlyphForGraph(DocumentID, false);
+}
+
+
+
+
+
+
 #undef LOCTEXT_NAMESPACE
+
+
