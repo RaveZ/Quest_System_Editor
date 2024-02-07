@@ -50,17 +50,26 @@ public:
 	void ClearGraph();
 
 #if WITH_EDITORONLY_DATA
-	/** Set of pages that combine into a single uber-graph */
+	/** Set of quest-graph pages */
 	UPROPERTY()
 	TArray<TObjectPtr<UEdGraph>> QuestGraphPages;
 
-	UPROPERTY()
-		class UEdGraph* EdGraph;
 
 	UPROPERTY(EditDefaultsOnly, Category = "QuestSystemGraph")
 		bool bCanRenameNode;
 
 	UPROPERTY(EditDefaultsOnly, Category = "QuestSystemGraph")
 		bool bCanBeCyclical;
+
+	/** Set of documents that were being edited in this blueprint, so we can open them right away */
+	UPROPERTY()
+	TArray<struct FEditedDocumentInfo> LastEditedDocuments;
+
+	/** Whether or not this blueprint is newly created, and hasn't been opened in an editor yet */
+	UPROPERTY(transient)
+	bool bIsNewlyCreated = true;
 #endif
+
+	/** Get all graphs in this blueprint */
+	void GetAllGraphs(TArray<UEdGraph*>& Graphs) const;
 };

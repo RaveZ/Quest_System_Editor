@@ -1,7 +1,10 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
-
 #include "QuestSystemEditorUtils.h"
+
+
+
+#define LOCTEXT_NAMESPACE "QuestSystemEditorUtils"
 
 FQuestSystemEditorUtils::FQuestSystemEditorUtils()
 {
@@ -13,7 +16,36 @@ FQuestSystemEditorUtils::~FQuestSystemEditorUtils()
 
 FName FQuestSystemEditorUtils::FindUniqueQuestName(const UQuestSystemGraph* InQuestSystemGraph, const FString& InBaseName, UStruct* InScope)
 {
-	return FName();
+	// Start with the base name
+	FString UniqueName = InBaseName;
+
+	// Iterate through the quest graph pages until we find a unique name
+	for (int i = 0;; i++)
+	{
+		bool bIsUnique = true;
+
+		// Check if the current name already exists in the quest graph pages
+		for (int j = 0; j < InQuestSystemGraph->QuestGraphPages.Num(); j++)
+		{
+			FString FullName = InQuestSystemGraph->QuestGraphPages[j].GetFName().ToString();
+
+			// If the current name matches a quest graph page name, it's not unique
+			if (FullName == UniqueName)
+			{
+				bIsUnique = false;
+				break;
+			}
+		}
+
+		// If the current name is unique, return it
+		if (bIsUnique)
+		{
+			return FName(*UniqueName);
+		}
+
+		// If the current name is not unique, append a number to it and try again
+		UniqueName = FString::Printf(TEXT("%s_%d"), *InBaseName, i + 1);
+	}
 }
 
 UEdGraph* FQuestSystemEditorUtils::CreateNewGraph(UObject* ParentScope, const FName& GraphName, TSubclassOf<class UEdGraph> GraphClass, TSubclassOf<class UEdGraphSchema> SchemaClass)
@@ -33,16 +65,6 @@ UEdGraph* FQuestSystemEditorUtils::CreateNewGraph(UObject* ParentScope, const FN
 				// a function to an interface that conflicts with something in a class hierarchy
 				ExistingObject->Rename(nullptr, ExistingObject->GetOuter(), REN_DoNotDirty | REN_ForceNoResetLoaders);
 			}
-			else if (ExistingObject->IsA<UObjectRedirector>())
-			{
-				const UBlueprint* Blueprint = Cast<UBlueprint>(ParentScope);
-				if (Blueprint && Blueprint->BlueprintType == BPTYPE_MacroLibrary)
-				{
-					// When renaming a graph inside a macro library, we may have dropped a redirector after a previous
-					// rename (see RenameGraph). If we're now reusing it, move the redirector aside to free up the name.
-					ExistingObject->Rename(nullptr, GetTransientPackage(), REN_DontCreateRedirectors);
-				}
-			}
 		}
 
 		// Construct new graph with the supplied name
@@ -55,7 +77,9 @@ UEdGraph* FQuestSystemEditorUtils::CreateNewGraph(UObject* ParentScope, const FN
 		NewGraph = NewObject<UEdGraph>(ParentScope, GraphClass, NAME_None, RF_Transactional);
 	}
 
+
 	NewGraph->Schema = SchemaClass;
+	NewGraph->GetSchema()->CreateDefaultNodesForGraph(*NewGraph);
 
 	// Now move to where we want it to. Workaround to ensure transaction buffer is correctly utilized
 	if (bRename)
@@ -72,3 +96,22 @@ void FQuestSystemEditorUtils::AddQuestGraphPage(UQuestSystemGraph* QuestSystemGr
 	Graph->MarkPackageDirty();
 #endif	//#if WITH_EDITORONLY_DATA
 }
+
+
+UEdGraph* FQuestSystemEditorUtils::FindQuestGraph(const UQuestSystemGraph* QuestSystemGraph)
+{
+
+	for (UEdGraph* CurrentGraph : QuestSystemGraph->QuestGraphPages)
+	{
+		if (CurrentGraph->GetFName().ToString().Contains(TEXT("QuestGraph")))
+		{
+			UE_LOG(LogTemp, Warning, TEXT("Current graph name: %s"), *CurrentGraph->GetFName().ToString());
+			return CurrentGraph;
+		}
+	}
+
+	return nullptr;
+}
+
+
+#undef LOCTEXT_NAMESPACE

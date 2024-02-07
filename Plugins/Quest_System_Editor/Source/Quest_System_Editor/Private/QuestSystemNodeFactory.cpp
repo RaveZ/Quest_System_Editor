@@ -14,9 +14,5 @@ TSharedPtr<class SGraphNode> FQuestSystemNodeFactory::CreateNode(UEdGraphNode* N
 	{
 		return SNew(SGraphNode_QuestSystemNode, EdNode_GraphNode);
 	}
-	/*else if (UEdNode_QuestSystemEdge* EdNode_Edge = Cast<UEdNode_QuestSystemEdge>(Node))
-	{
-		return SNew(SGraphNode_QuestSystemEdge, EdNode_Edge);
-	}*/
 	return nullptr;
 }

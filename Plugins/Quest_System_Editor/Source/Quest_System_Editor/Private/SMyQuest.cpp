@@ -5,8 +5,9 @@
 #include "Framework/Commands/GenericCommands.h"
 #include "GraphEditorActions.h"
 #include "SGraphActionMenu.h"
-#include "AssetGraphSchema_QuestSystem.h"
 #include "SGraphPalette.h"
+#include "QuestSystemEditorUtils.h"
+#include "Quest_System_EditorCommands.h"
 #include "Widgets/Input/SSearchBox.h"
 #include "Quest_System_EditorCommands.h"
 #include "SlateOptMacros.h"
@@ -21,15 +22,7 @@ void FMyQuestCommands::RegisterCommands()
 	UI_COMMAND(OpenExternalGraph, "Open External Graph", "Opens up this external graph's graph panel in its own asset editor", EUserInterfaceActionType::Button, FInputChord());
 	UI_COMMAND(FocusNode, "Focus", "Focuses on the associated node", EUserInterfaceActionType::Button, FInputChord());
 	UI_COMMAND(FocusNodeInNewTab, "Focus in New Tab", "Focuses on the associated node in a new tab", EUserInterfaceActionType::Button, FInputChord());
-	UI_COMMAND(ImplementFunction, "Implement event", "Implements this overridable function as a new event.", EUserInterfaceActionType::Button, FInputChord());
 	UI_COMMAND(DeleteEntry, "Delete", "Deletes this function or variable from this blueprint.", EUserInterfaceActionType::Button, FInputChord(EKeys::Platform_Delete));
-	UI_COMMAND(PasteVariable, "Paste Variable", "Pastes the variable to this blueprint.", EUserInterfaceActionType::Button, FInputChord());
-	UI_COMMAND(PasteLocalVariable, "Paste Local Variable", "Pastes the variable to this scope.", EUserInterfaceActionType::Button, FInputChord());
-	UI_COMMAND(PasteFunction, "Paste Function", "Pastes the function to this blueprint.", EUserInterfaceActionType::Button, FInputChord());
-	UI_COMMAND(PasteMacro, "Paste Macro", "Pastes the macro to this blueprint.", EUserInterfaceActionType::Button, FInputChord());
-	UI_COMMAND(GotoNativeVarDefinition, "Goto Code Definition", "Goto the native code definition of this variable", EUserInterfaceActionType::Button, FInputChord());
-	UI_COMMAND(MoveVariableToParent, "Move to Parent Class", "Moves the variable to its parent class", EUserInterfaceActionType::Button, FInputChord());
-	UI_COMMAND(MoveFunctionToParent, "Move to Parent Class", "Moves the function to its parent class", EUserInterfaceActionType::Button, FInputChord());
 }
 
 BEGIN_SLATE_FUNCTION_BUILD_OPTIMIZATION
@@ -86,24 +79,6 @@ void SMyQuest::Construct(const FArguments& InArgs, TWeakPtr<FAssetEditor_QuestSy
 			FCanExecuteAction::CreateSP(this, &SMyQuest::CanDuplicateAction),
 			FIsActionChecked(),
 			FIsActionButtonVisible::CreateSP(this, &SMyQuest::IsDuplicateActionVisible));
-
-		CommandList->MapAction(FMyQuestCommands::Get().MoveVariableToParent,
-			FExecuteAction::CreateSP(this, &SMyQuest::OnMoveToParent),
-			FCanExecuteAction(),
-			FIsActionChecked(),
-			FIsActionButtonVisible::CreateSP(this, &SMyQuest::CanMoveVariableToParent));
-
-		CommandList->MapAction(FMyQuestCommands::Get().MoveFunctionToParent,
-			FExecuteAction::CreateSP(this, &SMyQuest::OnMoveToParent),
-			FCanExecuteAction(),
-			FIsActionChecked(),
-			FIsActionButtonVisible::CreateSP(this, &SMyQuest::CanMoveFunctionToParent));
-
-		CommandList->MapAction(FMyQuestCommands::Get().GotoNativeVarDefinition,
-			FExecuteAction::CreateSP(this, &SMyQuest::GotoNativeCodeVarDefinition),
-			FCanExecuteAction(),
-			FIsActionChecked(),
-			FIsActionButtonVisible::CreateSP(this, &SMyQuest::IsNativeVariable));
 
 		ToolbarBuilderWidget = SNullWidget::NullWidget;
 
@@ -210,13 +185,13 @@ void SMyQuest::Construct(const FArguments& InArgs, TWeakPtr<FAssetEditor_QuestSy
 
 	GraphActionMenu->SetSectionExpansion(ExpandedSections);
 
-	//FCoreUObjectDelegates::OnObjectPropertyChanged.AddRaw(this, &SMyQuest::OnObjectPropertyChanged);
+	FCoreUObjectDelegates::OnObjectPropertyChanged.AddRaw(this, &SMyQuest::OnObjectPropertyChanged);
 
 }
 
 SMyQuest::~SMyQuest()
 {
-
+	FCoreUObjectDelegates::OnObjectPropertyChanged.RemoveAll(this);
 }
 void SMyQuest::Tick(const FGeometry& AllottedGeometry, const double InCurrentTime, const float InDeltaTime)
 {
@@ -227,12 +202,43 @@ void SMyQuest::Tick(const FGeometry& AllottedGeometry, const double InCurrentTim
 		Refresh();
 	}
 }
+
 FReply SMyQuest::OnKeyDown(const FGeometry& MyGeometry, const FKeyEvent& InKeyEvent)
 {
-	return FReply::Handled();
+	if (CommandList.IsValid() && CommandList->ProcessCommandBindings(InKeyEvent))
+	{
+		return FReply::Handled();
+	}
+	return FReply::Unhandled();
+}
+
+template<class SchemaActionType> SchemaActionType* SelectionAsType(const TSharedPtr< SGraphActionMenu >& GraphActionMenu)
+{
+	TArray<TSharedPtr<FEdGraphSchemaAction> > SelectedActions;
+	GraphActionMenu->GetSelectedActions(SelectedActions);
+
+	SchemaActionType* Selection = NULL;
+
+	TSharedPtr<FEdGraphSchemaAction> SelectedAction(SelectedActions.Num() > 0 ? SelectedActions[0] : NULL);
+	if (SelectedAction.IsValid() &&
+		SelectedAction->GetTypeId() == SchemaActionType::StaticGetTypeId())
+	{
+		// TODO Why not? StaticCastSharedPtr<>()
+
+		Selection = (SchemaActionType*)SelectedActions[0].Get();
+	}
+
+	return Selection;
+}
+
+FAssetSchemaAction_QuestSystemGraph* SMyQuest::SelectionAsGraph() const
+{
+	return SelectionAsType<FAssetSchemaAction_QuestSystemGraph>(GraphActionMenu);
 }
 void SMyQuest::OnRequestRenameOnActionNode()
 {
+	// Attempt to rename in both menus, only one of them will have anything selected
+	GraphActionMenu->OnRequestRenameOnActionNode();
 }
 void SMyQuest::OnPasteGeneric()
 {
@@ -250,6 +256,12 @@ void SMyQuest::Refresh()
 
 	GraphActionMenu->RefreshAllActions(/*bPreserveExpansion=*/ true);
 }
+
+bool SMyQuest::SelectionIsCategory() const
+{
+	return !SelectionHasContextMenu();
+}
+
 
 TSharedRef<SWidget> SMyQuest::OnCreateWidgetForAction(FCreateWidgetForActionData* const InCreateData)
 {
@@ -308,8 +320,17 @@ FReply SMyQuest::OnCategoryDragged(const FText& InCategory, const FPointerEvent&
 {
 	return FReply::Handled();
 }
+void SMyQuest::OnActionSelected(const TArray<TSharedPtr<FEdGraphSchemaAction>>& InActions)
+{
+	TSharedPtr<FAssetEditor_QuestSystem> QuestEditor = QuestEditorPtr.Pin();
+	QuestEditor->PropertyWidget->SetObject(GetQuestSystemObj());
+}
 void SMyQuest::OnGlobalActionSelected(const TArray<TSharedPtr<FEdGraphSchemaAction>>& InActions, ESelectInfo::Type InSelectionType)
 {
+	if (InSelectionType == ESelectInfo::OnMouseClick || InSelectionType == ESelectInfo::OnKeyPress || InSelectionType == ESelectInfo::OnNavigation || InActions.Num() == 0)
+	{
+		OnActionSelected(InActions);
+	}
 }
 void SMyQuest::OnActionDoubleClicked(const TArray<TSharedPtr<FEdGraphSchemaAction>>& InActions)
 {
@@ -344,7 +365,75 @@ void SMyQuest::ExecuteAction(TSharedPtr<FEdGraphSchemaAction> InAction)
 }
 TSharedPtr<SWidget> SMyQuest::OnContextMenuOpening()
 {
-	return SNew(SBox);
+	if (!QuestEditorPtr.IsValid())
+	{
+		return TSharedPtr<SWidget>();
+	}
+
+	const bool bShouldCloseWindowAfterMenuSelection = true;
+	FMenuBuilder MenuBuilder(bShouldCloseWindowAfterMenuSelection, CommandList);
+
+	// Check if the selected action is valid for a context menu
+	if (SelectionHasContextMenu())
+	{
+		MenuBuilder.BeginSection("BasicOperations");
+		{
+			MenuBuilder.AddMenuEntry(FMyQuestCommands::Get().OpenGraph);
+			MenuBuilder.AddMenuEntry(FMyQuestCommands::Get().OpenGraphInNewTab);
+			MenuBuilder.AddMenuEntry(FMyQuestCommands::Get().OpenExternalGraph);
+			MenuBuilder.AddMenuEntry(FMyQuestCommands::Get().FocusNode);
+			MenuBuilder.AddMenuEntry(FMyQuestCommands::Get().FocusNodeInNewTab);
+			MenuBuilder.AddMenuEntry(FGenericCommands::Get().Rename, NAME_None, LOCTEXT("Rename", "Rename"), LOCTEXT("Rename_Tooltip", "Renames this function or variable from blueprint."));
+			MenuBuilder.AddMenuEntry(FGenericCommands::Get().Cut);
+			MenuBuilder.AddMenuEntry(FGenericCommands::Get().Copy);
+			MenuBuilder.AddMenuEntry(FGenericCommands::Get().Duplicate);
+			MenuBuilder.AddMenuEntry(FMyQuestCommands::Get().DeleteEntry);
+		}
+		MenuBuilder.EndSection();
+
+		FAssetSchemaAction_QuestSystemGraph* Graph = SelectionAsGraph();
+
+		//if (Var && BlueprintEditorPtr.IsValid() && FBlueprintEditorUtils::DoesSupportEventGraphs(GetBlueprintObj()))
+		//{
+		//	FObjectProperty* ComponentProperty = CastField<FObjectProperty>(Var->GetProperty());
+
+		//	if (ComponentProperty && ComponentProperty->PropertyClass &&
+		//		ComponentProperty->PropertyClass->IsChildOf(UActorComponent::StaticClass()))
+		//	{
+		//		if (FBlueprintEditorUtils::CanClassGenerateEvents(ComponentProperty->PropertyClass))
+		//		{
+		//			TSharedPtr<FBlueprintEditor> BlueprintEditor(BlueprintEditorPtr.Pin());
+
+		//			// If the selected item is valid, and is a component of some sort, build a context menu
+		//			// of events appropriate to the component.
+		//			MenuBuilder.AddSubMenu(LOCTEXT("AddEventSubMenu", "Add Event"),
+		//				LOCTEXT("AddEventSubMenu_ToolTip", "Add Event"),
+		//				FNewMenuDelegate::CreateStatic(&SSubobjectBlueprintEditor::BuildMenuEventsSection,
+		//					BlueprintEditor->GetBlueprintObj(), ComponentProperty->PropertyClass,
+		//					FCanExecuteAction::CreateRaw(this, &SMyBlueprint::IsEditingMode),
+		//					FGetSelectedObjectsDelegate::CreateSP(this, &SMyBlueprint::GetSelectedItemsForContextMenu)));
+		//		}
+		//	}
+		//}
+		
+	}
+	else
+	{
+		BuildAddNewMenu(MenuBuilder);
+	}
+
+	return MenuBuilder.MakeWidget();
+}
+void SMyQuest::BuildAddNewMenu(FMenuBuilder& MenuBuilder)
+{
+	MenuBuilder.BeginSection("AddNewItem", LOCTEXT("AddOperations", "Add New"));
+
+	if (UQuestSystemGraph* CurrentBlueprint = GetQuestSystemObj())
+	{
+		MenuBuilder.AddMenuEntry(FQuest_System_EditorCommands::Get().AddNewQuestGraph);
+		
+	}
+	MenuBuilder.EndSection();
 }
 TSharedRef<SWidget> SMyQuest::CreateAddToSectionButton(int32 InSectionID, TWeakPtr<SWidget> WeakRowWidget, FText AddNewText, FName MetaDataTag)
 {
@@ -369,6 +458,7 @@ bool SMyQuest::CanRequestRenameOnActionNode(TWeakPtr<struct FGraphActionNode> In
 {
 	return false;
 }
+
 FText SMyQuest::OnGetSectionTitle(int32 InSectionID)
 {
 	FText SeperatorTitle;
@@ -428,16 +518,18 @@ bool SMyQuest::HandleActionMatchesName(FEdGraphSchemaAction* InAction, const FNa
 }
 void SMyQuest::OnOpenGraph()
 {
+	OpenGraph(FDocumentTracker::OpenNewDocument);
 }
 void SMyQuest::OnOpenGraphInNewTab()
 {
+	OpenGraph(FDocumentTracker::ForceOpenNewDocument);
 }
 void SMyQuest::OnOpenExternalGraph()
 {
 }
 bool SMyQuest::CanOpenGraph() const
 {
-	return false;
+	return true;
 }
 bool SMyQuest::CanOpenExternalGraph() const
 {
@@ -462,6 +554,14 @@ bool SMyQuest::CanDeleteEntry() const
 }
 bool SMyQuest::CanRequestRenameOnActionNode() const
 {
+	TArray<TSharedPtr<FEdGraphSchemaAction> > SelectedActions;
+	GraphActionMenu->GetSelectedActions(SelectedActions);
+
+	// If there is anything selected in the GraphActionMenu, check the item for if it can be renamed.
+	if (SelectedActions.Num() || SelectionIsCategory())
+	{
+		return GraphActionMenu->CanRequestRenameOnActionNode();
+	}
 	return false;
 }
 bool SMyQuest::IsDuplicateActionVisible() const
@@ -475,26 +575,12 @@ bool SMyQuest::CanDuplicateAction() const
 void SMyQuest::OnDuplicateAction()
 {
 }
-void SMyQuest::GotoNativeCodeVarDefinition()
-{
-}
-bool SMyQuest::IsNativeVariable() const
-{
-	return false;
-}
-void SMyQuest::OnMoveToParent()
-{
-}
-bool SMyQuest::CanMoveVariableToParent() const
-{
-	return false;
-}
-bool SMyQuest::CanMoveFunctionToParent() const
-{
-	return false;
-}
+
+
+
 void SMyQuest::OnCopy()
 {
+	
 }
 bool SMyQuest::CanCopy() const
 {
@@ -506,6 +592,40 @@ void SMyQuest::OnCut()
 bool SMyQuest::CanCut() const
 {
 	return false;
+}
+
+void SMyQuest::OpenGraph(FDocumentTracker::EOpenDocumentCause InCause, bool bOpenExternalGraphInNewEditor)
+{
+	UEdGraph* GraphToOpen = nullptr;
+
+	if (FAssetSchemaAction_QuestSystemGraph* GraphAction = SelectionAsGraph())
+	{
+		GraphToOpen = GraphAction->EdGraph;
+		// If we have no graph then this is an interface event, so focus on the event graph
+		/*if (!GraphToOpen)
+		{
+			GraphToOpen = FQuestSystemEditorUtils::FindQuestGraph(GetQuestSystemObj());
+		}*/
+	}
+
+	if (GraphToOpen)
+	{
+		if (bOpenExternalGraphInNewEditor )
+		{
+			QuestEditorPtr.Pin()->JumpToHyperlink(GraphToOpen, false);
+		}
+		else
+		{
+			QuestEditorPtr.Pin()->OpenDocument(GraphToOpen, InCause);
+		}
+	}
+}
+
+bool SMyQuest::SelectionHasContextMenu() const
+{
+	TArray<TSharedPtr<FEdGraphSchemaAction> > SelectedActions;
+	GraphActionMenu->GetSelectedActions(SelectedActions);
+	return SelectedActions.Num() > 0;
 }
 
 void SMyQuest::OnObjectPropertyChanged(UObject* InObject, FPropertyChangedEvent& InPropertyChangedEvent)

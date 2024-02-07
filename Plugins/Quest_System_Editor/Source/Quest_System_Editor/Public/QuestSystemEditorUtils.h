@@ -39,4 +39,7 @@ public:
 
 	/** Adds an questgraph page to this Quest Editor */
 	static void AddQuestGraphPage(UQuestSystemGraph* InQuestSystemGraph, class UEdGraph* Graph);
+
+	/** Returns the event graph, if any */
+	static UEdGraph* FindQuestGraph(const UQuestSystemGraph* QuestSystemGraph);
 };

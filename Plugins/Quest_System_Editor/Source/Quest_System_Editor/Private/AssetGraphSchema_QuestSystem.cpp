@@ -297,6 +297,7 @@ void UAssetGraphSchema_QuestSystem::GetContextMenuActions(UToolMenu* Menu, UGrap
 	{
 		{
 			FToolMenuSection& Section = Menu->AddSection("GenericGraphAssetGraphSchemaNodeActions", LOCTEXT("ClassActionsMenuHeader", "Node Actions"));
+			Section.AddMenuEntry(FGenericCommands::Get().Rename);
 			Section.AddMenuEntry(FGenericCommands::Get().Delete);
 			Section.AddMenuEntry(FGenericCommands::Get().Cut);
 			Section.AddMenuEntry(FGenericCommands::Get().Copy);

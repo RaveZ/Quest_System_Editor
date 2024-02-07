@@ -13,7 +13,6 @@ UQuestSystemGraph::UQuestSystemGraph()
 
 	bEdgeEnabled = false;
 #if WITH_EDITORONLY_DATA
-	EdGraph = nullptr;
 
 	bCanRenameNode = true;
 #endif
@@ -132,6 +131,24 @@ void UQuestSystemGraph::ClearGraph()
 
 	AllNodes.Empty();
 	RootNodes.Empty();
+}
+
+void UQuestSystemGraph::GetAllGraphs(TArray<UEdGraph*>& Graphs) const
+{
+#if WITH_EDITORONLY_DATA
+	
+
+	for (int32 i = 0; i < QuestGraphPages.Num(); ++i)
+	{
+		UEdGraph* Graph = QuestGraphPages[i];
+		if (Graph)
+		{
+			Graphs.Add(Graph);
+			Graph->GetAllChildrenGraphs(Graphs);
+		}
+	}
+	
+#endif // WITH_EDITORONLY_DATA
 }
 
 #undef LOCTEXT_NAMESPACE

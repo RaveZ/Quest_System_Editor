@@ -127,18 +127,37 @@ FQuestGraphEditorSummoner::FQuestGraphEditorSummoner(TSharedPtr<class FAssetEdit
 
 void FQuestGraphEditorSummoner::OnTabActivated(TSharedPtr<SDockTab> Tab) const
 {
+	TSharedRef<SGraphEditor> GraphEditor = StaticCastSharedRef<SGraphEditor>(Tab->GetContent());
+	QuestEditorPtr.Pin()->OnGraphEditorFocused(GraphEditor);
 }
 
 void FQuestGraphEditorSummoner::OnTabBackgrounded(TSharedPtr<SDockTab> Tab) const
 {
+	TSharedRef<SGraphEditor> GraphEditor = StaticCastSharedRef<SGraphEditor>(Tab->GetContent());
+	QuestEditorPtr.Pin()->OnGraphEditorBackgrounded(GraphEditor);
 }
 
 void FQuestGraphEditorSummoner::OnTabRefreshed(TSharedPtr<SDockTab> Tab) const
 {
+	TSharedRef<SGraphEditor> GraphEditor = StaticCastSharedRef<SGraphEditor>(Tab->GetContent());
+	GraphEditor->NotifyGraphChanged();
 }
 
 void FQuestGraphEditorSummoner::SaveState(TSharedPtr<SDockTab> Tab, TSharedPtr<FTabPayload> Payload) const
 {
+	TSharedRef<SGraphEditor> GraphEditor = StaticCastSharedRef<SGraphEditor>(Tab->GetContent());
+
+	FVector2D ViewLocation;
+	float ZoomAmount;
+	GraphEditor->GetViewLocation(ViewLocation, ZoomAmount);
+
+	UEdGraph* Graph = Payload->IsValid() ? FTabPayload_UObject::CastChecked<UEdGraph>(Payload) : nullptr;
+
+	if (Graph && QuestEditorPtr.Pin()->IsGraphInCurrentQuestGraph(Graph))
+	{
+		// Don't save references to external graphs.
+		QuestEditorPtr.Pin()->GetQuestSystemObj()->LastEditedDocuments.Add(FEditedDocumentInfo(Graph, ViewLocation, ZoomAmount));
+	}
 }
 
 TSharedRef<SWidget> FQuestGraphEditorSummoner::CreateTabBodyForObject(const FWorkflowTabSpawnInfo& Info, UEdGraph* DocumentID) const

@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "SGraphActionMenu.h"
+#include "AssetGraphSchema_QuestSystem.h"
 #include "Widgets/SCompoundWidget.h"
 #include "AssetEditor_QuestSystem.h"
 
@@ -28,15 +29,7 @@ public:
 	TSharedPtr<FUICommandInfo> OpenExternalGraph;
 	TSharedPtr<FUICommandInfo> FocusNode;
 	TSharedPtr<FUICommandInfo> FocusNodeInNewTab;
-	TSharedPtr<FUICommandInfo> ImplementFunction;
 	TSharedPtr<FUICommandInfo> DeleteEntry;
-	TSharedPtr<FUICommandInfo> PasteVariable;
-	TSharedPtr<FUICommandInfo> PasteLocalVariable;
-	TSharedPtr<FUICommandInfo> PasteFunction;
-	TSharedPtr<FUICommandInfo> PasteMacro;
-	TSharedPtr<FUICommandInfo> GotoNativeVarDefinition;
-	TSharedPtr<FUICommandInfo> MoveVariableToParent;
-	TSharedPtr<FUICommandInfo> MoveFunctionToParent;
 	// Add New Item
 	/** Initialize commands */
 	virtual void RegisterCommands() override;
@@ -58,6 +51,9 @@ public:
 	virtual void Tick(const FGeometry& AllottedGeometry, const double InCurrentTime, const float InDeltaTime);
 	virtual FReply OnKeyDown(const FGeometry& MyGeometry, const FKeyEvent& InKeyEvent);
 
+	/** Accessor for getting the current selection as a Quest graph */
+	FAssetSchemaAction_QuestSystemGraph* SelectionAsGraph() const;
+
 	/** Accessor the blueprint object from the main editor */
 	UQuestSystemGraph* GetQuestSystemObj() const { return QuestSystemGraph; }
 
@@ -71,6 +67,12 @@ public:
 	/** Refreshes the graph action menu */
 	void Refresh();
 	void SetFocusedGraph(UEdGraph* InEdGraph) { EdGraph = InEdGraph; }
+
+	/** Accessor for determining if the current selection is a category*/
+	bool SelectionIsCategory() const;
+
+	
+
 private:
 	/** Creates widgets for the graph schema actions */
 	TSharedRef<SWidget> OnCreateWidgetForAction(struct FCreateWidgetForActionData* const InCreateData);
@@ -78,15 +80,13 @@ private:
 	/** Callback used to populate all actions list in SGraphActionMenu */
 	void CollectAllActions(FGraphActionListBuilderBase& OutAllActions);
 	void CollectStaticSections(TArray<int32>& StaticSectionIDs);
-	//void AddEventForFunctionGraph(UEdGraph* EdGraph, int32 const SectionId, FGraphActionSort& SortList, const FText& ParentCategory = FText::GetEmpty(), bool bAddChildGraphs = true) const;
 	//void GetChildGraphs(UEdGraph* EdGraph, int32 const SectionId, FGraphActionSort& SortList, const FText& ParentCategory = FText::GetEmpty()) const;
 	//void GetChildEvents(UEdGraph const* EdGraph, int32 const SectionId, FGraphActionSort& SortList, const FText& ParentCategory = FText::GetEmpty(), bool bInAddChildGraphs = true) const;
-	//void GetLocalVariables(FGraphActionSort& SortList) const;
-
+	
 	/** Callbacks for the graph action menu */
 	FReply OnActionDragged(const TArray< TSharedPtr<FEdGraphSchemaAction> >& InActions, const FPointerEvent& MouseEvent);
 	FReply OnCategoryDragged(const FText& InCategory, const FPointerEvent& MouseEvent);
-	//void OnActionSelected(const TArray< TSharedPtr<FEdGraphSchemaAction> >& InActions);
+	void OnActionSelected(const TArray< TSharedPtr<FEdGraphSchemaAction> >& InActions);
 	//void OnActionSelectedHelper(TSharedPtr<FEdGraphSchemaAction> InAction, TWeakPtr<FAssetEditor_QuestSystem> InQuestEditor, UQuestSystemGraph* InQuestSystemGraph, TSharedRef<SKismetInspector> Inspector);
 	void OnGlobalActionSelected(const TArray< TSharedPtr<FEdGraphSchemaAction> >& InActions, ESelectInfo::Type InSelectionType);
 	void OnActionDoubleClicked(const TArray< TSharedPtr<FEdGraphSchemaAction> >& InActions);
@@ -94,7 +94,7 @@ private:
 	TSharedPtr<SWidget> OnContextMenuOpening();
 
 	//TSharedRef<SWidget> CreateAddNewMenuWidget();
-	//void BuildAddNewMenu(FMenuBuilder& MenuBuilder);
+	void BuildAddNewMenu(FMenuBuilder& MenuBuilder);
 	TSharedRef<SWidget> CreateAddToSectionButton(int32 InSectionID, TWeakPtr<SWidget> WeakRowWidget, FText AddNewText, FName MetaDataTag);
 
 	void OnCategoryNameCommitted(const FText& InNewText, ETextCommit::Type InTextCommit, TWeakPtr< struct FGraphActionNode > InAction);
@@ -124,16 +124,16 @@ private:
 	bool IsDuplicateActionVisible() const;
 	bool CanDuplicateAction() const;
 	void OnDuplicateAction();
-	void GotoNativeCodeVarDefinition();
-	bool IsNativeVariable() const;
-	void OnMoveToParent();
-	bool CanMoveVariableToParent() const;
-	bool CanMoveFunctionToParent() const;
 	void OnCopy();
 	bool CanCopy() const;
 	void OnCut();
 	bool CanCut() const;
 
+	/** Helper function to open the selected graph */
+	void OpenGraph(FDocumentTracker::EOpenDocumentCause InCause, bool bOpenExternalGraphInNewEditor = false);
+
+	/** Checks if the selected action has context menu */
+	bool SelectionHasContextMenu() const;
 
 	/** Delegate to hook us into non-structural Blueprint object post-change events */
 	void OnObjectPropertyChanged(UObject* InObject, FPropertyChangedEvent& InPropertyChangedEvent);

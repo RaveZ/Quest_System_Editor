@@ -131,6 +131,28 @@ public:
 	// Finds any open tabs containing the specified document and adds them to the specified array; returns true if at least one is found
 	bool FindOpenTabsContainingDocument(const UObject* DocumentID, /*inout*/ TArray< TSharedPtr<SDockTab> >& Results);
 
+	/** Create new tab for each element of LastEditedObjects array */
+	void InitializeDocumentTab();
+
+	/**	Returns whether the editor is currently editing a single Quest object */
+	bool IsEditingSingleQuestGraph() const;
+
+	/**
+	 * Returns the currently focused graph in the Quest editor
+	 */
+	UEdGraph* GetFocusedGraph() const;
+
+	/** Returns the currently selected node if there is a single node selected (if there are multiple nodes selected or none selected, it will return nullptr) */
+	UEdGraphNode* GetSingleSelectedNode() const;
+
+	/** Called when graph editor focus is changed */
+	virtual void OnGraphEditorFocused(const TSharedRef<class SGraphEditor>& InGraphEditor);
+
+	/** Called when the graph editor tab is backgrounded */
+	virtual void OnGraphEditorBackgrounded(const TSharedRef<SGraphEditor>& InGraphEditor);
+
+	/** Checks to see if the provided graph is contained within the current QuestSystemGraph */
+	bool IsGraphInCurrentQuestGraph(const UEdGraph* InGraph) const;
 private:
 	/** Helper to move focused graph when clicking on graph breadcrumb */
 	void OnChangeBreadCrumbGraph(class UEdGraph* InGraph);
@@ -150,7 +172,6 @@ protected:
 	
 	void BindCommands();
 
-	void CreateEdGraph();
 
 	void CreateCommandList();
 	
@@ -205,10 +226,14 @@ protected:
 #endif // #else // #if ENGINE_MAJOR_VERSION < 5
 
 public:
+
 	TSharedPtr<FDocumentTracker> DocumentManager;
+	TSharedPtr<class IDetailsView> PropertyWidget;
+
 protected:
+
 	/** Factory that spawns graph editors; used to look up all tabs spawned by it. */
-	TWeakPtr<FDocumentTabFactory> GraphEditorTabFactoryPtr;
+	TWeakPtr<FDocumentTabFactory> QuestEditorTabFactoryPtr;
 
 	UQuestEditorSettings* QuestGraphEditorSettings;
 
@@ -220,13 +245,14 @@ protected:
 	/** Handle to the registered OnPackageSave delegate */
 	FDelegateHandle OnPackageSavedDelegateHandle;
 
+	/** Currently focused graph editor */
 	TSharedPtr<SGraphEditor> ViewportWidget;
-	TSharedPtr<class IDetailsView> PropertyWidget;
 	TSharedPtr<class IDetailsView> EditorSettingsWidget;
 	TSharedPtr<class SMyQuest> MyQuestWidget;
 
 	/** The command list for this editor */
 	TSharedPtr<FUICommandList> GraphEditorCommands;
+
 
 
 };

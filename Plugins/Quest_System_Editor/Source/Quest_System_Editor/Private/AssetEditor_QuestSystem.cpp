@@ -70,11 +70,13 @@ FAssetEditor_QuestSystem::~FAssetEditor_QuestSystem()
 void FAssetEditor_QuestSystem::InitQuestSystemGraphAssetEditor(const EToolkitMode::Type Mode, const TSharedPtr<IToolkitHost>& InitToolkitHost, UQuestSystemGraph* Graph)
 {
 	EditingGraph = Graph;
-	CreateEdGraph();
 	FGenericCommands::Register();
 	FGraphEditorCommands::Register();
 	FMyQuestCommands::Register();
 	FQuest_System_EditorCommands::Register();
+
+	
+
 
 	if (!ToolbarBuilder.IsValid())
 	{
@@ -141,6 +143,21 @@ void FAssetEditor_QuestSystem::InitQuestSystemGraphAssetEditor(const EToolkitMod
 	FAssetEditorToolkit::InitAssetEditor(Mode, InitToolkitHost, GenericGraphEditorAppName, StandaloneDefaultLayout, bCreateDefaultStandaloneMenu, bCreateDefaultToolbar, EditingGraph, false);
 	CommonInitialization(Graph, true);
 	RegenerateMenusAndToolbars();
+	//InitializeDocumentTab();
+
+	if (Graph->bIsNewlyCreated)
+	{
+		NewDocument_OnClicked(CGT_NewQuestGraph);
+		Graph->bIsNewlyCreated = false;
+	}
+	else
+	{
+		if (GetQuestSystemObj()->QuestGraphPages.Num() > 0)
+		{
+			OpenDocument(GetQuestSystemObj()->QuestGraphPages[0], FDocumentTracker::OpenNewDocument);
+		}
+	}
+	
 }
 
 void FAssetEditor_QuestSystem::CommonInitialization(const UQuestSystemGraph* Graph, bool bShouldOpenInDefaultsMode)
@@ -159,7 +176,7 @@ void FAssetEditor_QuestSystem::CommonInitialization(const UQuestSystemGraph* Gra
 		));
 
 		// Also store off a reference to the grapheditor factory so we can find all the tabs spawned by it later.
-		GraphEditorTabFactoryPtr = GraphEditorFactory;
+		QuestEditorTabFactoryPtr = GraphEditorFactory;
 		DocumentManager->RegisterDocumentFactory(GraphEditorFactory);
 	}
 
@@ -211,18 +228,7 @@ void FAssetEditor_QuestSystem::UnregisterTabSpawners(const TSharedRef<FTabManage
 
 
 
-void FAssetEditor_QuestSystem::CreateEdGraph()
-{
-	if (EditingGraph->EdGraph == nullptr)
-	{
-		EditingGraph->EdGraph = CastChecked<UEdGraph_QuestSystemGraph>(FBlueprintEditorUtils::CreateNewGraph(EditingGraph, NAME_None, UEdGraph_QuestSystemGraph::StaticClass(), UAssetGraphSchema_QuestSystem::StaticClass()));
-		EditingGraph->EdGraph->bAllowDeletion = false;
 
-		// Give the schema a chance to fill out any required nodes (like the results node)
-		const UEdGraphSchema* Schema = EditingGraph->EdGraph->GetSchema();
-		Schema->CreateDefaultNodesForGraph(*EditingGraph->EdGraph);
-	}
-}
 
 void FAssetEditor_QuestSystem::BindCommands()
 {
@@ -258,7 +264,7 @@ void FAssetEditor_QuestSystem::CreateCommandList()
 	// however it should be safe, since commands are being used only within this editor
 	// if it ever crashes, this function will have to go away and be reimplemented in each derived class
 
-	ToolkitCommands->MapAction(FQuest_System_EditorCommands::Get().AddNewQuestGraph,
+	GraphEditorCommands->MapAction(FQuest_System_EditorCommands::Get().AddNewQuestGraph,
 		FExecuteAction::CreateSP(this, &FAssetEditor_QuestSystem::NewDocument_OnClicked, CGT_NewQuestGraph),
 		FCanExecuteAction::CreateSP(this, &FAssetEditor_QuestSystem::InEditingMode),
 		FIsActionChecked(),
@@ -396,22 +402,11 @@ void FAssetEditor_QuestSystem::AddToSelection(UEdGraphNode* InNode)
 void FAssetEditor_QuestSystem::JumpToHyperlink(const UObject* ObjectReference, bool bRequestRename)
 {
 	//SetCurrentMode(FBlueprintEditorApplicationModes::StandardBlueprintEditorMode);
-	if (const UEdGraphNode* Node = Cast<const UEdGraphNode>(ObjectReference))
-	{
-		if (bRequestRename)
-		{
-			//IsNodeTitleVisible(Node, bRequestRename);
-		}
-		else
-		{
-			//JumpToNode(Node, false);
-		}
-	}
-	else if (const UEdGraph* Graph = Cast<const UEdGraph>(ObjectReference))
+	if (const UEdGraph* Graph = Cast<const UEdGraph>(ObjectReference))
 	{
 		// Navigating into things should re-use the current tab when it makes sense
 		FDocumentTracker::EOpenDocumentCause OpenMode = FDocumentTracker::OpenNewDocument;
-		if ((Graph->GetSchema()->GetGraphType(Graph) == GT_Ubergraph) /*|| Cast<UK2Node>(Graph->GetOuter())*/ || Cast<UEdGraph>(Graph->GetOuter()))
+		if ((Graph->GetSchema()->GetGraphType(Graph) == GT_Ubergraph) /*|| Cast<UK2Node>(Graph->GetOuter())*/ || Cast<UEdGraph>(Graph-> GetOuter()))
 		{
 			// Ubergraphs directly reuse the current graph
 			OpenMode = FDocumentTracker::NavigatingCurrentDocument;
@@ -497,13 +492,20 @@ void FAssetEditor_QuestSystem::RegisterToolbarTab(const TSharedRef<class FTabMan
 
 void FAssetEditor_QuestSystem::AddReferencedObjects(FReferenceCollector& Collector)
 {
+	if (GetObjectsCurrentlyBeingEdited()->Num() > 0)
+	{
+		TArray<UObject*>& LocalEditingObjects = const_cast<TArray<UObject*>&>(GetEditingObjects());
+
+		Collector.AddReferencedObjects(LocalEditingObjects);
+	}
+
 	Collector.AddReferencedObject(EditingGraph);
-	Collector.AddReferencedObject(EditingGraph->EdGraph);
 }
 
 UQuestSystemGraph* FAssetEditor_QuestSystem::GetQuestSystemObj() const
 {
 	return EditingGraph;
+	//return GetEditingObjects().Num() == 1 ? Cast<UQuestSystemGraph>(GetEditingObjects()[0]) : nullptr;
 }
 
 bool FAssetEditor_QuestSystem::NewDocument_IsVisibleForType(ECreatedQuestDocumentType GraphType) const
@@ -519,7 +521,7 @@ void FAssetEditor_QuestSystem::NewDocument_OnClicked(ECreatedQuestDocumentType G
 	switch (GraphType)
 	{
 	case CGT_NewQuestGraph:
-		DocumentNameText = LOCTEXT("NewDocEventGraphName", "NewEventGraph");
+		DocumentNameText = LOCTEXT("NewDocQuestGraphName", "NewQuestGraph");
 		bResetMyBlueprintFilter = true;
 		break;
 	
@@ -530,12 +532,14 @@ void FAssetEditor_QuestSystem::NewDocument_OnClicked(ECreatedQuestDocumentType G
 
 	FName DocumentName = FName(*DocumentNameText.ToString());
 
+	
+
 	// Make sure the new name is valid
 	DocumentName = FQuestSystemEditorUtils::FindUniqueQuestName(GetQuestSystemObj(), DocumentNameText.ToString());
-
+		
 	//check(IsEditingSingleBlueprint());
 
-	const FScopedTransaction Transaction(LOCTEXT("AddNewQUestGraph", "Add New Quest Graph"));
+	const FScopedTransaction Transaction(LOCTEXT("AddNewQuestGraph", "Add New Quest Graph"));
 	GetQuestSystemObj()->Modify();
 
 	UEdGraph* NewGraph = nullptr;
@@ -651,6 +655,136 @@ bool FAssetEditor_QuestSystem::FindOpenTabsContainingDocument(const UObject* Doc
 	return (StartingCount != Results.Num());
 }
 
+
+void FAssetEditor_QuestSystem::InitializeDocumentTab()
+{
+	check(IsEditingSingleQuestGraph());
+
+	UQuestSystemGraph* QuestSystemGraph = GetQuestSystemObj();
+	if (QuestSystemGraph->LastEditedDocuments.Num() == 0)
+	{
+			QuestSystemGraph->LastEditedDocuments.Add(FQuestSystemEditorUtils::FindQuestGraph(QuestSystemGraph));
+	}
+
+	for (int32 i = 0; i < QuestSystemGraph->LastEditedDocuments.Num(); i++)
+	{
+		if (UObject* Obj = QuestSystemGraph->LastEditedDocuments[i].EditedObjectPath.ResolveObject())
+		{
+			if (UEdGraph* Graph = Cast<UEdGraph>(Obj))
+			{
+				struct LocalStruct
+				{
+					static TSharedPtr<SDockTab> OpenGraphTree(FAssetEditor_QuestSystem* InQuestSystemGraphEditor, UEdGraph* InGraph)
+					{
+						FDocumentTracker::EOpenDocumentCause OpenCause = FDocumentTracker::QuickNavigateCurrentDocument;
+
+						for (UObject* OuterObject = InGraph->GetOuter(); OuterObject; OuterObject = OuterObject->GetOuter())
+						{
+							if (OuterObject->IsA<UQuestSystemGraph>())
+							{
+								// reached up to the QuestSystemGraph for the graph, we are done climbing the tree
+								OpenCause = FDocumentTracker::RestorePreviousDocument;
+								break;
+							}
+							else if (UEdGraph* OuterGraph = Cast<UEdGraph>(OuterObject))
+							{
+								// Found another graph, open it up
+								OpenGraphTree(InQuestSystemGraphEditor, OuterGraph);
+								break;
+							}
+						}
+
+						return InQuestSystemGraphEditor->OpenDocument(InGraph, OpenCause);
+					}
+				};
+				TSharedPtr<SDockTab> TabWithGraph = LocalStruct::OpenGraphTree(this, Graph);
+				if (TabWithGraph.IsValid())
+				{
+					TSharedRef<SGraphEditor> GraphEditor = StaticCastSharedRef<SGraphEditor>(TabWithGraph->GetContent());
+					GraphEditor->SetViewLocation(QuestSystemGraph->LastEditedDocuments[i].SavedViewOffset, QuestSystemGraph->LastEditedDocuments[i].SavedZoomAmount);
+				}
+			}
+			else
+			{
+				TSharedPtr<SDockTab> TabWithGraph = OpenDocument(Obj, FDocumentTracker::RestorePreviousDocument);
+			}
+		}
+	}
+}
+
+
+
+bool FAssetEditor_QuestSystem::IsEditingSingleQuestGraph() const
+{
+	return GetQuestSystemObj() != nullptr;
+}
+
+UEdGraph* FAssetEditor_QuestSystem::GetFocusedGraph() const
+{
+	if (GetCurrGraphEditor().IsValid())
+	{
+		if (UEdGraph* Graph = GetCurrGraphEditor()->GetCurrentGraph())
+		{
+			if (IsValid(Graph))
+			{
+				return Graph;
+			}
+		}
+	}
+	return nullptr;
+}
+
+UEdGraphNode* FAssetEditor_QuestSystem::GetSingleSelectedNode() const
+{
+	const FGraphPanelSelectionSet SelectedNodes = GetSelectedNodes();
+	return (SelectedNodes.Num() == 1) ? Cast<UEdGraphNode>(*SelectedNodes.CreateConstIterator()) : nullptr;
+}
+
+void FAssetEditor_QuestSystem::OnGraphEditorFocused(const TSharedRef<class SGraphEditor>& InGraphEditor)
+{
+	// Update the graph editor that is currently focused
+	ViewportWidget = InGraphEditor;
+	InGraphEditor->SetPinVisibility(SGraphEditor::EPinVisibility::Pin_Show);
+
+	// Update the inspector as well, to show selection from the focused graph editor
+	FGraphPanelSelectionSet SelectedNodes = GetSelectedNodes();
+	//FocusInspectorOnGraphSelection(SelectedNodes, /*bForceRefresh=*/ true);
+
+	// During undo, garbage graphs can be temporarily brought into focus, ensure that before a refresh of the MyBlueprint window that the graph is owned by a Blueprint
+	if (ViewportWidget.IsValid() && MyQuestWidget.IsValid())
+	{
+		// The focused graph can be garbage as well
+		TWeakObjectPtr< UEdGraph > FocusedGraphPtr = ViewportWidget->GetCurrentGraph();
+		UEdGraph* FocusedGraph = FocusedGraphPtr.Get();
+
+		if (FocusedGraph != nullptr)
+		{
+			MyQuestWidget->Refresh();
+		}
+	}
+
+	
+}
+
+void FAssetEditor_QuestSystem::OnGraphEditorBackgrounded(const TSharedRef<SGraphEditor>& InGraphEditor)
+{
+}
+
+bool FAssetEditor_QuestSystem::IsGraphInCurrentQuestGraph(const UEdGraph* InGraph) const
+{
+	bool bEditable = true;
+
+	UQuestSystemGraph* EditingBP = GetQuestSystemObj();
+	if (EditingBP)
+	{
+		TArray<UEdGraph*> Graphs;
+		EditingBP->GetAllGraphs(Graphs);
+		bEditable &= Graphs.Contains(InGraph);
+	}
+
+	return bEditable;
+}
+
 void FAssetEditor_QuestSystem::OnChangeBreadCrumbGraph(UEdGraph* InGraph)
 {
 }
@@ -748,8 +882,9 @@ TSharedRef<SGraphEditor> FAssetEditor_QuestSystem::CreateGraphEditorWidget(TShar
 	return SNew(SGraphEditor)
 		.AdditionalCommands(GraphEditorCommands)
 		.IsEditable(true)
+		.TitleBar(TitleBarWidget)
 		.Appearance(AppearanceInfo)
-		.GraphToEdit(EditingGraph->EdGraph)
+		.GraphToEdit(InGraph)
 		.GraphEvents(InEvents)
 		.AutoExpandActionMenu(true)
 		.ShowGraphStateOverlay(false);
@@ -763,11 +898,12 @@ void FAssetEditor_QuestSystem::RebuildQuestSystemGraph()
 		//LOG_WARNING(TEXT("FGenericGraphAssetEditor::RebuildGenericGraph EditingGraph is nullptr"));
 		return;
 	}
-
-	UEdGraph_QuestSystemGraph* EdGraph = Cast<UEdGraph_QuestSystemGraph>(EditingGraph->EdGraph);
-	check(EdGraph != nullptr);
-
-	EdGraph->RebuildQuestSystemGraph();
+	for (UEdGraph* EdGraph : EditingGraph->QuestGraphPages)
+	{
+		UEdGraph_QuestSystemGraph* QuestGraph = Cast<UEdGraph_QuestSystemGraph>(EdGraph);
+		check(EdGraph != nullptr);
+		QuestGraph->RebuildQuestSystemGraph();
+	}
 }
 void FAssetEditor_QuestSystem::SelectAllNodes()
 {
@@ -1113,13 +1249,22 @@ void FAssetEditor_QuestSystem::OnRenameNode()
 }
 bool FAssetEditor_QuestSystem::CanRenameNodes() const
 {
-	UEdGraph_QuestSystemGraph* EdGraph = Cast<UEdGraph_QuestSystemGraph>(EditingGraph->EdGraph);
+	if (GetFocusedGraph())
+	{
+		if (const UEdGraphNode* SelectedNode = GetSingleSelectedNode())
+		{
+			return SelectedNode->GetCanRenameNode();
+		}
+	}
+	return false;
+
+	/*UEdGraph_QuestSystemGraph* EdGraph = Cast<UEdGraph_QuestSystemGraph>(EditingGraph->EdGraph);
 	check(EdGraph != nullptr);
 
 	UQuestSystemGraph* Graph = EdGraph->GetQuestSystemGraph();
 	check(Graph != nullptr)
 
-		return Graph->bCanRenameNode && GetSelectedNodes().Num() == 1;
+		return Graph->bCanRenameNode && GetSelectedNodes().Num() == 1;*/
 }
 void FAssetEditor_QuestSystem::OnSelectedNodesChanged(const TSet<class UObject*>& NewSelection)
 {
@@ -1140,6 +1285,7 @@ void FAssetEditor_QuestSystem::OnSelectedNodesChanged(const TSet<class UObject*>
 		PropertyWidget->SetObjects(Selection);
 	}
 }
+
 void FAssetEditor_QuestSystem::OnNodeDoubleClicked(UEdGraphNode* Node)
 {
 	UEdNode_QuestSystemNode* MyNode = Cast<UEdNode_QuestSystemNode>(Node);
@@ -1156,12 +1302,18 @@ void FAssetEditor_QuestSystem::OnNodeDoubleClicked(UEdGraphNode* Node)
 		}
 	}
 }
+
 void FAssetEditor_QuestSystem::OnFinishedChangingProperties(const FPropertyChangedEvent& PropertyChangedEvent)
 {
 	if (EditingGraph == nullptr)
 		return;
 
-	EditingGraph->EdGraph->GetSchema()->ForceVisualizationCacheClear();
+	for (UEdGraph* EdGraph : EditingGraph->QuestGraphPages)
+	{
+		EdGraph->GetSchema()->ForceVisualizationCacheClear();
+	}
+	DocumentManager->RefreshAllTabs();
+
 }
 //Called when saving our file graph
 #if ENGINE_MAJOR_VERSION < 5
@@ -1175,6 +1327,7 @@ void FAssetEditor_QuestSystem::OnPackageSavedWithContext(const FString& PackageF
 {
 	RebuildQuestSystemGraph();
 }
+
 #endif // #else // #if ENGINE_MAJOR_VERSION < 5
 
 #undef LOCTEXT_NAMESPACE
