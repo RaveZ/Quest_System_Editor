@@ -10,7 +10,7 @@
 
 class UQuestSystemGraph;
 
-UCLASS()
+UCLASS(Blueprintable)
 class QUEST_SYSTEM_RUNTIME_API UQuestSystemGraphEdge : public UObject
 {
 	GENERATED_BODY()

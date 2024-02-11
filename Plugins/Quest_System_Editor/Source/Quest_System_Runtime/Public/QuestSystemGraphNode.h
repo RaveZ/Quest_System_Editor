@@ -16,7 +16,7 @@ enum class ENodeLimits : uint8
 	Limited
 };
 
-UCLASS()
+UCLASS(Blueprintable)
 class QUEST_SYSTEM_RUNTIME_API UQuestSystemGraphNode : public UObject
 {
 	GENERATED_BODY()

@@ -47,7 +47,7 @@ const FName GenericGraphEditorAppName = FName(TEXT("GenericGraphEditorApp"));
 
 FAssetEditor_QuestSystem::FAssetEditor_QuestSystem()
 {
-	EditingGraph = nullptr;
+	EditingQuestGraph = nullptr;
 	QuestGraphEditorSettings = NewObject<UQuestEditorSettings>(UQuestEditorSettings::StaticClass());
 	DocumentManager = MakeShareable(new FDocumentTracker);
 
@@ -69,7 +69,7 @@ FAssetEditor_QuestSystem::~FAssetEditor_QuestSystem()
 
 void FAssetEditor_QuestSystem::InitQuestSystemGraphAssetEditor(const EToolkitMode::Type Mode, const TSharedPtr<IToolkitHost>& InitToolkitHost, UQuestSystemGraph* Graph)
 {
-	EditingGraph = Graph;
+	EditingQuestGraph = Graph;
 	FGenericCommands::Register();
 	FGraphEditorCommands::Register();
 	FMyQuestCommands::Register();
@@ -140,7 +140,7 @@ void FAssetEditor_QuestSystem::InitQuestSystemGraphAssetEditor(const EToolkitMod
 
 	const bool bCreateDefaultStandaloneMenu = true;
 	const bool bCreateDefaultToolbar = true;
-	FAssetEditorToolkit::InitAssetEditor(Mode, InitToolkitHost, GenericGraphEditorAppName, StandaloneDefaultLayout, bCreateDefaultStandaloneMenu, bCreateDefaultToolbar, EditingGraph, false);
+	FAssetEditorToolkit::InitAssetEditor(Mode, InitToolkitHost, GenericGraphEditorAppName, StandaloneDefaultLayout, bCreateDefaultStandaloneMenu, bCreateDefaultToolbar, EditingQuestGraph, false);
 	CommonInitialization(Graph, true);
 	RegenerateMenusAndToolbars();
 	//InitializeDocumentTab();
@@ -344,17 +344,17 @@ FText FAssetEditor_QuestSystem::GetBaseToolkitName() const
 
 FText FAssetEditor_QuestSystem::GetToolkitName() const
 {
-	const bool bDirtyState = EditingGraph->GetOutermost()->IsDirty();
+	const bool bDirtyState = EditingQuestGraph->GetOutermost()->IsDirty();
 
 	FFormatNamedArguments Args;
-	Args.Add(TEXT("QuestGraphName"), FText::FromString(EditingGraph->GetName()));
+	Args.Add(TEXT("QuestGraphName"), FText::FromString(EditingQuestGraph->GetName()));
 	Args.Add(TEXT("DirtyState"), bDirtyState ? FText::FromString(TEXT("*")) : FText::GetEmpty());
 	return FText::Format(LOCTEXT("QuestGraphEditorToolkitName", "{QuestGraphName}{DirtyState}"), Args);
 }
 
 FText FAssetEditor_QuestSystem::GetToolkitToolTipText() const
 {
-	return FAssetEditorToolkit::GetToolTipTextForObject(EditingGraph);
+	return FAssetEditorToolkit::GetToolTipTextForObject(EditingQuestGraph);
 }
 
 FLinearColor FAssetEditor_QuestSystem::GetWorldCentricTabColorScale() const
@@ -375,7 +375,7 @@ FString FAssetEditor_QuestSystem::GetDocumentationLink() const
 
 void FAssetEditor_QuestSystem::SaveAsset_Execute()
 {
-	if (EditingGraph != nullptr)
+	if (EditingQuestGraph != nullptr)
 	{
 		RebuildQuestSystemGraph();
 	}
@@ -492,19 +492,19 @@ void FAssetEditor_QuestSystem::RegisterToolbarTab(const TSharedRef<class FTabMan
 
 void FAssetEditor_QuestSystem::AddReferencedObjects(FReferenceCollector& Collector)
 {
-	if (GetObjectsCurrentlyBeingEdited()->Num() > 0)
+	/*if (GetObjectsCurrentlyBeingEdited()->Num() > 0)
 	{
 		TArray<UObject*>& LocalEditingObjects = const_cast<TArray<UObject*>&>(GetEditingObjects());
 
 		Collector.AddReferencedObjects(LocalEditingObjects);
 	}
 
-	Collector.AddReferencedObject(EditingGraph);
+	Collector.AddReferencedObject(EditingQuestGraph);*/
 }
 
 UQuestSystemGraph* FAssetEditor_QuestSystem::GetQuestSystemObj() const
 {
-	return EditingGraph;
+	return EditingQuestGraph;
 	//return GetEditingObjects().Num() == 1 ? Cast<UQuestSystemGraph>(GetEditingObjects()[0]) : nullptr;
 }
 
@@ -785,6 +785,11 @@ bool FAssetEditor_QuestSystem::IsGraphInCurrentQuestGraph(const UEdGraph* InGrap
 	return bEditable;
 }
 
+UQuestEditorSettings* FAssetEditor_QuestSystem::GetSettings() const
+{
+	return QuestGraphEditorSettings;
+}
+
 void FAssetEditor_QuestSystem::OnChangeBreadCrumbGraph(UEdGraph* InGraph)
 {
 }
@@ -856,7 +861,7 @@ void FAssetEditor_QuestSystem::CreateInternalWidgets()
 
 	FPropertyEditorModule& PropertyModule = FModuleManager::LoadModuleChecked<FPropertyEditorModule>("PropertyEditor");
 	PropertyWidget = PropertyModule.CreateDetailView(Args);
-	PropertyWidget->SetObject(EditingGraph);
+	PropertyWidget->SetObject(EditingQuestGraph);
 	PropertyWidget->OnFinishedChangingProperties().AddSP(this, &FAssetEditor_QuestSystem::OnFinishedChangingProperties);
 
 	EditorSettingsWidget = PropertyModule.CreateDetailView(Args);
@@ -893,12 +898,12 @@ TSharedRef<SGraphEditor> FAssetEditor_QuestSystem::CreateGraphEditorWidget(TShar
 
 void FAssetEditor_QuestSystem::RebuildQuestSystemGraph()
 {
-	if (EditingGraph == nullptr)
+	if (EditingQuestGraph == nullptr)
 	{
-		//LOG_WARNING(TEXT("FGenericGraphAssetEditor::RebuildGenericGraph EditingGraph is nullptr"));
+		//LOG_WARNING(TEXT("FGenericGraphAssetEditor::RebuildGenericGraph EditingQuestGraph is nullptr"));
 		return;
 	}
-	for (UEdGraph* EdGraph : EditingGraph->QuestGraphPages)
+	for (UEdGraph* EdGraph : EditingQuestGraph->QuestGraphPages)
 	{
 		UEdGraph_QuestSystemGraph* QuestGraph = Cast<UEdGraph_QuestSystemGraph>(EdGraph);
 		check(EdGraph != nullptr);
@@ -1169,11 +1174,11 @@ void FAssetEditor_QuestSystem::HandleNewNodeClassPicked(UClass* InClass) const
 	/*UE_CLOG(InClass == nullptr, LogBehaviorTreeEditor, Error, TEXT("Trying to handle new node of NULL class for Behavior Treee %s ")
 		, *GetNameSafe(BehaviorTree));*/
 
-	if (EditingGraph != nullptr && InClass != nullptr && EditingGraph->GetOutermost())
+	if (EditingQuestGraph != nullptr && InClass != nullptr && EditingQuestGraph->GetOutermost())
 	{
 		const FString ClassName = FBlueprintEditorUtils::GetClassNameWithoutSuffix(InClass);
 
-		FString PathName = EditingGraph->GetOutermost()->GetPathName();
+		FString PathName = EditingQuestGraph->GetOutermost()->GetPathName();
 		PathName = FPaths::GetPath(PathName);
 
 		// Now that we've generated some reasonable default locations/names for the package, allow the user to have the final say
@@ -1258,7 +1263,7 @@ bool FAssetEditor_QuestSystem::CanRenameNodes() const
 	}
 	return false;
 
-	/*UEdGraph_QuestSystemGraph* EdGraph = Cast<UEdGraph_QuestSystemGraph>(EditingGraph->EdGraph);
+	/*UEdGraph_QuestSystemGraph* EdGraph = Cast<UEdGraph_QuestSystemGraph>(EditingQuestGraph->EdGraph);
 	check(EdGraph != nullptr);
 
 	UQuestSystemGraph* Graph = EdGraph->GetQuestSystemGraph();
@@ -1277,7 +1282,7 @@ void FAssetEditor_QuestSystem::OnSelectedNodesChanged(const TSet<class UObject*>
 
 	if (Selection.Num() == 0)
 	{
-		PropertyWidget->SetObject(EditingGraph);
+		PropertyWidget->SetObject(EditingQuestGraph);
 
 	}
 	else
@@ -1305,10 +1310,10 @@ void FAssetEditor_QuestSystem::OnNodeDoubleClicked(UEdGraphNode* Node)
 
 void FAssetEditor_QuestSystem::OnFinishedChangingProperties(const FPropertyChangedEvent& PropertyChangedEvent)
 {
-	if (EditingGraph == nullptr)
+	if (EditingQuestGraph == nullptr)
 		return;
 
-	for (UEdGraph* EdGraph : EditingGraph->QuestGraphPages)
+	for (UEdGraph* EdGraph : EditingQuestGraph->QuestGraphPages)
 	{
 		EdGraph->GetSchema()->ForceVisualizationCacheClear();
 	}
@@ -1326,6 +1331,9 @@ void FAssetEditor_QuestSystem::OnPackageSaved(const FString& PackageFileName, UO
 void FAssetEditor_QuestSystem::OnPackageSavedWithContext(const FString& PackageFileName, UPackage* Package, FObjectPostSaveContext ObjectSaveContext)
 {
 	RebuildQuestSystemGraph();
+	if (QuestGraphEditorSettings == nullptr) {
+		UE_LOG(LogTemp, Log, TEXT("Null"))
+	}
 }
 
 #endif // #else // #if ENGINE_MAJOR_VERSION < 5

@@ -16,6 +16,7 @@ class QUEST_SYSTEM_EDITOR_API UEdNode_QuestSystemRoot : public UEdNode_QuestSyst
 	GENERATED_BODY()
 
 public:
+	UEdNode_QuestSystemRoot();
 	//virtual void PostPlacedNewNode() override;
 	virtual void AllocateDefaultPins() override;
 	virtual bool CanDuplicateNode() const override { return false; }

@@ -3,6 +3,12 @@
 
 #include "EdNode_QuestSystemRoot.h"
 
+UEdNode_QuestSystemRoot::UEdNode_QuestSystemRoot()
+{
+	bIsReadOnly = true;
+	bCanRenameNode = false;
+}
+
 void UEdNode_QuestSystemRoot::AllocateDefaultPins()
 {
 	CreatePin(EGPD_Output, "MultipleNode", TEXT("In"));

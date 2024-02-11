@@ -35,6 +35,8 @@ public:
 	virtual UEdGraphPin* GetInputPin() const;
 	virtual UEdGraphPin* GetOutputPin() const;
 
+
+
 #if WITH_EDITOR
 	virtual void PostEditUndo() override;
 #endif

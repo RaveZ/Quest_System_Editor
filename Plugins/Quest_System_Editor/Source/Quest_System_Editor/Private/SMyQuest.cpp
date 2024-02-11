@@ -456,7 +456,7 @@ void SMyQuest::OnCategoryNameCommitted(const FText& InNewText, ETextCommit::Type
 }
 bool SMyQuest::CanRequestRenameOnActionNode(TWeakPtr<struct FGraphActionNode> InSelectedNode) const
 {
-	return false;
+	return true;
 }
 
 FText SMyQuest::OnGetSectionTitle(int32 InSectionID)

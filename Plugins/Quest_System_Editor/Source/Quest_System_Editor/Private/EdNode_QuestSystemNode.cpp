@@ -5,6 +5,7 @@
 
 UEdNode_QuestSystemNode::UEdNode_QuestSystemNode()
 {
+	bIsReadOnly = false;
 	bCanRenameNode = true;
 }
 
@@ -40,6 +41,16 @@ FText UEdNode_QuestSystemNode::GetNodeTitle(ENodeTitleType::Type TitleType) cons
 	{
 		return QuestSystemGraphNode->GetNodeTitle();
 	}
+}
+
+bool UEdNode_QuestSystemNode::CanDuplicateNode() const
+{
+	return bIsReadOnly ? false : Super::CanDuplicateNode();
+}
+
+bool UEdNode_QuestSystemNode::CanUserDeleteNode() const
+{
+	return bIsReadOnly ? false : Super::CanUserDeleteNode();
 }
 
 void UEdNode_QuestSystemNode::PrepareForCopying()

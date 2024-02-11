@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "EdGraph/EdGraphNode.h"
+#include "UObject/ObjectMacros.h"
 #include "UObject/NoExportTypes.h"
 #include "EdGraph_QuestSystemGraph.h"
 #include "QuestSystemGraph.h"
@@ -32,6 +33,8 @@ public:
 	//UedGraphnode interface
 	virtual void AllocateDefaultPins() override;
 	virtual FText GetNodeTitle(ENodeTitleType::Type TitleType) const override;
+	virtual bool CanDuplicateNode() const override;
+	virtual bool CanUserDeleteNode() const override;
 	virtual void PrepareForCopying() override;
 	virtual void AutowireNewNode(UEdGraphPin* FromPin) override;
 	virtual FText GetDescription() const;
@@ -46,4 +49,8 @@ public:
 #if WITH_EDITOR
 	virtual void PostEditUndo() override;
 #endif
+
+	/** if set, all modifications (including delete/cut) are disabled */
+	UPROPERTY()
+	uint32 bIsReadOnly : 1;
 };

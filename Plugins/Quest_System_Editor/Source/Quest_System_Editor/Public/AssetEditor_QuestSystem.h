@@ -153,6 +153,10 @@ public:
 
 	/** Checks to see if the provided graph is contained within the current QuestSystemGraph */
 	bool IsGraphInCurrentQuestGraph(const UEdGraph* InGraph) const;
+
+
+	UQuestEditorSettings* GetSettings() const;
+
 private:
 	/** Helper to move focused graph when clicking on graph breadcrumb */
 	void OnChangeBreadCrumbGraph(class UEdGraph* InGraph);
@@ -237,7 +241,7 @@ protected:
 
 	UQuestEditorSettings* QuestGraphEditorSettings;
 
-	UQuestSystemGraph* EditingGraph;
+	UQuestSystemGraph* EditingQuestGraph;
 
 	//Toolbar
 	TSharedPtr<class FAssetEditorToolbar_QuestSystem> ToolbarBuilder;
