@@ -32,7 +32,7 @@ void UEdGraph_QuestSystemGraph::RebuildQuestSystemGraph()
 
 			NodeMap.Add(QuestSystemGraphNode, EdNode);
 
-			Graph->AllNodes.Add(QuestSystemGraphNode);
+			EdGraphAllNodes.Add(QuestSystemGraphNode);
 
 			for (int PinIdx = 0; PinIdx < EdNode->Pins.Num(); ++PinIdx)
 			{
@@ -92,26 +92,27 @@ void UEdGraph_QuestSystemGraph::RebuildQuestSystemGraph()
 		}
 	}
 
-	for (int i = 0; i < Graph->AllNodes.Num(); ++i)
+	for (int i = 0; i < EdGraphAllNodes.Num(); ++i)
 	{
-		UQuestSystemGraphNode* Node = Graph->AllNodes[i];
+		UQuestSystemGraphNode* Node = EdGraphAllNodes[i];
 		if (Node->ParentNodes.Num() == 0)
 		{
 			Graph->RootNodes.Add(Node);
 
 			SortNodes(Node);
 		}
+		Graph->AllNodes.Add(Node);
 
 		Node->Graph = Graph;
 		Node->Rename(nullptr, Graph, REN_DontCreateRedirectors | REN_DoNotDirty);
 	}
 
-	Graph->RootNodes.Sort([&](const UQuestSystemGraphNode& L, const UQuestSystemGraphNode& R)
+	/*Graph->RootNodes.Sort([&](const UQuestSystemGraphNode& L, const UQuestSystemGraphNode& R)
 		{
 			UEdNode_QuestSystemNode* EdNode_LNode = NodeMap[&L];
 			UEdNode_QuestSystemNode* EdNode_RNode = NodeMap[&R];
 			return EdNode_LNode->NodePosX < EdNode_RNode->NodePosX;
-		});
+		});*/
 }
 
 UQuestSystemGraph* UEdGraph_QuestSystemGraph::GetQuestSystemGraph() const
@@ -145,9 +146,10 @@ void UEdGraph_QuestSystemGraph::Clear()
 {
 	UQuestSystemGraph* Graph = GetQuestSystemGraph();
 
-	Graph->ClearGraph();
+	//Graph->ClearGraph();
 	NodeMap.Reset();
 	EdgeMap.Reset();
+	EdGraphAllNodes.Empty();
 
 	for (int i = 0; i < Nodes.Num(); ++i)
 	{

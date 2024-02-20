@@ -33,6 +33,11 @@ public:
 	UPROPERTY(Transient)
 		TMap<UQuestSystemGraphEdge*, UEdNode_QuestSystemEdge*> EdgeMap;
 
+
+		/** All UQuestGraphNode for this EdGraph */
+	UPROPERTY(Transient)
+		TArray<UQuestSystemGraphNode*> EdGraphAllNodes;
+
 protected:
 	void Clear();
 

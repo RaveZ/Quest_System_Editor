@@ -189,8 +189,9 @@ void UAssetGraphSchema_QuestSystem::GetBreakLinkToSubMenuActions(UToolMenu* Menu
 
 void UAssetGraphSchema_QuestSystem::CreateDefaultNodesForGraph(UEdGraph& Graph) const
 {
+
 	FGraphNodeCreator<UEdNode_QuestSystemRoot> NodeCreator(Graph);
-	UEdNode_QuestSystemNode* MyNode = NodeCreator.CreateNode();
+	UEdNode_QuestSystemRoot* MyNode = NodeCreator.CreateNode();
 	NodeCreator.Finalize();
 	SetNodeMetaData(MyNode, FNodeMetadata::DefaultGraphNode);
 }

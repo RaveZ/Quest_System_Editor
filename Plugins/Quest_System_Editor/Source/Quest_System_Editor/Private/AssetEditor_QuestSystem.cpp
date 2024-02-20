@@ -903,6 +903,7 @@ void FAssetEditor_QuestSystem::RebuildQuestSystemGraph()
 		//LOG_WARNING(TEXT("FGenericGraphAssetEditor::RebuildGenericGraph EditingQuestGraph is nullptr"));
 		return;
 	}
+	GetQuestSystemObj()->ClearGraph();
 	for (UEdGraph* EdGraph : EditingQuestGraph->QuestGraphPages)
 	{
 		UEdGraph_QuestSystemGraph* QuestGraph = Cast<UEdGraph_QuestSystemGraph>(EdGraph);
