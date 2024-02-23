@@ -126,6 +126,8 @@ class UAssetGraphSchema_QuestSystem : public UEdGraphSchema
 
 	virtual void ForceVisualizationCacheClear() const override;
 
+protected:
+	static TSharedPtr<FAssetSchemaAction_QuestSystem_NewNode> AddNewNodeAction(FGraphActionListBuilderBase& ContextMenuBuilder, const FText& Category, const FText& MenuDesc, const FText& Tooltip);
 private:
 	static int32 CurrentCacheRefreshID;
 };

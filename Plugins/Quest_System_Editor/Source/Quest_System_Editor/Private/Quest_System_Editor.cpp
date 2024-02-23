@@ -4,6 +4,8 @@
 #include "Quest_System_EditorStyle.h"
 #include "Quest_System_EditorCommands.h"
 #include "AssetTypeActions_QuestSystem.h"
+#include "QuestSystemGraphNode.h"
+#include "QuestSystemGraphNode_Task.h"
 #include "IAssetTools.h"
 #include "LevelEditor.h"
 #include "Widgets/Docking/SDockTab.h"
@@ -36,6 +38,8 @@ void FQuest_System_EditorModule::StartupModule()
 	QuestEditorAssetCategoryBit = AssetTools.RegisterAdvancedAssetCategory(FName(TEXT("QuestSystemGraph")), LOCTEXT("QuestSystemAssetCategory", "QuestSystemGraph"));
 
 	RegisterAssetTypeAction(AssetTools, MakeShareable(new FAssetTypeActions_QuestSystem(QuestEditorAssetCategoryBit)));
+
+	
 }
 
 void FQuest_System_EditorModule::ShutdownModule()
@@ -65,6 +69,8 @@ void FQuest_System_EditorModule::ShutdownModule()
 	FQuest_System_EditorCommands::Unregister();
 
 	FGlobalTabmanager::Get()->UnregisterNomadTabSpawner(Quest_System_EditorTabName);
+
+	ClassCache.Reset();
 }
 
 void FQuest_System_EditorModule::RegisterAssetTypeAction(IAssetTools& AssetTools, TSharedRef<IAssetTypeActions> Action)
@@ -106,6 +112,16 @@ TSharedRef<SDockTab> FQuest_System_EditorModule::OnSpawnPluginTab(const FSpawnTa
 void FQuest_System_EditorModule::PluginButtonClicked()
 {
 	FGlobalTabmanager::Get()->TryInvokeTab(Quest_System_EditorTabName);
+}
+
+void FQuest_System_EditorModule::CheckClassCache()
+{
+	if (!ClassCache.IsValid())
+	{
+		ClassCache = MakeShareable(new FGraphNodeClassHelper(UQuestSystemGraphNode::StaticClass()));
+		FGraphNodeClassHelper::AddObservedBlueprintClasses(UQuestSystemGraphNode_Task::StaticClass());
+		ClassCache->UpdateAvailableBlueprintClasses();
+	}
 }
 
 void FQuest_System_EditorModule::RegisterMenus()

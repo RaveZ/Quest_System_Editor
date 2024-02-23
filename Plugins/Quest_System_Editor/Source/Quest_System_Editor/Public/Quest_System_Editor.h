@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "AIGraphTypes.h"
 #include "Modules/ModuleManager.h"
 #include <EdGraphUtilities.h>
 #include "SSubobjectEditor.h"
@@ -90,6 +91,10 @@ public:
 	
 	/** This function will be bound to Command (by default it will bring up plugin window) */
 	void PluginButtonClicked();
+
+	TSharedPtr<struct FGraphNodeClassHelper> GetClassCache() { return ClassCache; }
+	
+	void CheckClassCache();
 	
 private:
 
@@ -109,4 +114,6 @@ private:
 
 	EAssetTypeCategories::Type QuestEditorAssetCategoryBit;
 	TArray< TSharedPtr<IAssetTypeActions> > CreatedAssetTypeActions;
+
+	TSharedPtr<struct FGraphNodeClassHelper> ClassCache;
 };

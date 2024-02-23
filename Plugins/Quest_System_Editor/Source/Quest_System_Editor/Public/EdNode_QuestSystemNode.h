@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "EdGraph/EdGraphNode.h"
+#include "AIGraphTypes.h"
 #include "UObject/ObjectMacros.h"
 #include "UObject/NoExportTypes.h"
 #include "EdGraph_QuestSystemGraph.h"
@@ -21,6 +22,10 @@ class QUEST_SYSTEM_EDITOR_API UEdNode_QuestSystemNode : public UEdGraphNode
 public:
 	UEdNode_QuestSystemNode();
 	virtual ~UEdNode_QuestSystemNode();
+
+	/** instance class */
+	UPROPERTY()
+	struct FGraphNodeClassData ClassData;
 
 	UPROPERTY(VisibleAnywhere, Instanced, Category = "GenericGraph")
 		UQuestSystemGraphNode* QuestSystemGraphNode;

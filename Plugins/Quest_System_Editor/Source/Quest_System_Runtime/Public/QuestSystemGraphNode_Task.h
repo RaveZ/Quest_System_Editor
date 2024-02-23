@@ -17,8 +17,10 @@ class QUEST_SYSTEM_RUNTIME_API UQuestSystemGraphNode_Task : public UQuestSystemG
 public:
     UQuestSystemGraphNode_Task();
 
-    UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "DialogueSession")
+    UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Tasks")
     FText Description;
+
+
 
 
 #if WITH_EDITOR

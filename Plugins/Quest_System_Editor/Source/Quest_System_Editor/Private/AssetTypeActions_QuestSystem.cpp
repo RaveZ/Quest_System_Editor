@@ -35,8 +35,12 @@ void FAssetTypeActions_QuestSystem::OpenAssetEditor(const TArray<UObject*>& InOb
 	{
 		if (UQuestSystemGraph* Graph = Cast<UQuestSystemGraph>(*ObjIt))
 		{
+			FQuest_System_EditorModule& QuestSystemEditorModule = FModuleManager::GetModuleChecked<FQuest_System_EditorModule>("Quest_System_Editor");
+			QuestSystemEditorModule.CheckClassCache();
+
 			TSharedRef<FAssetEditor_QuestSystem> NewGraphEditor(new FAssetEditor_QuestSystem());
 			NewGraphEditor->InitQuestSystemGraphAssetEditor(Mode, EditWithinLevelEditor, Graph);
+
 		}
 	}
 }

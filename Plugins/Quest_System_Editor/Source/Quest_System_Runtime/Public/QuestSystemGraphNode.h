@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "AIGraphTypes.h"
 #include "UObject/NoExportTypes.h"
 #include "QuestSystemGraphNode.generated.h"
 
@@ -25,6 +26,7 @@ public:
 	UQuestSystemGraphNode();
 	virtual ~UQuestSystemGraphNode();
 
+
 	UPROPERTY(VisibleDefaultsOnly, Category = "QuestSystemGraphNode")
 		UQuestSystemGraph* Graph;
 
@@ -36,6 +38,11 @@ public:
 
 	UPROPERTY(BlueprintReadOnly, Category = "QuestSystemGraphNode")
 		TMap<UQuestSystemGraphNode*, UQuestSystemGraphEdge*> Edges;
+
+	/** node name */
+	UPROPERTY(Category=Description, EditAnywhere)
+		FString NodeName;
+
 
 	UFUNCTION(BlueprintCallable, Category = "QuestSystemGraphNode")
 		virtual UQuestSystemGraphEdge* GetEdge(UQuestSystemGraphNode* ChildNode);
@@ -51,7 +58,16 @@ public:
 
 	UFUNCTION(BlueprintImplementableEvent)
 	void ReceiveExecute(AActor* OwnerActor);
+
 	virtual FText GetDescription_Implementation() const;
+
+	/** @return name of node */
+	FString GetNodeName() const;
+
+	/** returns short name of object's class (BTTaskNode_Wait -> Wait) */
+	static FString GetShortTypeName(const UObject* Ob);
+
+
 
 	//////////////////////////////////////////////////////////////////////////
 #if WITH_EDITORONLY_DATA

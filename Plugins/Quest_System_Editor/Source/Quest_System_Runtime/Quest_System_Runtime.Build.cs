@@ -27,6 +27,7 @@ public class Quest_System_Runtime : ModuleRules
                 "Core",
                 "CoreUObject",
                 "Engine",
+                "AIGraph",
 				// ... add other public dependencies that you statically link with here ...
 			}
             );
@@ -37,7 +38,8 @@ public class Quest_System_Runtime : ModuleRules
 				// ... add private dependencies that you statically link with here ...
                 "Slate",
                 "SlateCore",
-                "GameplayTags"
+                "GameplayTags",
+                "AIGraph",
             }
             );
 

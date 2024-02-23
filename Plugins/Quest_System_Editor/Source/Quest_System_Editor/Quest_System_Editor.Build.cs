@@ -32,6 +32,9 @@ public class Quest_System_Editor : ModuleRules
                 "CoreUObject",
                 "Engine",
                 "UnrealEd",
+				"Kismet",
+				"AIGraph",
+				"EditorStyle",
 				// ... add other public dependencies that you statically link with here ...
 			}
 			);
@@ -58,6 +61,7 @@ public class Quest_System_Editor : ModuleRules
 				"Engine",
 				"Slate",
 				"SlateCore",
+                "AIGraph",
 				// ... add private dependencies that you statically link with here ...	
 			}
 			);

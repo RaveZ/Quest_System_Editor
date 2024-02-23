@@ -31,7 +31,34 @@ UQuestSystemGraphEdge* UQuestSystemGraphNode::GetEdge(UQuestSystemGraphNode* Chi
 
 FText UQuestSystemGraphNode::GetDescription_Implementation() const
 {
-	return LOCTEXT("NodeDesc", "Generic Graph Node");
+	return LOCTEXT("NodeDesc", "Quest Graph Node");
+}
+
+FString UQuestSystemGraphNode::GetNodeName() const
+{
+	return NodeName.Len() ? NodeName : UQuestSystemGraphNode::GetShortTypeName(this);
+}
+
+FString UQuestSystemGraphNode::GetShortTypeName(const UObject* Ob)
+{
+	if ((Ob == nullptr) || (Ob->GetClass() == nullptr))
+	{
+		return TEXT("None");
+	}
+
+	if (Ob->GetClass()->HasAnyClassFlags(CLASS_CompiledFromBlueprint))
+	{
+		return Ob->GetClass()->GetName().LeftChop(2);
+	}
+
+	FString TypeDesc = Ob->GetClass()->GetName();
+	const int32 ShortNameIdx = TypeDesc.Find(TEXT("_"), ESearchCase::CaseSensitive);
+	if (ShortNameIdx != INDEX_NONE)
+	{
+		TypeDesc.MidInline(ShortNameIdx + 1, MAX_int32, false);
+	}
+
+	return TypeDesc;
 }
 
 #if WITH_EDITOR

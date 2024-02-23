@@ -3,17 +3,28 @@
 
 #include "AssetGraphSchema_QuestSystem.h"
 #include "ToolMenus.h"
+#include "Quest_System_Editor.h"
+#include "AIGraphTypes.h"
 #include "ConnectionDrawPolicy_QuestSystem.h"
 #include "Framework/Commands/GenericCommands.h"
+#include "Settings/EditorStyleSettings.h"
 #include "EdNode_QuestSystemNode.h"
+#include "EdNode_QuestSystemTask.h"
 #include "EdNode_QuestSystemEdge.h"
 #include "GraphEditorActions.h"
 #include "QuestSystemGraph.h"
-#include <QuestSystemGraphNode_Root.h>
+#include "QuestSystemGraphNode_Root.h"
+#include "QuestSystemGraphNode_Task.h"
 #include <EdNode_QuestSystemRoot.h>
 
 
 #define LOCTEXT_NAMESPACE "AssetSchema_QuestSystemGraph"
+
+namespace
+{
+	// Maximum distance a drag can be off a node edge to require 'push off' from node
+	const int32 NodeDistance = 60;
+}
 
 int32 UAssetGraphSchema_QuestSystem::CurrentCacheRefreshID = 0;
 
@@ -68,7 +79,57 @@ private:
 
 UEdGraphNode* FAssetSchemaAction_QuestSystem_NewNode::PerformAction(UEdGraph* ParentGraph, UEdGraphPin* FromPin, const FVector2D Location, bool bSelectNewNode)
 {
-	UEdGraphNode* ResultNode = nullptr;
+	UEdGraphNode* ResultNode = NULL;
+
+	//// If there is a template, we actually use it
+	if (NodeTemplate != NULL)
+	{
+		const FScopedTransaction Transaction(LOCTEXT("AddNode", "Add Node"));
+		ParentGraph->Modify();
+		if (FromPin)
+		{
+			FromPin->Modify();
+		}
+
+		NodeTemplate->SetFlags(RF_Transactional);
+
+	//	// set outer to be the graph so it doesn't go away
+		NodeTemplate->Rename(NULL, ParentGraph, REN_NonTransactional);
+		ParentGraph->AddNode(NodeTemplate, true);
+
+		NodeTemplate->CreateNewGuid();
+		NodeTemplate->PostPlacedNewNode();
+
+		// For input pins, new node will generally overlap node being dragged off
+		// Work out if we want to visually push away from connected node
+		int32 XLocation = Location.X;
+		if (FromPin && FromPin->Direction == EGPD_Input)
+		{
+			UEdGraphNode* PinNode = FromPin->GetOwningNode();
+			const float XDelta = FMath::Abs(PinNode->NodePosX - Location.X);
+
+			if (XDelta < NodeDistance)
+			{
+				// Set location to edge of current node minus the max move distance
+				// to force node to push off from connect node enough to give selection handle
+				XLocation = PinNode->NodePosX - NodeDistance;
+			}
+		}
+
+		NodeTemplate->NodePosX = XLocation;
+		NodeTemplate->NodePosY = Location.Y;
+		NodeTemplate->SnapToGrid(GetDefault<UEditorStyleSettings>()->GridSnapSize);
+
+		// setup pins after placing node in correct spot, since pin sorting will happen as soon as link connection change occurs
+		NodeTemplate->AllocateDefaultPins();
+		NodeTemplate->AutowireNewNode(FromPin);
+
+		ResultNode = NodeTemplate;
+	}
+
+	return ResultNode;
+
+	/*UEdGraphNode* ResultNode = nullptr;
 
 	if (NodeTemplate != nullptr)
 	{
@@ -94,7 +155,7 @@ UEdGraphNode* FAssetSchemaAction_QuestSystem_NewNode::PerformAction(UEdGraph* Pa
 		ResultNode = NodeTemplate;
 	}
 
-	return ResultNode;
+	return ResultNode;*/
 }
 
 void FAssetSchemaAction_QuestSystem_NewNode::AddReferencedObjects(FReferenceCollector& Collector)
@@ -189,11 +250,14 @@ void UAssetGraphSchema_QuestSystem::GetBreakLinkToSubMenuActions(UToolMenu* Menu
 
 void UAssetGraphSchema_QuestSystem::CreateDefaultNodesForGraph(UEdGraph& Graph) const
 {
+	UQuestSystemGraph* QuestGraph = CastChecked<UQuestSystemGraph>(Graph.GetOuter());
 
 	FGraphNodeCreator<UEdNode_QuestSystemRoot> NodeCreator(Graph);
-	UEdNode_QuestSystemRoot* MyNode = NodeCreator.CreateNode();
+	UEdNode_QuestSystemRoot* RootNode = NodeCreator.CreateNode();
+	RootNode->QuestSystemGraphNode = NewObject<UQuestSystemGraphNode>(RootNode, UQuestSystemGraphNode_Root::StaticClass());
+	RootNode->QuestSystemGraphNode->Graph = QuestGraph;
 	NodeCreator.Finalize();
-	SetNodeMetaData(MyNode, FNodeMetadata::DefaultGraphNode);
+	SetNodeMetaData(RootNode, FNodeMetadata::DefaultGraphNode);
 }
 
 EGraphType UAssetGraphSchema_QuestSystem::GetGraphType(const UEdGraph* TestEdGraph) const
@@ -225,22 +289,14 @@ void UAssetGraphSchema_QuestSystem::GetGraphContextActions(FGraphContextMenuBuil
 		Desc = FText::FromString(Title);
 	}
 
-	/*if (!Graph->NodeType->HasAnyClassFlags(CLASS_Abstract))
+	
+
+
+	//to check if we create another instance derived from UQuestSystemGraphNode and they will added automatically
+	/*for (TObjectIterator<UClass> It; It; ++It)
 	{
-		TSharedPtr<FAssetSchemaAction_QuestSystem_NewNode> NewNodeAction(new FAssetSchemaAction_QuestSystem_NewNode(LOCTEXT("GenericGraphNodeAction", "Generic Graph Node"), Desc, AddToolTip, 0));
-		NewNodeAction->NodeTemplate = NewObject<UEdNode_QuestSystemNode>(ContextMenuBuilder.OwnerOfTemporaries);
-		NewNodeAction->NodeTemplate->QuestSystemGraphNode = NewObject<UQuestSystemGraphNode>(NewNodeAction->NodeTemplate, Graph->NodeType);
-		NewNodeAction->NodeTemplate->QuestSystemGraphNode->Graph = Graph;
-		ContextMenuBuilder.AddAction(NewNodeAction);
 
-		Visited.Add(Graph->NodeType);
-	}*/
-
-
-	//to check if we create another instance derived from UQuestSystemGraphNode and they will added automatically??
-	for (TObjectIterator<UClass> It; It; ++It)
-	{
-		if (It->IsChildOf(Graph->NodeType) && !It->HasAnyClassFlags(CLASS_Abstract) && !Visited.Contains(*It))
+		if (It->IsChildOf(UQuestSystemGraphNode::StaticClass()) && !It->HasAnyClassFlags(CLASS_Abstract) && !Visited.Contains(*It))
 		{
 			TSubclassOf<UQuestSystemGraphNode> NodeType = *It;
 
@@ -259,7 +315,7 @@ void UAssetGraphSchema_QuestSystem::GetGraphContextActions(FGraphContextMenuBuil
 				Desc = FText::FromString(Title);
 			}
 
-			TSharedPtr<FAssetSchemaAction_QuestSystem_NewNode> Action(new FAssetSchemaAction_QuestSystem_NewNode(LOCTEXT("GenericGraphNodeAction", "Generic Graph Node"), Desc, AddToolTip, 0));
+			TSharedPtr<FAssetSchemaAction_QuestSystem_NewNode> Action(new FAssetSchemaAction_QuestSystem_NewNode(LOCTEXT("QuestSystemGraphNodeAction", "Task Node"), Desc, AddToolTip, 0));
 			Action->NodeTemplate = NewObject<UEdNode_QuestSystemNode>(ContextMenuBuilder.OwnerOfTemporaries);
 			Action->NodeTemplate->QuestSystemGraphNode = NewObject<UQuestSystemGraphNode>(Action->NodeTemplate, NodeType);
 			Action->NodeTemplate->QuestSystemGraphNode->Graph = Graph;
@@ -267,7 +323,41 @@ void UAssetGraphSchema_QuestSystem::GetGraphContextActions(FGraphContextMenuBuil
 
 			Visited.Add(NodeType);
 		}
+	}*/
+
+
+	//Task
+	FQuest_System_EditorModule& EditorModule = FModuleManager::GetModuleChecked<FQuest_System_EditorModule>(TEXT("Quest_System_Editor"));
+	FGraphNodeClassHelper* ClassCache = EditorModule.GetClassCache().Get();
+
+	FCategorizedGraphActionListBuilder TasksBuilder(TEXT("Tasks"));
+
+	TArray<FGraphNodeClassData> NodeClasses;
+	ClassCache->GatherClasses(UQuestSystemGraphNode_Task::StaticClass(), NodeClasses);
+	
+
+	for (auto& NodeClass : NodeClasses)
+	{
+		if (NodeClass.GetClass(true) == UQuestSystemGraphNode_Task::StaticClass())
+			continue;
+
+
+		UE_LOG(LogTemp, Warning, TEXT("NodeClass: %s"), *FName::NameToDisplayString(NodeClass.ToString(), false));
+
+		const FText NodeTypeName = FText::FromString(FName::NameToDisplayString(NodeClass.ToString(), false));
+
+		TSharedPtr<FAssetSchemaAction_QuestSystem_NewNode> AddOpAction = UAssetGraphSchema_QuestSystem::AddNewNodeAction(TasksBuilder, NodeClass.GetCategory(), NodeTypeName, FText::GetEmpty());
+		UClass* GraphNodeClass = UEdNode_QuestSystemTask::StaticClass();
+		
+
+		UEdNode_QuestSystemNode* OpNode = NewObject<UEdNode_QuestSystemNode>(ContextMenuBuilder.OwnerOfTemporaries, GraphNodeClass);
+		OpNode->ClassData = NodeClass;
+		AddOpAction->NodeTemplate = OpNode;
+		AddOpAction->NodeTemplate->QuestSystemGraphNode = NewObject<UQuestSystemGraphNode>(AddOpAction->NodeTemplate, NodeClass.GetClass(true));
+		AddOpAction->NodeTemplate->QuestSystemGraphNode->Graph = Graph;
 	}
+
+	ContextMenuBuilder.Append(TasksBuilder);
 }
 
 void UAssetGraphSchema_QuestSystem::GetContextMenuActions(UToolMenu* Menu, UGraphNodeContextMenuContext* Context) const
@@ -484,6 +574,14 @@ int32 UAssetGraphSchema_QuestSystem::GetCurrentVisualizationCacheID() const
 void UAssetGraphSchema_QuestSystem::ForceVisualizationCacheClear() const
 {
 	++CurrentCacheRefreshID;
+}
+
+TSharedPtr<FAssetSchemaAction_QuestSystem_NewNode> UAssetGraphSchema_QuestSystem::AddNewNodeAction(FGraphActionListBuilderBase& ContextMenuBuilder, const FText& Category, const FText& MenuDesc, const FText& Tooltip)
+{
+	TSharedPtr<FAssetSchemaAction_QuestSystem_NewNode> NewAction = TSharedPtr<FAssetSchemaAction_QuestSystem_NewNode>(new FAssetSchemaAction_QuestSystem_NewNode(Category, MenuDesc, Tooltip, 0));
+	ContextMenuBuilder.AddAction(NewAction);
+
+	return NewAction;
 }
 
 

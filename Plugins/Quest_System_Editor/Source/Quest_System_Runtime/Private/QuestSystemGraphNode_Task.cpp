@@ -12,7 +12,7 @@ UQuestSystemGraphNode_Task::UQuestSystemGraphNode_Task()
 #if WITH_EDITOR
 FText UQuestSystemGraphNode_Task::GetNodeTitle() const
 {
-	return Description.IsEmpty() ? LOCTEXT("EmptyParagraph", "(Empty paragraph)") : Description;
+    return Super::GetNodeTitle();
 
 }
 

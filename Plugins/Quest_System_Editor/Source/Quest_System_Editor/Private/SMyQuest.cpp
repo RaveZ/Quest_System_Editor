@@ -267,6 +267,7 @@ TSharedRef<SWidget> SMyQuest::OnCreateWidgetForAction(FCreateWidgetForActionData
 {
 	return QuestEditorPtr.IsValid() ? SNew(SGraphPaletteItem, InCreateData) : SNew(SGraphPaletteItem, InCreateData);
 }
+
 void SMyQuest::CollectAllActions(FGraphActionListBuilderBase& OutAllActions)
 {
 	const UAssetGraphSchema_QuestSystem* QuestSystemSchema = GetDefault<UAssetGraphSchema_QuestSystem>();
