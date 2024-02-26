@@ -4,13 +4,13 @@
 
 #include "CoreMinimal.h"
 #include "QuestSystemGraphNode.h"
+#include "QuestSystemGraphNode_Root.h"
 #include "QuestSystemGraphEdge.h"
 #include "GameplayTagContainer.h"
 #include "QuestSystemGraph.generated.h"
 
-/**
- * 
- */
+
+
 UCLASS(Blueprintable)
 class QUEST_SYSTEM_RUNTIME_API UQuestSystemGraph : public UObject
 {
@@ -66,10 +66,10 @@ public:
 	TArray<struct FEditedDocumentInfo> LastEditedDocuments;
 
 	/** Whether or not this blueprint is newly created, and hasn't been opened in an editor yet */
-	UPROPERTY(transient)
+	UPROPERTY(/*transient*/ BlueprintReadOnly, Category = "QuestSystemGraph")
 	bool bIsNewlyCreated = true;
 #endif
 
-	/** Get all graphs in this blueprint */
+	/** Get all graphs in this QuestEditor */
 	void GetAllGraphs(TArray<UEdGraph*>& Graphs) const;
 };

@@ -53,11 +53,16 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "QuestSystemGraphNode")
 		UQuestSystemGraph* GetGraph() const;
 
+	UFUNCTION(BlueprintCallable, Category = "QuestSystemGraphNode")
+		void GoToNextNode();
+
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "QuestSystemGraphNode")
 		FText GetDescription() const;
 
 	UFUNCTION(BlueprintImplementableEvent)
 	void ReceiveExecute(AActor* OwnerActor);
+
+
 
 	virtual FText GetDescription_Implementation() const;
 

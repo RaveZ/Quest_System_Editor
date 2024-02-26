@@ -107,6 +107,9 @@ public:
 
 	TSharedPtr<SDockTab> OpenDocument(const UObject* DocumentID, FDocumentTracker::EOpenDocumentCause Cause);
 	
+	/** Finds the tab associated with the specified asset, and closes if it is open */
+	void CloseDocumentTab(const UObject* DocumentID);
+
 	/** Utility function to handle all steps required to rename a newly added action */
 	void RenameNewlyAddedAction(FName InActionName);
 

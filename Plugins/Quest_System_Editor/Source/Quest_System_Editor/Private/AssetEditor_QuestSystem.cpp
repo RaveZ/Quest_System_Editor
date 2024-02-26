@@ -150,6 +150,7 @@ void FAssetEditor_QuestSystem::InitQuestSystemGraphAssetEditor(const EToolkitMod
 	{
 		NewDocument_OnClicked(CGT_NewQuestGraph);
 		Graph->bIsNewlyCreated = false;
+		Graph->Modify();
 	}
 	else
 	{
@@ -522,7 +523,7 @@ void FAssetEditor_QuestSystem::NewDocument_OnClicked(ECreatedQuestDocumentType G
 	switch (GraphType)
 	{
 	case CGT_NewQuestGraph:
-		DocumentNameText = LOCTEXT("NewDocQuestGraphName", "NewQuestGraph");
+		DocumentNameText = LOCTEXT("NewDocQuestGraphName", "QuestGraph");
 		bResetMyBlueprintFilter = true;
 		break;
 	
@@ -580,18 +581,24 @@ TSharedPtr<SDockTab> FAssetEditor_QuestSystem::OpenDocument(const UObject* Docum
 	return DocumentManager->OpenDocument(Payload, Cause);
 }
 
+void FAssetEditor_QuestSystem::CloseDocumentTab(const UObject* DocumentID)
+{
+	TSharedRef<FTabPayload_UObject> Payload = FTabPayload_UObject::Make(DocumentID);
+	DocumentManager->CloseTab(Payload);
+}
+
 void FAssetEditor_QuestSystem::RenameNewlyAddedAction(FName InActionName)
 {
 	//TabManager->TryInvokeTab(FBlueprintEditorTabs::MyBlueprintID);
 	//TryInvokingDetailsTab(/*Flash*/false);
 
-	//if (MyBlueprintWidget.IsValid())
-	//{
-	//	// Force a refresh immediately, the item has to be present in the list for the rename requests to be successful.
-	//	MyBlueprintWidget->Refresh();
-	//	MyBlueprintWidget->SelectItemByName(InActionName, ESelectInfo::OnMouseClick);
-	//	MyBlueprintWidget->OnRequestRenameOnActionNode();
-	//}
+	if (MyQuestWidget.IsValid())
+	{
+		// Force a refresh immediately, the item has to be present in the list for the rename requests to be successful.
+		MyQuestWidget->Refresh();
+		MyQuestWidget->SelectItemByName(InActionName, ESelectInfo::OnMouseClick);
+		MyQuestWidget->OnRequestRenameOnActionNode();
+	}
 }
 
 void FAssetEditor_QuestSystem::LogSimpleMessage(const FText& MessageText)

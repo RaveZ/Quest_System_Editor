@@ -6,6 +6,9 @@
 
 #define LOCTEXT_NAMESPACE "QuestSystemGraph"
 
+
+
+
 UQuestSystemGraph::UQuestSystemGraph()
 {
 	NodeType = UQuestSystemGraphNode::StaticClass();

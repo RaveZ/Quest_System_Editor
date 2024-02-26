@@ -71,7 +71,11 @@ public:
 	/** Accessor for determining if the current selection is a category*/
 	bool SelectionIsCategory() const;
 
-	
+	/** Selects an item by name in either the main graph action menu or the local one */
+	void SelectItemByName(const FName& ItemName, ESelectInfo::Type SelectInfo = ESelectInfo::Direct, int32 SectionId = INDEX_NONE, bool bIsCategory = false);
+
+	/** Clears the selection in the graph action menus */
+	void ClearGraphActionMenuSelection();
 
 private:
 	/** Creates widgets for the graph schema actions */
@@ -128,6 +132,9 @@ private:
 	bool CanCopy() const;
 	void OnCut();
 	bool CanCut() const;
+
+	/** Helper function to delete a graph in the MyBlueprint window */
+	void OnDeleteGraph(UEdGraph* InGraph);
 
 	/** Helper function to open the selected graph */
 	void OpenGraph(FDocumentTracker::EOpenDocumentCause InCause, bool bOpenExternalGraphInNewEditor = false);

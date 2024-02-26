@@ -2,8 +2,37 @@
 
 
 #include "BFL_QuestSystem.h"
+#include "QuestSystemGraphNode_Root.h"
 
-UQuestSystemGraph* UBFL_QuestSystem::RunQuest(UQuestSystemGraph* _quest)
+#define LOCTEXT_NAMESPACE "BFL_QuestGraph"
+UQuestSystemGraph* UBFL_QuestSystem::RunQuest(UQuestSystemGraph* QuestAsset)
 {
-	return Cast<UQuestSystemGraph>(_quest);
+	if (QuestAsset == NULL)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("RunQuest: Unable to run NULL Quest Graph"));
+		return false;
+	}
+
+	bool bSuccess = true;
+	UQuestSystemGraph* Quest = CastChecked<UQuestSystemGraph>(QuestAsset);
+
+	for (UQuestSystemGraphNode* Node : Quest->RootNodes)
+	{
+		//TODO : pengecekan state quest dan state custom untuk menggantikan ENUM QUestState
+		if (UQuestSystemGraphNode_Root* RootNode = Cast<UQuestSystemGraphNode_Root>(Node))
+		{
+			if (RootNode->QuestState == EQuestState::E_Active)
+			{
+				RootNode->GoToNextNode();
+
+			}
+				
+		}
+	}	
+	
+	
+
+	return Cast<UQuestSystemGraph>(QuestAsset);
 }
+
+#undef LOCTEXT_NAMESPACE

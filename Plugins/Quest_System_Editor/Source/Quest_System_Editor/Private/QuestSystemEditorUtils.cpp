@@ -89,6 +89,95 @@ UEdGraph* FQuestSystemEditorUtils::CreateNewGraph(UObject* ParentScope, const FN
 	return NewGraph;
 }
 
+
+
+void FQuestSystemEditorUtils::RemoveNode(UQuestSystemGraph* QuestSystemGraph, UEdNode_QuestSystemNode* Node, bool bDontRecompile)
+{
+	check(Node);
+
+	const UEdGraphSchema* Schema = nullptr;
+
+	// Ensure we mark parent graph modified
+	if (UEdGraph* GraphObj = Node->GetGraph())
+	{
+		GraphObj->Modify();
+		Schema = GraphObj->GetSchema();
+	}
+
+	Node->Modify();
+
+	// Timelines will be removed from the blueprint if the node is a UK2Node_Timeline
+	if (Schema)
+	{
+		Schema->BreakNodeLinks(*Node);
+	}
+
+	Node->DestroyNode();
+
+	/*if (!bDontRecompile && (Blueprint != nullptr))
+	{
+		FBlueprintEditorUtils::MarkBlueprintAsStructurallyModified(Blueprint);
+	}*/
+}
+
+void FQuestSystemEditorUtils::RemoveGraph(UQuestSystemGraph* QuestSystemGraph, UEdGraph* GraphToRemove)
+{
+	GraphToRemove->Modify();
+
+	for (UObject* TestOuter = GraphToRemove->GetOuter(); TestOuter; TestOuter = TestOuter->GetOuter())
+	{
+		if (TestOuter == QuestSystemGraph)
+		{
+			QuestSystemGraph->QuestGraphPages.Remove(GraphToRemove);
+
+			// Can't just call Remove, the object is wrapped in a struct
+			for (int EditedDocIdx = 0; EditedDocIdx < QuestSystemGraph->LastEditedDocuments.Num(); ++EditedDocIdx)
+			{
+				if (QuestSystemGraph->LastEditedDocuments[EditedDocIdx].EditedObjectPath.ResolveObject() == GraphToRemove)
+				{
+					QuestSystemGraph->LastEditedDocuments.RemoveAt(EditedDocIdx);
+					break;
+				}
+			}
+		}
+		else if (UEdGraph* OuterGraph = Cast<UEdGraph>(TestOuter))
+		{
+			// remove ourselves
+			OuterGraph->Modify();
+			OuterGraph->SubGraphs.Remove(GraphToRemove);
+		}
+		else if (!(Cast<UEdGraphNode>(TestOuter) && Cast<UEdGraphNode>(TestOuter)->GetSubGraphs().Num() > 0))
+		{
+			break;
+		}
+	}
+
+	
+
+	// Handle subgraphs held in graph
+	TArray<UEdGraphNode*> AllNodes;
+	GraphToRemove->GetNodesOfClass<UEdGraphNode>(AllNodes);
+
+	for (UEdGraphNode* GraphNode : AllNodes)
+	{
+		for (UEdGraph* SubGraph : GraphNode->GetSubGraphs())
+		{
+			if (SubGraph && SubGraph->GetOuter()->IsA(UEdGraphNode::StaticClass()))
+			{
+				FQuestSystemEditorUtils::RemoveGraph(QuestSystemGraph, SubGraph);
+			}
+		}
+	}
+
+	GraphToRemove->GetSchema()->HandleGraphBeingDeleted(*GraphToRemove);
+
+	GraphToRemove->Rename(nullptr, QuestSystemGraph ? QuestSystemGraph->GetOuter() : nullptr, REN_DoNotDirty | REN_DontCreateRedirectors);
+	GraphToRemove->ClearFlags(RF_Standalone | RF_Public);
+	GraphToRemove->RemoveFromRoot();
+
+	
+}
+
 void FQuestSystemEditorUtils::AddQuestGraphPage(UQuestSystemGraph* QuestSystemGraph, UEdGraph* Graph)
 {
 #if WITH_EDITORONLY_DATA

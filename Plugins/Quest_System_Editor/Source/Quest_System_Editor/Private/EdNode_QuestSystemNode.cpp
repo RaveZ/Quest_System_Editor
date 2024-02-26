@@ -82,12 +82,30 @@ FLinearColor UEdNode_QuestSystemNode::GetBackgroundColor() const
 
 UEdGraphPin* UEdNode_QuestSystemNode::GetInputPin() const
 {
-	return Pins[0];
+	//return Pins[0];
+	for (int32 PinIndex = 0; PinIndex < Pins.Num(); PinIndex++)
+	{
+		if (Pins[PinIndex]->Direction == EGPD_Input)
+		{
+			return Pins[PinIndex];
+		}
+	}
+
+	return nullptr;
 }
 
 UEdGraphPin* UEdNode_QuestSystemNode::GetOutputPin() const
 {
-	return Pins[1];
+	//return Pins[1];
+	for (int32 PinIndex = 0; PinIndex < Pins.Num(); PinIndex++)
+	{
+		if (Pins[PinIndex]->Direction == EGPD_Output)
+		{
+			return Pins[PinIndex];
+		}
+	}
+
+	return nullptr;
 }
 
 bool UEdNode_QuestSystemNode::UsesBlueprint() const

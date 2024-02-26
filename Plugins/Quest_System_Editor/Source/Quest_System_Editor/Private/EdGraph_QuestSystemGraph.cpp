@@ -3,6 +3,7 @@
 
 #include "EdGraph_QuestSystemGraph.h"
 #include "EdNode_QuestSystemEdge.h"
+#include "EdNode_QuestSystemRoot.h"
 #include "EdNode_QuestSystemNode.h"
 
 UEdGraph_QuestSystemGraph::UEdGraph_QuestSystemGraph()
@@ -90,6 +91,13 @@ void UEdGraph_QuestSystemGraph::RebuildQuestSystemGraph()
 			Edge->EndNode = EndNode->QuestSystemGraphNode;
 			Edge->StartNode->Edges.Add(Edge->EndNode, Edge);
 		}
+
+		if (UEdNode_QuestSystemRoot* RootNode = Cast<UEdNode_QuestSystemRoot>(Nodes[i]))
+		{
+			if (RootNode->QuestSystemGraphNode == nullptr)
+				continue;
+			Graph->RootNodes.Add(RootNode->QuestSystemGraphNode);
+		}
 	}
 
 	for (int i = 0; i < EdGraphAllNodes.Num(); ++i)
@@ -97,10 +105,12 @@ void UEdGraph_QuestSystemGraph::RebuildQuestSystemGraph()
 		UQuestSystemGraphNode* Node = EdGraphAllNodes[i];
 		if (Node->ParentNodes.Num() == 0)
 		{
-			Graph->RootNodes.Add(Node);
+			//use this line below if you want to automatically detect rootnodes baed on their parent
+			//Graph->RootNodes.Add(Node);
 
 			SortNodes(Node);
 		}
+
 		Graph->AllNodes.Add(Node);
 
 		Node->Graph = Graph;

@@ -22,7 +22,7 @@ void FMyQuestCommands::RegisterCommands()
 	UI_COMMAND(OpenExternalGraph, "Open External Graph", "Opens up this external graph's graph panel in its own asset editor", EUserInterfaceActionType::Button, FInputChord());
 	UI_COMMAND(FocusNode, "Focus", "Focuses on the associated node", EUserInterfaceActionType::Button, FInputChord());
 	UI_COMMAND(FocusNodeInNewTab, "Focus in New Tab", "Focuses on the associated node in a new tab", EUserInterfaceActionType::Button, FInputChord());
-	UI_COMMAND(DeleteEntry, "Delete", "Deletes this function or variable from this blueprint.", EUserInterfaceActionType::Button, FInputChord(EKeys::Platform_Delete));
+	UI_COMMAND(DeleteEntry, "Delete", "Deletes this function or variable from this Quest Editor.", EUserInterfaceActionType::Button, FInputChord(EKeys::Platform_Delete));
 }
 
 BEGIN_SLATE_FUNCTION_BUILD_OPTIMIZATION
@@ -260,6 +260,33 @@ void SMyQuest::Refresh()
 bool SMyQuest::SelectionIsCategory() const
 {
 	return !SelectionHasContextMenu();
+}
+
+void SMyQuest::SelectItemByName(const FName& ItemName, ESelectInfo::Type SelectInfo, int32 SectionId, bool bIsCategory)
+{
+	// Check if the graph action menu is being told to clear
+	if (ItemName == NAME_None)
+	{
+		ClearGraphActionMenuSelection();
+	}
+	else
+	{
+		// Attempt to select the item in the main graph action menu
+		const bool bSucceededAtSelecting = GraphActionMenu->SelectItemByName(ItemName, SelectInfo, SectionId, bIsCategory);
+		if (!bSucceededAtSelecting)
+		{
+			// We failed to select the item, maybe because it was filtered out?
+			// Reset the item filter and try again (we don't do this first because someone went to the effort of typing
+			// a filter and probably wants to keep it unless it is getting in the way, as it just has)
+			//OnResetItemFilter();
+			GraphActionMenu->SelectItemByName(ItemName, SelectInfo, SectionId, bIsCategory);
+		}
+	}
+}
+
+void SMyQuest::ClearGraphActionMenuSelection()
+{
+	GraphActionMenu->SelectItemByName(NAME_None);
 }
 
 
@@ -548,11 +575,31 @@ void SMyQuest::OnFocusNodeInNewTab()
 }
 void SMyQuest::OnDeleteEntry()
 {
+	if (FAssetSchemaAction_QuestSystemGraph* GraphAction = SelectionAsGraph())
+	{
+		OnDeleteGraph(GraphAction->EdGraph);
+	}
+
+	Refresh();
+	//BlueprintEditorPtr.Pin()->GetInspector()->ShowDetailsForObjects(TArray<UObject*>());
+
 }
+
 bool SMyQuest::CanDeleteEntry() const
 {
+	// Cannot delete entries while not in editing mode
+	/*if (!IsEditingMode())
+	{
+		return false;
+	}*/
+
+	if (FAssetSchemaAction_QuestSystemGraph* GraphAction = SelectionAsGraph())
+	{
+		return (GraphAction->EdGraph ? GraphAction->EdGraph->bAllowDeletion : false);
+	}
 	return false;
 }
+
 bool SMyQuest::CanRequestRenameOnActionNode() const
 {
 	TArray<TSharedPtr<FEdGraphSchemaAction> > SelectedActions;
@@ -565,6 +612,7 @@ bool SMyQuest::CanRequestRenameOnActionNode() const
 	}
 	return false;
 }
+
 bool SMyQuest::IsDuplicateActionVisible() const
 {
 	return false;
@@ -593,6 +641,46 @@ void SMyQuest::OnCut()
 bool SMyQuest::CanCut() const
 {
 	return false;
+}
+
+void SMyQuest::OnDeleteGraph(UEdGraph* InGraph)
+{
+	if (InGraph && InGraph->bAllowDeletion)
+	{
+		if (const UEdGraphSchema* Schema = InGraph->GetSchema())
+		{
+			if (Schema->TryDeleteGraph(InGraph))
+			{
+				return;
+			}
+		}
+
+		const FScopedTransaction Transaction(LOCTEXT("RemoveGraph", "Remove Graph"));
+		GetQuestSystemObj()->Modify();
+
+		InGraph->Modify();
+
+		
+		// Remove any  nodes bound to this graph
+		TArray<UEdNode_QuestSystemNode*> AllNodes;
+		FQuestSystemEditorUtils::GetAllNodesOfClass<UEdNode_QuestSystemNode>(GetQuestSystemObj(), AllNodes);
+
+		const bool bDontRecompile = true;
+		for (UEdNode_QuestSystemNode* CompNode : AllNodes)
+		{
+			if (CompNode->GetQuestSystemGraphEdGraph() == InGraph)
+			{
+				FQuestSystemEditorUtils::RemoveNode(GetQuestSystemObj(), CompNode, bDontRecompile);
+			}
+		}
+		
+
+		FQuestSystemEditorUtils::RemoveGraph(GetQuestSystemObj(), InGraph);
+		QuestEditorPtr.Pin()->CloseDocumentTab(InGraph);
+
+
+		InGraph = NULL;
+	}
 }
 
 void SMyQuest::OpenGraph(FDocumentTracker::EOpenDocumentCause InCause, bool bOpenExternalGraphInNewEditor)

@@ -7,9 +7,15 @@
 #include "UObject/NoExportTypes.h"
 #include "QuestSystemGraphNode_Task.generated.h"
 
-/**
- * 
- */
+UENUM(BlueprintType)
+enum class EClearCondition : uint8
+{
+    E_Default		UMETA(DisplayName = "DEFAULT"),
+    E_Slay			UMETA(DisplayName = "SLAY"),
+    E_Collect		UMETA(DisplayName = "COLLECT"),
+    E_Travel		UMETA(DisplayName = "TRAVEL"),
+};
+
 UCLASS()
 class QUEST_SYSTEM_RUNTIME_API UQuestSystemGraphNode_Task : public UQuestSystemGraphNode
 {

@@ -122,4 +122,17 @@ UQuestSystemGraph* UQuestSystemGraphNode::GetGraph() const
 	return Graph;
 }
 
+void UQuestSystemGraphNode::GoToNextNode() 
+{
+	if (Graph == NULL)
+		return;
+
+	for (UQuestSystemGraphNode* Node : ChildrenNodes)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("Node"));
+	}
+	
+	
+}
+
 #undef LOCTEXT_NAMESPACE

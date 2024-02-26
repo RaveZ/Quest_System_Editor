@@ -16,5 +16,5 @@ class QUEST_SYSTEM_RUNTIME_API UBFL_QuestSystem : public UBlueprintFunctionLibra
 	GENERATED_BODY()
 public:
 	UFUNCTION(BlueprintCallable)
-	static UQuestSystemGraph* RunQuest(UQuestSystemGraph* _quest);
+	static UQuestSystemGraph* RunQuest(UQuestSystemGraph* QuestAsset);
 };
