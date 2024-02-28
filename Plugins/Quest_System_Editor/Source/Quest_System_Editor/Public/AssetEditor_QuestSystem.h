@@ -237,6 +237,12 @@ public:
 	TSharedPtr<FDocumentTracker> DocumentManager;
 	TSharedPtr<class IDetailsView> PropertyWidget;
 
+	/** Currently focused Editor Graph*/
+	UEdGraph* FocusedEdGraph;
+
+	/** Currently focused graph editor */
+	TSharedPtr<SGraphEditor> ViewportWidget;
+
 protected:
 
 	/** Factory that spawns graph editors; used to look up all tabs spawned by it. */
@@ -246,14 +252,13 @@ protected:
 
 	UQuestSystemGraph* EditingQuestGraph;
 
+
 	//Toolbar
 	TSharedPtr<class FAssetEditorToolbar_QuestSystem> ToolbarBuilder;
 
 	/** Handle to the registered OnPackageSave delegate */
 	FDelegateHandle OnPackageSavedDelegateHandle;
 
-	/** Currently focused graph editor */
-	TSharedPtr<SGraphEditor> ViewportWidget;
 	TSharedPtr<class IDetailsView> EditorSettingsWidget;
 	TSharedPtr<class SMyQuest> MyQuestWidget;
 

@@ -80,6 +80,16 @@ UEdGraph* FQuestSystemEditorUtils::CreateNewGraph(UObject* ParentScope, const FN
 
 	NewGraph->Schema = SchemaClass;
 	NewGraph->GetSchema()->CreateDefaultNodesForGraph(*NewGraph);
+	
+	if (UEdGraph_QuestSystemGraph* QuestGraph = Cast<UEdGraph_QuestSystemGraph>(NewGraph))
+	{
+		QuestGraph->QuestSystem = NewObject<UQuestSystem>(ParentScope, UQuestSystem::StaticClass(), NAME_None, RF_Transactional);
+		
+		if (UQuestSystemGraph* QuestSystemGraph = Cast<UQuestSystemGraph>(QuestGraph->GetQuestSystemGraph()))
+		{
+			QuestSystemGraph->QuestSystems.Add(QuestGraph->QuestSystem);
+		}
+	}
 
 	// Now move to where we want it to. Workaround to ensure transaction buffer is correctly utilized
 	if (bRename)
@@ -129,6 +139,10 @@ void FQuestSystemEditorUtils::RemoveGraph(UQuestSystemGraph* QuestSystemGraph, U
 		if (TestOuter == QuestSystemGraph)
 		{
 			QuestSystemGraph->QuestGraphPages.Remove(GraphToRemove);
+			if (UEdGraph_QuestSystemGraph* QuestGraphToRemove = Cast<UEdGraph_QuestSystemGraph>(GraphToRemove))
+			{
+				QuestSystemGraph->QuestSystems.Remove(QuestGraphToRemove->QuestSystem);
+			}
 
 			// Can't just call Remove, the object is wrapped in a struct
 			for (int EditedDocIdx = 0; EditedDocIdx < QuestSystemGraph->LastEditedDocuments.Num(); ++EditedDocIdx)

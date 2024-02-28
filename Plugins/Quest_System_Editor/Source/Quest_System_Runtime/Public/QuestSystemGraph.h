@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "QuestSystemGraphNode.h"
+#include "QuestSystem.h"
 #include "QuestSystemGraphNode_Root.h"
 #include "QuestSystemGraphEdge.h"
 #include "GameplayTagContainer.h"
@@ -21,33 +22,25 @@ public:
 
 	UPROPERTY(EditDefaultsOnly, Category = "QuestSystemGraph")
 		FString Name;
+
 	UPROPERTY(EditDefaultsOnly, Category = "QuestSystemGraph")
 		TSubclassOf<UQuestSystemGraphNode> NodeType;
+
 	UPROPERTY(EditDefaultsOnly, Category = "QuestSystemGraph")
 		TSubclassOf<UQuestSystemGraphEdge> EdgeType;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "QuestSystemGraph")
 		FGameplayTagContainer GraphTags;
 
-	UPROPERTY(BlueprintReadOnly, Category = "QuestSystemGraph")
-		TArray<UQuestSystemGraphNode*> RootNodes;
 
+	/** Set of QuestSystem linked with Quest Graph Pages */
 	UPROPERTY(BlueprintReadOnly, Category = "QuestSystemGraph")
-		TArray<UQuestSystemGraphNode*> AllNodes;
+		TArray<UQuestSystem*> QuestSystems;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "QuestSystemGraph")
 		bool bEdgeEnabled;
 
-	UFUNCTION(BlueprintCallable, Category = "QuestSystemGraph")
-		void Print(bool ToConsole = true, bool ToScreen = true);
 
-	UFUNCTION(BlueprintCallable, Category = "QuestSystemGraph")
-		int GetLevelNum() const;
-
-	UFUNCTION(BlueprintCallable, Category = "QuestSystemGraph")
-		void GetNodesByLevel(int Level, TArray<UQuestSystemGraphNode*>& Nodes);
-
-	void ClearGraph();
 
 #if WITH_EDITORONLY_DATA
 	/** Set of quest-graph pages */

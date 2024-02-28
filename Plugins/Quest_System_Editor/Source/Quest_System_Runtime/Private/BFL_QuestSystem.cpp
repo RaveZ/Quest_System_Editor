@@ -2,10 +2,11 @@
 
 
 #include "BFL_QuestSystem.h"
+#include "QuestSystem.h"
 #include "QuestSystemGraphNode_Root.h"
 
 #define LOCTEXT_NAMESPACE "BFL_QuestGraph"
-UQuestSystemGraph* UBFL_QuestSystem::RunQuest(UQuestSystemGraph* QuestAsset)
+bool UBFL_QuestSystem::RunQuest(UQuestSystemGraph* QuestAsset)
 {
 	if (QuestAsset == NULL)
 	{
@@ -14,25 +15,24 @@ UQuestSystemGraph* UBFL_QuestSystem::RunQuest(UQuestSystemGraph* QuestAsset)
 	}
 
 	bool bSuccess = true;
-	UQuestSystemGraph* Quest = CastChecked<UQuestSystemGraph>(QuestAsset);
-
-	for (UQuestSystemGraphNode* Node : Quest->RootNodes)
+	UQuestSystemGraph* QuestSystemGraph = CastChecked<UQuestSystemGraph>(QuestAsset);
+	for (UQuestSystem* Quest : QuestSystemGraph->QuestSystems)
 	{
-		//TODO : pengecekan state quest dan state custom untuk menggantikan ENUM QUestState
-		if (UQuestSystemGraphNode_Root* RootNode = Cast<UQuestSystemGraphNode_Root>(Node))
+		for (UQuestSystemGraphNode* Node : Quest->RootNodes)
 		{
-			if (RootNode->QuestState == EQuestState::E_Active)
+			//TODO : pengecekan state quest dan state custom untuk menggantikan ENUM QUestState
+			if (Quest->QuestState == EQuestState::E_Active)
 			{
-				RootNode->GoToNextNode();
-
+				Quest->CurrentNode = Node;
+				Node->GoToNextNode();
 			}
-				
 		}
-	}	
-	
+	}
 	
 
-	return Cast<UQuestSystemGraph>(QuestAsset);
+	return bSuccess;
 }
+
+
 
 #undef LOCTEXT_NAMESPACE

@@ -911,7 +911,13 @@ void FAssetEditor_QuestSystem::RebuildQuestSystemGraph()
 		//LOG_WARNING(TEXT("FGenericGraphAssetEditor::RebuildGenericGraph EditingQuestGraph is nullptr"));
 		return;
 	}
-	GetQuestSystemObj()->ClearGraph();
+
+	/*for (UEdGraph* EdGraph : EditingQuestGraph->QuestGraphPages)
+	{
+		UEdGraph_QuestSystemGraph* QuestGraph = Cast<UEdGraph_QuestSystemGraph>(EdGraph);
+		check(EdGraph != nullptr);
+		QuestGraph->Clear();
+	}*/
 	for (UEdGraph* EdGraph : EditingQuestGraph->QuestGraphPages)
 	{
 		UEdGraph_QuestSystemGraph* QuestGraph = Cast<UEdGraph_QuestSystemGraph>(EdGraph);
@@ -1291,8 +1297,14 @@ void FAssetEditor_QuestSystem::OnSelectedNodesChanged(const TSet<class UObject*>
 
 	if (Selection.Num() == 0)
 	{
-		PropertyWidget->SetObject(EditingQuestGraph);
-
+		if (UEdGraph_QuestSystemGraph* QuestGraph = Cast<UEdGraph_QuestSystemGraph>(ViewportWidget->GetCurrentGraph()))
+		{
+			PropertyWidget->SetObject(QuestGraph->QuestSystem);
+		}
+		else
+		{
+			PropertyWidget->SetObject(nullptr);
+		}
 	}
 	else
 	{

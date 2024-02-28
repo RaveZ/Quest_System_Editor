@@ -2,6 +2,7 @@
 
 
 #include "QuestSystemGraphNode.h"
+#include "QuestSystem.h"
 #include "QuestSystemGraph.h"
 
 #define LOCTEXT_NAMESPACE "QuestSystemGraphNode"
@@ -127,12 +128,21 @@ void UQuestSystemGraphNode::GoToNextNode()
 	if (Graph == NULL)
 		return;
 
-	for (UQuestSystemGraphNode* Node : ChildrenNodes)
-	{
-		UE_LOG(LogTemp, Warning, TEXT("Node"));
-	}
+	UE_LOG(LogTemp, Warning, TEXT("Current node name: %s"), *QuestSystem->CurrentNode->NodeTitle.ToString());
+
 	
+	if (ChildrenNodes.Num() > 0) 
+	{
+		for (UQuestSystemGraphNode* Node : ChildrenNodes)
+		{
+			//TODO: Make thema able to detect the children node
+			QuestSystem->CurrentNode = Node;
+		}
+		QuestSystem->CurrentNode->GoToNextNode();
+	}
 	
 }
 
 #undef LOCTEXT_NAMESPACE
+
+

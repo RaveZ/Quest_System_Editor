@@ -350,8 +350,9 @@ FReply SMyQuest::OnCategoryDragged(const FText& InCategory, const FPointerEvent&
 }
 void SMyQuest::OnActionSelected(const TArray<TSharedPtr<FEdGraphSchemaAction>>& InActions)
 {
-	TSharedPtr<FAssetEditor_QuestSystem> QuestEditor = QuestEditorPtr.Pin();
-	QuestEditor->PropertyWidget->SetObject(GetQuestSystemObj());
+	TSharedPtr<FEdGraphSchemaAction> InAction(InActions.Num() > 0 ? InActions[0] : NULL);
+
+	
 }
 void SMyQuest::OnGlobalActionSelected(const TArray<TSharedPtr<FEdGraphSchemaAction>>& InActions, ESelectInfo::Type InSelectionType)
 {
@@ -383,10 +384,22 @@ void SMyQuest::ExecuteAction(TSharedPtr<FEdGraphSchemaAction> InAction)
 		if (InAction->GetTypeId() == FAssetSchemaAction_QuestSystemGraph::StaticGetTypeId())
 		{
 			FAssetSchemaAction_QuestSystemGraph* GraphAction = (FAssetSchemaAction_QuestSystemGraph*)InAction.Get();
+			QuestEditorPtr.Pin()->FocusedEdGraph = GraphAction->EdGraph;
 
 			if (GraphAction->EdGraph)
 			{
 				QuestEditorPtr.Pin()->JumpToHyperlink(GraphAction->EdGraph);
+
+				TSharedPtr<FAssetEditor_QuestSystem> QuestEditor = QuestEditorPtr.Pin();
+				/*if (UEdGraph_QuestSystemGraph* QuestGraph = Cast<UEdGraph_QuestSystemGraph>(QuestEditor->FocusedEdGraph))
+				{
+					QuestEditor->PropertyWidget->SetObject(QuestGraph->QuestSystem);
+				}*/
+
+				if (UEdGraph_QuestSystemGraph* QuestGraph = Cast<UEdGraph_QuestSystemGraph>(QuestEditor->ViewportWidget->GetCurrentGraph()))
+				{
+					QuestEditor->PropertyWidget->SetObject(QuestGraph->QuestSystem);
+				}
 			}
 		}
 	}
@@ -411,7 +424,7 @@ TSharedPtr<SWidget> SMyQuest::OnContextMenuOpening()
 			MenuBuilder.AddMenuEntry(FMyQuestCommands::Get().OpenExternalGraph);
 			MenuBuilder.AddMenuEntry(FMyQuestCommands::Get().FocusNode);
 			MenuBuilder.AddMenuEntry(FMyQuestCommands::Get().FocusNodeInNewTab);
-			MenuBuilder.AddMenuEntry(FGenericCommands::Get().Rename, NAME_None, LOCTEXT("Rename", "Rename"), LOCTEXT("Rename_Tooltip", "Renames this function or variable from blueprint."));
+			MenuBuilder.AddMenuEntry(FGenericCommands::Get().Rename, NAME_None, LOCTEXT("Rename", "Rename"), LOCTEXT("Rename_Tooltip", "Renames this Quest Graph."));
 			MenuBuilder.AddMenuEntry(FGenericCommands::Get().Cut);
 			MenuBuilder.AddMenuEntry(FGenericCommands::Get().Copy);
 			MenuBuilder.AddMenuEntry(FGenericCommands::Get().Duplicate);

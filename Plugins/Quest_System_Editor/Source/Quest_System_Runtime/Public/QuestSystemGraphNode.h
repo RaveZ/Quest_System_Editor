@@ -8,6 +8,7 @@
 #include "QuestSystemGraphNode.generated.h"
 
 class UQuestSystemGraph;
+class UQuestSystem;
 class UQuestSystemGraphEdge;
 
 UENUM(BlueprintType)
@@ -16,6 +17,8 @@ enum class ENodeLimits : uint8
 	Unlimited,
 	Limited
 };
+
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnNodeEvent, UQuestSystemGraphNode*, Node);
 
 UCLASS(Blueprintable)
 class QUEST_SYSTEM_RUNTIME_API UQuestSystemGraphNode : public UObject
@@ -30,7 +33,10 @@ public:
 	UPROPERTY(VisibleDefaultsOnly, Category = "QuestSystemGraphNode")
 		UQuestSystemGraph* Graph;
 
-	UPROPERTY(BlueprintReadOnly, Category = "QuestSystemGraphNode")
+	UPROPERTY(VisibleDefaultsOnly, Category = "QuestSystemGraphNode")
+		UQuestSystem* QuestSystem;
+
+		UPROPERTY(BlueprintReadOnly, Category = "QuestSystemGraphNode")
 		TArray<UQuestSystemGraphNode*> ParentNodes;
 
 	UPROPERTY(BlueprintReadOnly, Category = "QuestSystemGraphNode")
@@ -62,6 +68,8 @@ public:
 	UFUNCTION(BlueprintImplementableEvent)
 	void ReceiveExecute(AActor* OwnerActor);
 
+	UPROPERTY(BlueprintAssignable)
+	FOnNodeEvent OnNodeEvent;
 
 
 	virtual FText GetDescription_Implementation() const;

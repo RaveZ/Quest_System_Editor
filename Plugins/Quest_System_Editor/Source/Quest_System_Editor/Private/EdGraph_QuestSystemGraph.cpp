@@ -33,7 +33,7 @@ void UEdGraph_QuestSystemGraph::RebuildQuestSystemGraph()
 
 			NodeMap.Add(QuestSystemGraphNode, EdNode);
 
-			EdGraphAllNodes.Add(QuestSystemGraphNode);
+			QuestSystem->AllNodes.Add(QuestSystemGraphNode);
 
 			for (int PinIdx = 0; PinIdx < EdNode->Pins.Num(); ++PinIdx)
 			{
@@ -96,33 +96,31 @@ void UEdGraph_QuestSystemGraph::RebuildQuestSystemGraph()
 		{
 			if (RootNode->QuestSystemGraphNode == nullptr)
 				continue;
-			Graph->RootNodes.Add(RootNode->QuestSystemGraphNode);
+			QuestSystem->RootNodes.Add(RootNode->QuestSystemGraphNode);
 		}
 	}
 
-	for (int i = 0; i < EdGraphAllNodes.Num(); ++i)
+	for (int i = 0; i < QuestSystem->AllNodes.Num(); ++i)
 	{
-		UQuestSystemGraphNode* Node = EdGraphAllNodes[i];
+		UQuestSystemGraphNode* Node = QuestSystem->AllNodes[i];
 		if (Node->ParentNodes.Num() == 0)
 		{
-			//use this line below if you want to automatically detect rootnodes baed on their parent
+			//use this line below if you want to automatically detect rootnodes based on their parent
 			//Graph->RootNodes.Add(Node);
-
 			SortNodes(Node);
 		}
 
-		Graph->AllNodes.Add(Node);
-
 		Node->Graph = Graph;
+		Node->QuestSystem = QuestSystem;
 		Node->Rename(nullptr, Graph, REN_DontCreateRedirectors | REN_DoNotDirty);
 	}
 
-	/*Graph->RootNodes.Sort([&](const UQuestSystemGraphNode& L, const UQuestSystemGraphNode& R)
+	QuestSystem->RootNodes.Sort([&](const UQuestSystemGraphNode& L, const UQuestSystemGraphNode& R)
 		{
 			UEdNode_QuestSystemNode* EdNode_LNode = NodeMap[&L];
 			UEdNode_QuestSystemNode* EdNode_RNode = NodeMap[&R];
 			return EdNode_LNode->NodePosX < EdNode_RNode->NodePosX;
-		});*/
+		});
 }
 
 UQuestSystemGraph* UEdGraph_QuestSystemGraph::GetQuestSystemGraph() const
@@ -154,23 +152,20 @@ void UEdGraph_QuestSystemGraph::PostEditUndo()
 
 void UEdGraph_QuestSystemGraph::Clear()
 {
-	UQuestSystemGraph* Graph = GetQuestSystemGraph();
-
-	//Graph->ClearGraph();
+	QuestSystem->ClearGraph();
 	NodeMap.Reset();
 	EdgeMap.Reset();
-	EdGraphAllNodes.Empty();
 
 	for (int i = 0; i < Nodes.Num(); ++i)
 	{
 		if (UEdNode_QuestSystemNode* EdNode = Cast<UEdNode_QuestSystemNode>(Nodes[i]))
 		{
-			UQuestSystemGraphNode* GenericGraphNode = EdNode->QuestSystemGraphNode;
-			if (GenericGraphNode)
+			UQuestSystemGraphNode* QuestGraphNode = EdNode->QuestSystemGraphNode;
+			if (QuestGraphNode)
 			{
-				GenericGraphNode->ParentNodes.Reset();
-				GenericGraphNode->ChildrenNodes.Reset();
-				GenericGraphNode->Edges.Reset();
+				QuestGraphNode->ParentNodes.Reset();
+				QuestGraphNode->ChildrenNodes.Reset();
+				QuestGraphNode->Edges.Reset();
 			}
 		}
 	}

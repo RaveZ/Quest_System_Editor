@@ -293,7 +293,7 @@ void UAssetGraphSchema_QuestSystem::GetGraphContextActions(FGraphContextMenuBuil
 
 
 	//to check if we create another instance derived from UQuestSystemGraphNode and they will added automatically
-	/*for (TObjectIterator<UClass> It; It; ++It)
+	for (TObjectIterator<UClass> It; It; ++It)
 	{
 
 		if (It->IsChildOf(UQuestSystemGraphNode::StaticClass()) && !It->HasAnyClassFlags(CLASS_Abstract) && !Visited.Contains(*It))
@@ -323,7 +323,7 @@ void UAssetGraphSchema_QuestSystem::GetGraphContextActions(FGraphContextMenuBuil
 
 			Visited.Add(NodeType);
 		}
-	}*/
+	}
 
 
 	//Task

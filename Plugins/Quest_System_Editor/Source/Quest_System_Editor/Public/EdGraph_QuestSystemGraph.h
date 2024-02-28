@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "EdGraph/EdGraph.h"
+#include "QuestSystem.h"
 #include "EdGraph_QuestSystemGraph.generated.h"
 
 class UQuestSystemGraph;
@@ -27,6 +28,10 @@ public:
 	virtual bool Modify(bool bAlwaysMarkDirty = true) override;
 	virtual void PostEditUndo() override;
 
+	/** QuestSystem linked with this UEdGraph */
+	UPROPERTY(VisibleAnywhere, Instanced, Category = "QuestSystemGraph")
+		UQuestSystem* QuestSystem;
+
 	UPROPERTY(Transient)
 		TMap<UQuestSystemGraphNode*, UEdNode_QuestSystemNode*> NodeMap;
 
@@ -34,12 +39,9 @@ public:
 		TMap<UQuestSystemGraphEdge*, UEdNode_QuestSystemEdge*> EdgeMap;
 
 
-		/** All UQuestGraphNode for this EdGraph */
-	UPROPERTY(Transient)
-		TArray<UQuestSystemGraphNode*> EdGraphAllNodes;
+	void Clear();
 
 protected:
-	void Clear();
 
 	void SortNodes(UQuestSystemGraphNode* RootNode);
 };
