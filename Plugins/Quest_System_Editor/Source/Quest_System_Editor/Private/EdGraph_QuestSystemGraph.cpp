@@ -110,7 +110,7 @@ void UEdGraph_QuestSystemGraph::RebuildQuestSystemGraph()
 			SortNodes(Node);
 		}
 
-		Node->Graph = Graph;
+		Node->QuestGraph = Graph;
 		Node->QuestSystem = QuestSystem;
 		Node->Rename(nullptr, Graph, REN_DontCreateRedirectors | REN_DoNotDirty);
 	}

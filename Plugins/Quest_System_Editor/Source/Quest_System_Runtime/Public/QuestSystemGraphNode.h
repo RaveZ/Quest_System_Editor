@@ -18,8 +18,6 @@ enum class ENodeLimits : uint8
 	Limited
 };
 
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnNodeEvent, UQuestSystemGraphNode*, Node);
-
 UCLASS(Blueprintable)
 class QUEST_SYSTEM_RUNTIME_API UQuestSystemGraphNode : public UObject
 {
@@ -31,7 +29,7 @@ public:
 
 
 	UPROPERTY(VisibleDefaultsOnly, Category = "QuestSystemGraphNode")
-		UQuestSystemGraph* Graph;
+		UQuestSystemGraph* QuestGraph;
 
 	UPROPERTY(VisibleDefaultsOnly, Category = "QuestSystemGraphNode")
 		UQuestSystem* QuestSystem;
@@ -56,20 +54,24 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "QuestSystemGraphNode")
 		bool IsLeafNode() const;
 
-	UFUNCTION(BlueprintCallable, Category = "QuestSystemGraphNode")
-		UQuestSystemGraph* GetGraph() const;
 
 	UFUNCTION(BlueprintCallable, Category = "QuestSystemGraphNode")
 		void GoToNextNode();
 
+	UFUNCTION(BlueprintCallable, Category = "QuestSystemGraphNode")
+		AController* GetOwningController();
+
+	UFUNCTION(BlueprintCallable, Category = "QuestSystemGraphNode")
+		APawn* GetOwningPawn();
+
+	UFUNCTION(BlueprintCallable, Category = "QuestSystemGraphNode")
+		UActorComponent* GetOwningComponent();
+
+	UFUNCTION(BlueprintCallable, Category = "QuestSystemGraphNode")
+		UQuestSystemGraph* GetOwningQuest() const;
+
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "QuestSystemGraphNode")
 		FText GetDescription() const;
-
-	UFUNCTION(BlueprintImplementableEvent)
-	void ReceiveExecute(AActor* OwnerActor);
-
-	UPROPERTY(BlueprintAssignable)
-	FOnNodeEvent OnNodeEvent;
 
 
 	virtual FText GetDescription_Implementation() const;

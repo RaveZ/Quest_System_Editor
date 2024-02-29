@@ -118,17 +118,15 @@ bool UQuestSystemGraphNode::IsLeafNode() const
 	return ChildrenNodes.Num() == 0;
 }
 
-UQuestSystemGraph* UQuestSystemGraphNode::GetGraph() const
-{
-	return Graph;
-}
-
 void UQuestSystemGraphNode::GoToNextNode() 
 {
-	if (Graph == NULL)
+	if (QuestGraph == NULL)
 		return;
 
 	UE_LOG(LogTemp, Warning, TEXT("Current node name: %s"), *QuestSystem->CurrentNode->NodeTitle.ToString());
+	UE_LOG(LogTemp, Warning, TEXT("Current Task Owning Controller name: %s"), *GetOwningController()->GetFName().ToString());
+	UE_LOG(LogTemp, Warning, TEXT("Current Task Owning Pawn name: %s"), *GetOwningPawn()->GetFName().ToString());
+	UE_LOG(LogTemp, Warning, TEXT("Current Task Owning Component name: %s"), *GetOwningComponent()->GetFName().ToString());
 
 	
 	if (ChildrenNodes.Num() > 0) 
@@ -141,6 +139,26 @@ void UQuestSystemGraphNode::GoToNextNode()
 		QuestSystem->CurrentNode->GoToNextNode();
 	}
 	
+}
+
+UQuestSystemGraph* UQuestSystemGraphNode::GetOwningQuest() const
+{
+	return QuestGraph;
+}
+
+AController* UQuestSystemGraphNode::GetOwningController()
+{
+	return QuestGraph->OwningController;
+}
+
+APawn* UQuestSystemGraphNode::GetOwningPawn()
+{
+	return QuestGraph->OwningPawn;
+}
+
+UActorComponent* UQuestSystemGraphNode::GetOwningComponent()
+{
+	return QuestGraph->OwningComponent;
 }
 
 #undef LOCTEXT_NAMESPACE

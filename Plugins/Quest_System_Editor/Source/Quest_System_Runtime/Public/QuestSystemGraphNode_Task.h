@@ -24,9 +24,10 @@ public:
     UQuestSystemGraphNode_Task();
 
     UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Tasks")
-    FText Description;
+        FText Description;
 
-
+    UFUNCTION(BlueprintImplementableEvent, BlueprintCallable)
+        void OnTaskBegin(AController* OwnerController);
 
 
 #if WITH_EDITOR

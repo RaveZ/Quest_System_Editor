@@ -40,6 +40,14 @@ public:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "QuestSystemGraph")
 		bool bEdgeEnabled;
 
+	UPROPERTY(BlueprintReadWrite, Category = "QuestSystemGraph")
+		AController* OwningController;
+
+	UPROPERTY(BlueprintReadWrite, Category = "QuestSystemGraph")
+		APawn* OwningPawn;
+
+	UPROPERTY(BlueprintReadWrite, Category = "QuestSystemGraph")
+		UActorComponent* OwningComponent;
 
 
 #if WITH_EDITORONLY_DATA

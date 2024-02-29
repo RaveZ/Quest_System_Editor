@@ -255,7 +255,7 @@ void UAssetGraphSchema_QuestSystem::CreateDefaultNodesForGraph(UEdGraph& Graph) 
 	FGraphNodeCreator<UEdNode_QuestSystemRoot> NodeCreator(Graph);
 	UEdNode_QuestSystemRoot* RootNode = NodeCreator.CreateNode();
 	RootNode->QuestSystemGraphNode = NewObject<UQuestSystemGraphNode>(RootNode, UQuestSystemGraphNode_Root::StaticClass());
-	RootNode->QuestSystemGraphNode->Graph = QuestGraph;
+	RootNode->QuestSystemGraphNode->QuestGraph = QuestGraph;
 	NodeCreator.Finalize();
 	SetNodeMetaData(RootNode, FNodeMetadata::DefaultGraphNode);
 }
@@ -318,7 +318,7 @@ void UAssetGraphSchema_QuestSystem::GetGraphContextActions(FGraphContextMenuBuil
 			TSharedPtr<FAssetSchemaAction_QuestSystem_NewNode> Action(new FAssetSchemaAction_QuestSystem_NewNode(LOCTEXT("QuestSystemGraphNodeAction", "Task Node"), Desc, AddToolTip, 0));
 			Action->NodeTemplate = NewObject<UEdNode_QuestSystemNode>(ContextMenuBuilder.OwnerOfTemporaries);
 			Action->NodeTemplate->QuestSystemGraphNode = NewObject<UQuestSystemGraphNode>(Action->NodeTemplate, NodeType);
-			Action->NodeTemplate->QuestSystemGraphNode->Graph = Graph;
+			Action->NodeTemplate->QuestSystemGraphNode->QuestGraph = Graph;
 			ContextMenuBuilder.AddAction(Action);
 
 			Visited.Add(NodeType);
@@ -354,7 +354,7 @@ void UAssetGraphSchema_QuestSystem::GetGraphContextActions(FGraphContextMenuBuil
 		OpNode->ClassData = NodeClass;
 		AddOpAction->NodeTemplate = OpNode;
 		AddOpAction->NodeTemplate->QuestSystemGraphNode = NewObject<UQuestSystemGraphNode>(AddOpAction->NodeTemplate, NodeClass.GetClass(true));
-		AddOpAction->NodeTemplate->QuestSystemGraphNode->Graph = Graph;
+		AddOpAction->NodeTemplate->QuestSystemGraphNode->QuestGraph = Graph;
 	}
 
 	ContextMenuBuilder.Append(TasksBuilder);
@@ -446,7 +446,7 @@ const FPinConnectionResponse UAssetGraphSchema_QuestSystem::CanCreateConnection(
 	}
 
 
-	if (EdNode_Out->QuestSystemGraphNode->GetGraph()->bEdgeEnabled)
+	if (EdNode_Out->QuestSystemGraphNode->GetOwningQuest()->bEdgeEnabled)
 	{
 		return FPinConnectionResponse(CONNECT_RESPONSE_MAKE_WITH_CONVERSION_NODE, LOCTEXT("PinConnect", "Connect nodes with edge"));
 	}
@@ -496,7 +496,7 @@ bool UAssetGraphSchema_QuestSystem::CreateAutomaticConversionNodeAndConnections(
 	if (!NodeA || !NodeA->GetOutputPin() || !NodeB || !NodeB->GetInputPin())
 		return false;
 
-	UQuestSystemGraph* Graph = NodeA->QuestSystemGraphNode->GetGraph();
+	UQuestSystemGraph* Graph = NodeA->QuestSystemGraphNode->GetOwningQuest();
 
 	FVector2D InitPos((NodeA->NodePosX + NodeB->NodePosX) / 2, (NodeA->NodePosY + NodeB->NodePosY) / 2);
 

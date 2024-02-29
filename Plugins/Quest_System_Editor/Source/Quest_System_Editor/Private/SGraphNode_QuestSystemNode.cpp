@@ -469,7 +469,7 @@ bool SGraphNode_QuestSystemNode::IsNameReadOnly() const
 	UEdNode_QuestSystemNode* EdNode_Node = Cast<UEdNode_QuestSystemNode>(GraphNode);
 	check(EdNode_Node != nullptr);
 
-	UQuestSystemGraph* QuestSystemGraph = EdNode_Node->QuestSystemGraphNode->Graph;
+	UQuestSystemGraph* QuestSystemGraph = EdNode_Node->QuestSystemGraphNode->QuestGraph;
 	check(QuestSystemGraph != nullptr);
 
 	return (!QuestSystemGraph->bCanRenameNode || !EdNode_Node->QuestSystemGraphNode->IsNameEditable()) || SGraphNode::IsNameReadOnly();
