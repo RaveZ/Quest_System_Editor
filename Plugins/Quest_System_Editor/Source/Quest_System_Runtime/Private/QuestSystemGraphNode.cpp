@@ -118,29 +118,6 @@ bool UQuestSystemGraphNode::IsLeafNode() const
 	return ChildrenNodes.Num() == 0;
 }
 
-void UQuestSystemGraphNode::GoToNextNode() 
-{
-	if (QuestGraph == NULL)
-		return;
-
-	UE_LOG(LogTemp, Warning, TEXT("Current node name: %s"), *QuestSystem->CurrentNode->NodeTitle.ToString());
-	UE_LOG(LogTemp, Warning, TEXT("Current Task Owning Controller name: %s"), *GetOwningController()->GetFName().ToString());
-	UE_LOG(LogTemp, Warning, TEXT("Current Task Owning Pawn name: %s"), *GetOwningPawn()->GetFName().ToString());
-	UE_LOG(LogTemp, Warning, TEXT("Current Task Owning Component name: %s"), *GetOwningComponent()->GetFName().ToString());
-
-	
-	if (ChildrenNodes.Num() > 0) 
-	{
-		for (UQuestSystemGraphNode* Node : ChildrenNodes)
-		{
-			//TODO: Make thema able to detect the children node
-			QuestSystem->CurrentNode = Node;
-		}
-		QuestSystem->CurrentNode->GoToNextNode();
-	}
-	
-}
-
 UQuestSystemGraph* UQuestSystemGraphNode::GetOwningQuest() const
 {
 	return QuestGraph;

@@ -2,6 +2,7 @@
 
 
 #include "QuestSystemGraphNode_Task.h"
+#include "QuestSystem.h"
 
 #define LOCTEXT_NAMESPACE "QuestSystemGraphNode_Task"
 
@@ -10,6 +11,13 @@ UQuestSystemGraphNode_Task::UQuestSystemGraphNode_Task()
 }
 
 #if WITH_EDITOR
+void UQuestSystemGraphNode_Task::CompleteTask()
+{
+    if (QuestSystem == NULL)
+        return;
+
+    QuestSystem->GoToNextNode();
+}
 FText UQuestSystemGraphNode_Task::GetNodeTitle() const
 {
     return Super::GetNodeTitle();

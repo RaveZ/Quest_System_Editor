@@ -3,12 +3,16 @@
 
 #include "QuestComponent.h"
 
+
+
+#define LOCTEXT_NAMESPACE "QuestComponent"
 // Sets default values for this component's properties
 UQuestComponent::UQuestComponent()
 {
 	// Set this component to be initialized when the game starts, and to be ticked every frame.  You can turn these features
 	// off to improve performance if you don't need them.
 	PrimaryComponentTick.bCanEverTick = true;
+	QuestAssets.Empty();
 
 	// ...
 }
@@ -31,17 +35,18 @@ bool UQuestComponent::StartQuest(UQuestSystemGraph* QuestAsset)
 	QuestAsset->OwningPawn = OwningPawn;
 	QuestAsset->OwningComponent = OwningComponent;
 
+	QuestAssets.Add(QuestAsset);
 
 	bool bSuccess = true;
-	for (UQuestSystem* Quest : QuestAsset->QuestSystems)
+	for (UQuestSystem* QuestSystem : QuestAsset->QuestSystems)
 	{
-		for (UQuestSystemGraphNode* Node : Quest->RootNodes)
+		for (UQuestSystemGraphNode* Node : QuestSystem->RootNodes)
 		{
 			//TODO : pengecekan state quest dan state custom untuk menggantikan ENUM QuestState
-			if (Quest->QuestState == EQuestState::E_Active)
+			if (QuestSystem->QuestState == EQuestState::E_Active)
 			{
-				Quest->CurrentNode = Node;
-				Node->GoToNextNode();
+				QuestSystem->CurrentNode = Node;
+				QuestSystem->GoToNextNode();
 			}
 		}
 	}
@@ -68,3 +73,4 @@ void UQuestComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActor
 	// ...
 }
 
+#undef LOCTEXT_NAMESPACE

@@ -26,9 +26,14 @@ public:
     UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Tasks")
         FText Description;
 
-    UFUNCTION(BlueprintImplementableEvent, BlueprintCallable)
+    UFUNCTION(BlueprintImplementableEvent, BlueprintCallable, Category = "Tasks")
         void OnTaskBegin(AController* OwnerController);
 
+    UFUNCTION(BlueprintImplementableEvent, BlueprintCallable, Category = "Tasks")
+        void OnTaskCompleted(AController* OwnerController);
+
+    UFUNCTION(BlueprintCallable, Category = "Tasks")
+        void CompleteTask();
 
 #if WITH_EDITOR
     virtual FText GetNodeTitle() const override;

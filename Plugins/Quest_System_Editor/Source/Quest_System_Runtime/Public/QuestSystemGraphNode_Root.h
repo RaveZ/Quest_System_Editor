@@ -15,6 +15,6 @@ class QUEST_SYSTEM_RUNTIME_API UQuestSystemGraphNode_Root : public UQuestSystemG
 	GENERATED_BODY()
 
 public:
-
+		
 	
 };

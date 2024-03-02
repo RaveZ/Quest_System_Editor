@@ -17,14 +17,17 @@ public:
 	// Sets default values for this component's properties
 	UQuestComponent();
 
+	UPROPERTY(BlueprintReadWrite, Category = "QuestComponent")
+		UActorComponent* OwningComponent;
+
 	UPROPERTY(BlueprintReadOnly, Category = "QuestComponent")
 		AController* OwningController;
 
-	UPROPERTY(BlueprintReadWrite, Category = "QuestSystemGraph")
+	UPROPERTY(BlueprintReadWrite, Category = "QuestComponent")
 		APawn* OwningPawn;
 
-	UPROPERTY(BlueprintReadWrite, Category = "QuestSystemGraph")
-		UActorComponent* OwningComponent;
+	UPROPERTY(BlueprintReadOnly, Category = "QuestComponent")
+		TArray<UQuestSystemGraph*> QuestAssets;
 
 	UFUNCTION(BlueprintCallable, Category = "QuestComponent")
 		bool StartQuest(UQuestSystemGraph* QuestAsset);

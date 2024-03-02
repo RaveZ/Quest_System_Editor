@@ -2,7 +2,11 @@
 
 
 #include "QuestSystem.h"
+#include "QuestSystemGraph.h"
+#include "QuestSystemGraphNode_Task.h"
 
+
+#define LOCTEXT_NAMESPACE "QuestSystem"
 
 void UQuestSystem::Print(bool ToConsole, bool ToScreen)
 {
@@ -38,6 +42,34 @@ void UQuestSystem::Print(bool ToConsole, bool ToScreen)
 		CurrLevelNodes = NextLevelNodes;
 		NextLevelNodes.Reset();
 		++Level;
+	}
+}
+
+void UQuestSystem::GoToNextNode()
+{
+	if (QuestGraph == NULL)
+		return;
+	if (CurrentNode == NULL)
+		return;
+
+	UE_LOG(LogTemp, Warning, TEXT("Current node name: %s"), *CurrentNode->NodeTitle.ToString());
+	UE_LOG(LogTemp, Warning, TEXT("Current Task Owning Controller name: %s"), *CurrentNode->GetOwningController()->GetFName().ToString());
+	UE_LOG(LogTemp, Warning, TEXT("Current Task Owning Pawn name: %s"), *CurrentNode->GetOwningPawn()->GetFName().ToString());
+	UE_LOG(LogTemp, Warning, TEXT("Current Task Owning Component name: %s"), *CurrentNode->GetOwningComponent()->GetFName().ToString());
+
+
+	if (CurrentNode->ChildrenNodes.Num() > 0)
+	{
+		for (UQuestSystemGraphNode* Node : CurrentNode->ChildrenNodes)
+		{
+			//TODO: Make them able to detect the children node AND Check Condition feature
+			CurrentNode = Node;
+			if (UQuestSystemGraphNode_Task* TaskNode = Cast<UQuestSystemGraphNode_Task>(CurrentNode))
+			{
+				TaskNode->OnTaskBegin(GetOwningController());
+			}
+		}
+		//GoToNextNode();
 	}
 }
 
@@ -97,6 +129,26 @@ void UQuestSystem::GetNodesByLevel(int Level, TArray<UQuestSystemGraphNode*>& No
 	}
 }
 
+AController* UQuestSystem::GetOwningController()
+{
+	return QuestGraph->OwningController;
+}
+
+APawn* UQuestSystem::GetOwningPawn()
+{
+	return QuestGraph->OwningPawn;
+}
+
+UActorComponent* UQuestSystem::GetOwningComponent()
+{
+	return QuestGraph->OwningComponent;
+}
+
+UQuestSystemGraph* UQuestSystem::GetOwningQuest() const
+{
+	return QuestGraph;
+}
+
 void UQuestSystem::ClearGraph()
 {
 	for (int i = 0; i < AllNodes.Num(); ++i)
@@ -113,3 +165,5 @@ void UQuestSystem::ClearGraph()
 	AllNodes.Empty();
 	RootNodes.Empty();
 }
+
+#undef LOCTEXT_NAMESPACE

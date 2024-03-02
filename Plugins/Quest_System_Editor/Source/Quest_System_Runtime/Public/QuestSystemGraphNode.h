@@ -34,7 +34,7 @@ public:
 	UPROPERTY(VisibleDefaultsOnly, Category = "QuestSystemGraphNode")
 		UQuestSystem* QuestSystem;
 
-		UPROPERTY(BlueprintReadOnly, Category = "QuestSystemGraphNode")
+	UPROPERTY(BlueprintReadOnly, Category = "QuestSystemGraphNode")
 		TArray<UQuestSystemGraphNode*> ParentNodes;
 
 	UPROPERTY(BlueprintReadOnly, Category = "QuestSystemGraphNode")
@@ -54,9 +54,6 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "QuestSystemGraphNode")
 		bool IsLeafNode() const;
 
-
-	UFUNCTION(BlueprintCallable, Category = "QuestSystemGraphNode")
-		void GoToNextNode();
 
 	UFUNCTION(BlueprintCallable, Category = "QuestSystemGraphNode")
 		AController* GetOwningController();

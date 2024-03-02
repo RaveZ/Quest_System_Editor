@@ -14,10 +14,10 @@
 UENUM(BlueprintType)
 enum class EQuestState : uint8
 {
-	E_Inactive		UMETA(DisplayName = "INACTIVE"),
 	E_Active		UMETA(DisplayName = "ACTIVE"),
 	E_Complete		UMETA(DisplayName = "COMPLETE"),
 	E_Fail			UMETA(DisplayName = "FAIL"),
+	E_Inactive		UMETA(DisplayName = "INACTIVE"),
 };
 
 UCLASS(Blueprintable)
@@ -26,10 +26,16 @@ class QUEST_SYSTEM_RUNTIME_API UQuestSystem : public UObject
 	GENERATED_BODY()
 public:
 	/** Quest ID */
-	UPROPERTY(Category = Description, EditAnywhere)
-		FString QuestID;
-		
-	UPROPERTY(EditDefaultsOnly, Category = "QuestSystemGraphNode_Root")
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "QuestSystem")
+		FName QuestID;
+
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "QuestSystem")
+		FText Description;
+	
+		UPROPERTY(VisibleDefaultsOnly, Category = "QuestSystem")
+		UQuestSystemGraph* QuestGraph;
+	
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "QuestSystem")
 		EQuestState QuestState = EQuestState::E_Active;
 	
 	UPROPERTY(BlueprintReadOnly, Category = "QuestSystem")
@@ -41,15 +47,28 @@ public:
 	UPROPERTY(BlueprintReadOnly, Category = "QuestSystem")
 		TArray<UQuestSystemGraphNode*> AllNodes;
 
+	UFUNCTION(BlueprintCallable, Category = "QuestSystem")
+		void Print(bool ToConsole = true, bool ToScreen = true);
 
 	UFUNCTION(BlueprintCallable, Category = "QuestSystem")
-	void Print(bool ToConsole = true, bool ToScreen = true);
+		void GoToNextNode();
 
 	UFUNCTION(BlueprintCallable, Category = "QuestSystem")
-	int GetLevelNum() const;
+		int GetLevelNum() const;
 
 	UFUNCTION(BlueprintCallable, Category = "QuestSystem")
-	void GetNodesByLevel(int Level, TArray<UQuestSystemGraphNode*>& Nodes);
+		void GetNodesByLevel(int Level, TArray<UQuestSystemGraphNode*>& Nodes);
 
+	UFUNCTION(BlueprintCallable, Category = "QuestSystem")
+		AController* GetOwningController();
+
+	UFUNCTION(BlueprintCallable, Category = "QuestSystem")
+		APawn* GetOwningPawn();
+
+	UFUNCTION(BlueprintCallable, Category = "QuestSystem")
+		UActorComponent* GetOwningComponent();
+
+	UFUNCTION(BlueprintCallable, Category = "QuestSystem")
+		UQuestSystemGraph* GetOwningQuest() const;
 	void ClearGraph();
 };
