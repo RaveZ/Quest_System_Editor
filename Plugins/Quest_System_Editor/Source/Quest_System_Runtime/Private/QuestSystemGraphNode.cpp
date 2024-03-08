@@ -2,6 +2,7 @@
 
 
 #include "QuestSystemGraphNode.h"
+#include "QuestSystemGraphEdge.h"
 #include "QuestSystem.h"
 #include "QuestSystemGraph.h"
 
@@ -118,24 +119,37 @@ bool UQuestSystemGraphNode::IsLeafNode() const
 	return ChildrenNodes.Num() == 0;
 }
 
-UQuestSystemGraph* UQuestSystemGraphNode::GetOwningQuest() const
+UQuestSystemGraph* UQuestSystemGraphNode::GetOwningQuest()
 {
+	if (!QuestGraph)
+		return nullptr;
+
 	return QuestGraph;
 }
 
 AController* UQuestSystemGraphNode::GetOwningController()
 {
+	if (!QuestGraph)
+		return nullptr;
+	
+
 	return QuestGraph->OwningController;
 }
 
 APawn* UQuestSystemGraphNode::GetOwningPawn()
 {
+	if (!QuestGraph)
+		return nullptr;
+
 	return QuestGraph->OwningPawn;
 }
 
-UActorComponent* UQuestSystemGraphNode::GetOwningComponent()
+UQuestComponent* UQuestSystemGraphNode::GetQuestComponent()
 {
-	return QuestGraph->OwningComponent;
+	if (!QuestGraph)
+		return nullptr;
+
+	return QuestGraph->QuestComponent;
 }
 
 #undef LOCTEXT_NAMESPACE

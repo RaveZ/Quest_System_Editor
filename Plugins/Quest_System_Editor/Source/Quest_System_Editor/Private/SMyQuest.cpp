@@ -372,6 +372,7 @@ void SMyQuest::OnActionDoubleClicked(const TArray<TSharedPtr<FEdGraphSchemaActio
 	ExecuteAction(InAction);
 
 }
+
 void SMyQuest::ExecuteAction(TSharedPtr<FEdGraphSchemaAction> InAction)
 {
 	// Force it to open in a new document if shift is pressed
@@ -404,6 +405,7 @@ void SMyQuest::ExecuteAction(TSharedPtr<FEdGraphSchemaAction> InAction)
 		}
 	}
 }
+
 TSharedPtr<SWidget> SMyQuest::OnContextMenuOpening()
 {
 	if (!QuestEditorPtr.IsValid())

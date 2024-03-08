@@ -3,12 +3,12 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "QuestSystemGraphNode.h"
 #include "UObject/NoExportTypes.h"
 #include "QuestSystemGraphEdge.generated.h"
 
 
 class UQuestSystemGraph;
+class UQuestSystemGraphNode;
 
 UCLASS(Blueprintable)
 class QUEST_SYSTEM_RUNTIME_API UQuestSystemGraphEdge : public UObject

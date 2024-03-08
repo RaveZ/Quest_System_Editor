@@ -2,4 +2,5 @@
 
 
 #include "QuestSystemGraphNode_Root.h"
+#include "QuestSystemGraphNode.h"
 

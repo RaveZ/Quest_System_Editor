@@ -3,14 +3,14 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "QuestSystemGraphNode.h"
-#include "QuestSystem.h"
-#include "QuestSystemGraphNode_Root.h"
-#include "QuestSystemGraphEdge.h"
 #include "GameplayTagContainer.h"
 #include "QuestSystemGraph.generated.h"
 
 
+class UQuestSystem;
+class UQuestComponent;
+class UQuestSystemGraphNode;
+class UQuestSystemGraphEdge;
 
 UCLASS(Blueprintable)
 class QUEST_SYSTEM_RUNTIME_API UQuestSystemGraph : public UObject
@@ -47,7 +47,7 @@ public:
 		APawn* OwningPawn;
 
 	UPROPERTY(BlueprintReadWrite, Category = "QuestSystemGraph")
-		UActorComponent* OwningComponent;
+		UQuestComponent* QuestComponent;
 
 
 #if WITH_EDITORONLY_DATA

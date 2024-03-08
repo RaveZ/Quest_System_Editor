@@ -3,10 +3,12 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "QuestSystemGraph.h"
 #include "Components/ActorComponent.h"
 #include "QuestComponent.generated.h"
 
+
+//Delegate
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FQuestObjectiveUpdated, UQuestSystem*, UpdatedQuest);
 
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent), Blueprintable)
 class QUEST_SYSTEM_RUNTIME_API UQuestComponent : public UActorComponent
@@ -18,7 +20,7 @@ public:
 	UQuestComponent();
 
 	UPROPERTY(BlueprintReadWrite, Category = "QuestComponent")
-		UActorComponent* OwningComponent;
+		UQuestComponent* QuestComponent;
 
 	UPROPERTY(BlueprintReadOnly, Category = "QuestComponent")
 		AController* OwningController;
@@ -31,6 +33,9 @@ public:
 
 	UFUNCTION(BlueprintCallable, Category = "QuestComponent")
 		bool StartQuest(UQuestSystemGraph* QuestAsset);
+
+	UPROPERTY(BlueprintAssignable, BlueprintCallable, Category = "QuestComponent")
+		FQuestObjectiveUpdated OnQuestObjectiveUpdated;
 
 protected:
 	// Called when the game starts

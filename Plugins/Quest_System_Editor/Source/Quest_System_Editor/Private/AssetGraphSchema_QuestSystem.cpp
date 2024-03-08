@@ -11,11 +11,12 @@
 #include "EdNode_QuestSystemNode.h"
 #include "EdNode_QuestSystemTask.h"
 #include "EdNode_QuestSystemEdge.h"
+#include "EdNode_QuestSystemRoot.h"
 #include "GraphEditorActions.h"
 #include "QuestSystemGraph.h"
+#include "QuestSystemGraphEdge.h"
 #include "QuestSystemGraphNode_Root.h"
 #include "QuestSystemGraphNode_Task.h"
-#include <EdNode_QuestSystemRoot.h>
 
 
 #define LOCTEXT_NAMESPACE "AssetSchema_QuestSystemGraph"

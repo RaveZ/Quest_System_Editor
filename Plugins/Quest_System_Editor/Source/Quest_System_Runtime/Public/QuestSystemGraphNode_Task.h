@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "QuestSystemGraphNode.h"
+#include "Tickable.h"
 #include "UObject/NoExportTypes.h"
 #include "QuestSystemGraphNode_Task.generated.h"
 
@@ -16,8 +17,9 @@ enum class EClearCondition : uint8
     E_Travel		UMETA(DisplayName = "TRAVEL"),
 };
 
-UCLASS()
-class QUEST_SYSTEM_RUNTIME_API UQuestSystemGraphNode_Task : public UQuestSystemGraphNode
+
+UCLASS(Blueprintable, EditInlineNew, HideDropdown)
+class QUEST_SYSTEM_RUNTIME_API UQuestSystemGraphNode_Task : public UQuestSystemGraphNode, public FTickableGameObject
 {
 	GENERATED_BODY()
 public:
@@ -26,14 +28,35 @@ public:
     UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Tasks")
         FText Description;
 
+    UPROPERTY(Instanced, EditAnywhere, Category = "Tasks")
+        TArray<UQuestSystemGraphNode_Task*> Tasks;
+
     UFUNCTION(BlueprintImplementableEvent, BlueprintCallable, Category = "Tasks")
         void OnTaskBegin(AController* OwnerController);
 
     UFUNCTION(BlueprintImplementableEvent, BlueprintCallable, Category = "Tasks")
-        void OnTaskCompleted(AController* OwnerController);
+        void OnTaskCompleted();
+
+    UFUNCTION(BlueprintImplementableEvent, BlueprintCallable, Category = "Tasks")
+        void OnTaskTick();
 
     UFUNCTION(BlueprintCallable, Category = "Tasks")
-        void CompleteTask();
+        bool CompleteTask();
+
+    //UObject
+    virtual void PostEditChangeProperty(struct FPropertyChangedEvent& PropertyChangedEvent) override;
+
+    // FTickableGameObject Begin
+    virtual void Tick(float DeltaTime) override;
+    virtual ETickableTickType GetTickableTickType() const override
+    {
+        return ETickableTickType::Always;
+    }
+    virtual TStatId GetStatId() const override
+    {
+        RETURN_QUICK_DECLARE_CYCLE_STAT(FMyTickableThing, STATGROUP_Tickables);
+    }
+    
 
 #if WITH_EDITOR
     virtual FText GetNodeTitle() const override;
@@ -42,4 +65,8 @@ public:
 
     virtual FLinearColor GetBackgroundColor() const override;
 #endif
+private:
+    // The last frame number we were ticked.
+    // We don't want to tick multiple times per frame 
+    uint32 LastFrameNumberWeTicked = INDEX_NONE;
 };

@@ -5,6 +5,8 @@
 #include "EdNode_QuestSystemEdge.h"
 #include "EdNode_QuestSystemRoot.h"
 #include "EdNode_QuestSystemNode.h"
+#include "QuestSystemGraphEdge.h"
+#include "QuestSystemGraphNode.h"
 
 UEdGraph_QuestSystemGraph::UEdGraph_QuestSystemGraph()
 {

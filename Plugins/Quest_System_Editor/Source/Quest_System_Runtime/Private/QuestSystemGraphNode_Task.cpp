@@ -2,7 +2,9 @@
 
 
 #include "QuestSystemGraphNode_Task.h"
+#include "QuestComponent.h"
 #include "QuestSystem.h"
+#include "QuestSystemGraphNode.h"
 
 #define LOCTEXT_NAMESPACE "QuestSystemGraphNode_Task"
 
@@ -11,13 +13,33 @@ UQuestSystemGraphNode_Task::UQuestSystemGraphNode_Task()
 }
 
 #if WITH_EDITOR
-void UQuestSystemGraphNode_Task::CompleteTask()
+bool UQuestSystemGraphNode_Task::CompleteTask()
 {
     if (QuestSystem == NULL)
-        return;
+        return false;
 
+    bool bSuccess = true;
     QuestSystem->GoToNextNode();
+    OnTaskCompleted();
+    GetQuestComponent()->OnQuestObjectiveUpdated.Broadcast(QuestSystem);
+    
+    return bSuccess;
 }
+
+void UQuestSystemGraphNode_Task::PostEditChangeProperty(FPropertyChangedEvent& PropertyChangedEvent)
+{
+    Super::PostEditChangeProperty(PropertyChangedEvent);
+}
+
+void UQuestSystemGraphNode_Task::Tick(float DeltaTime)
+{
+    if (LastFrameNumberWeTicked == GFrameCounter)
+        return;
+    //Do The Tick Logic
+    OnTaskTick();
+    LastFrameNumberWeTicked = GFrameCounter;
+}
+
 FText UQuestSystemGraphNode_Task::GetNodeTitle() const
 {
     return Super::GetNodeTitle();

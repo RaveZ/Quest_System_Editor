@@ -2,12 +2,12 @@
 
 
 #include "QuestSystemGraph.h"
-
+#include "QuestSystem.h"
+#include "QuestComponent.h"
+#include "QuestSystemGraphNode.h"
+#include "QuestSystemGraphEdge.h"
 
 #define LOCTEXT_NAMESPACE "QuestSystemGraph"
-
-
-
 
 UQuestSystemGraph::UQuestSystemGraph()
 {

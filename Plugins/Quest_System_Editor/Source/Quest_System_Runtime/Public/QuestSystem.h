@@ -3,13 +3,14 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "QuestSystemGraphNode.h"
-#include "QuestSystemGraphNode_Root.h"
-#include "QuestSystemGraphEdge.h"
 #include "GameplayTagContainer.h"
 #include "UObject/NoExportTypes.h"
 #include "QuestSystem.generated.h"
 
+class UQuestSystemGraphNode;
+class UQuestSystemGraphEdge;
+class UQuestSystemGraphNode_Root;
+class UQuestSystemGraphNode_Task;
 
 UENUM(BlueprintType)
 enum class EQuestState : uint8
@@ -25,15 +26,17 @@ class QUEST_SYSTEM_RUNTIME_API UQuestSystem : public UObject
 {
 	GENERATED_BODY()
 public:
+	UPROPERTY(VisibleDefaultsOnly, Category = "QuestAssets")
+		UQuestSystemGraph* QuestGraph;
+
 	/** Quest ID */
 	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "QuestSystem")
 		FName QuestID;
 
 	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "QuestSystem")
 		FText Description;
-	
-		UPROPERTY(VisibleDefaultsOnly, Category = "QuestSystem")
-		UQuestSystemGraph* QuestGraph;
+
+		
 	
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "QuestSystem")
 		EQuestState QuestState = EQuestState::E_Active;
@@ -66,7 +69,7 @@ public:
 		APawn* GetOwningPawn();
 
 	UFUNCTION(BlueprintCallable, Category = "QuestSystem")
-		UActorComponent* GetOwningComponent();
+		UQuestComponent* GetQuestComponent();
 
 	UFUNCTION(BlueprintCallable, Category = "QuestSystem")
 		UQuestSystemGraph* GetOwningQuest() const;

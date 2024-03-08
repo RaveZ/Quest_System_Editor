@@ -3,7 +3,10 @@
 
 #include "QuestSystem.h"
 #include "QuestSystemGraph.h"
+#include "QuestSystemGraphNode.h"
+#include "QuestSystemGraphEdge.h"
 #include "QuestSystemGraphNode_Task.h"
+#include "QuestSystemGraphNode_Root.h"
 
 
 #define LOCTEXT_NAMESPACE "QuestSystem"
@@ -51,12 +54,6 @@ void UQuestSystem::GoToNextNode()
 		return;
 	if (CurrentNode == NULL)
 		return;
-
-	UE_LOG(LogTemp, Warning, TEXT("Current node name: %s"), *CurrentNode->NodeTitle.ToString());
-	UE_LOG(LogTemp, Warning, TEXT("Current Task Owning Controller name: %s"), *CurrentNode->GetOwningController()->GetFName().ToString());
-	UE_LOG(LogTemp, Warning, TEXT("Current Task Owning Pawn name: %s"), *CurrentNode->GetOwningPawn()->GetFName().ToString());
-	UE_LOG(LogTemp, Warning, TEXT("Current Task Owning Component name: %s"), *CurrentNode->GetOwningComponent()->GetFName().ToString());
-
 
 	if (CurrentNode->ChildrenNodes.Num() > 0)
 	{
@@ -131,21 +128,33 @@ void UQuestSystem::GetNodesByLevel(int Level, TArray<UQuestSystemGraphNode*>& No
 
 AController* UQuestSystem::GetOwningController()
 {
+	if (!QuestGraph)
+		return nullptr;
+
 	return QuestGraph->OwningController;
 }
 
 APawn* UQuestSystem::GetOwningPawn()
 {
+	if (!QuestGraph)
+		return nullptr;
+
 	return QuestGraph->OwningPawn;
 }
 
-UActorComponent* UQuestSystem::GetOwningComponent()
+UQuestComponent* UQuestSystem::GetQuestComponent()
 {
-	return QuestGraph->OwningComponent;
+	if (!QuestGraph)
+		return nullptr;
+
+	return QuestGraph->QuestComponent;
 }
 
 UQuestSystemGraph* UQuestSystem::GetOwningQuest() const
 {
+	if (!QuestGraph)
+		return nullptr;
+
 	return QuestGraph;
 }
 

@@ -18,7 +18,9 @@ enum class ENodeLimits : uint8
 	Limited
 };
 
-UCLASS(Blueprintable)
+
+
+UCLASS(Blueprintable, EditInlineNew)
 class QUEST_SYSTEM_RUNTIME_API UQuestSystemGraphNode : public UObject
 {
 	GENERATED_BODY()
@@ -28,10 +30,10 @@ public:
 	virtual ~UQuestSystemGraphNode();
 
 
-	UPROPERTY(VisibleDefaultsOnly, Category = "QuestSystemGraphNode")
+	UPROPERTY(BlueprintReadOnly, Category = "QuestSystemGraphNode")
 		UQuestSystemGraph* QuestGraph;
 
-	UPROPERTY(VisibleDefaultsOnly, Category = "QuestSystemGraphNode")
+	UPROPERTY(BlueprintReadOnly, Category = "QuestSystemGraphNode")
 		UQuestSystem* QuestSystem;
 
 	UPROPERTY(BlueprintReadOnly, Category = "QuestSystemGraphNode")
@@ -62,10 +64,10 @@ public:
 		APawn* GetOwningPawn();
 
 	UFUNCTION(BlueprintCallable, Category = "QuestSystemGraphNode")
-		UActorComponent* GetOwningComponent();
+		UQuestComponent* GetQuestComponent();
 
 	UFUNCTION(BlueprintCallable, Category = "QuestSystemGraphNode")
-		UQuestSystemGraph* GetOwningQuest() const;
+		UQuestSystemGraph* GetOwningQuest();
 
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "QuestSystemGraphNode")
 		FText GetDescription() const;
@@ -106,6 +108,8 @@ public:
 
 	UPROPERTY(EditDefaultsOnly, Category = "QuestSystemGraphNode_Editor", meta = (ClampMin = "0", EditCondition = "ChildrenLimitType == ENodeLimit::Limited", EditConditionHides))
 		int32 ChildrenLimit;
+
+
 
 #endif
 

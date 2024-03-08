@@ -2,6 +2,9 @@
 
 
 #include "QuestComponent.h"
+#include "QuestSystem.h"
+#include "QuestSystemGraph.h"
+#include "QuestSystemGraphNode_Task.h"
 
 
 
@@ -27,13 +30,13 @@ bool UQuestComponent::StartQuest(UQuestSystemGraph* QuestAsset)
 
 	//Set Dependency
 	OwningController = Cast<AController>(GetOwner());
-	OwningPawn = OwningController->GetPawn();
-	OwningComponent = this;
+	OwningPawn = OwningController->K2_GetPawn();
+	QuestComponent = this;
 
 	//Set Quest Asset Dependency
 	QuestAsset->OwningController = OwningController;
 	QuestAsset->OwningPawn = OwningPawn;
-	QuestAsset->OwningComponent = OwningComponent;
+	QuestAsset->QuestComponent = QuestComponent;
 
 	QuestAssets.Add(QuestAsset);
 
@@ -49,6 +52,7 @@ bool UQuestComponent::StartQuest(UQuestSystemGraph* QuestAsset)
 				QuestSystem->GoToNextNode();
 			}
 		}
+
 	}
 
 	return bSuccess;
