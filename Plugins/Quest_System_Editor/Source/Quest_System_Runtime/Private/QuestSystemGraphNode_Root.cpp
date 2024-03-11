@@ -4,3 +4,7 @@
 #include "QuestSystemGraphNode_Root.h"
 #include "QuestSystemGraphNode.h"
 
+FText UQuestSystemGraphNode_Root::GetNodeDescription() const
+{
+	return FText::FromString(TEXT("Root Node"));
+}

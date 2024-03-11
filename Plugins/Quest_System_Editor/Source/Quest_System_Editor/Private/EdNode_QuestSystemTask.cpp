@@ -2,13 +2,14 @@
 
 
 #include "EdNode_QuestSystemTask.h"
+#include "QuestSystemGraphNode.h"
 
 FText UEdNode_QuestSystemTask::GetNodeTitle(ENodeTitleType::Type TitleType) const
 {
 	const UQuestSystemGraphNode* MyNode = Cast<UQuestSystemGraphNode>(QuestSystemGraphNode);
 	if (MyNode != NULL)
 	{
-		return FText::FromString(MyNode->GetNodeName());
+		return MyNode->GetNodeTitle();
 	}
 	else if (!ClassData.GetClassName().IsEmpty())
 	{

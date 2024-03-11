@@ -30,6 +30,9 @@ public:
 	virtual ~UQuestSystemGraphNode();
 
 
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Detail")
+		FText Description;
+
 	UPROPERTY(BlueprintReadOnly, Category = "QuestSystemGraphNode")
 		UQuestSystemGraph* QuestGraph;
 
@@ -45,9 +48,7 @@ public:
 	UPROPERTY(BlueprintReadOnly, Category = "QuestSystemGraphNode")
 		TMap<UQuestSystemGraphNode*, UQuestSystemGraphEdge*> Edges;
 
-	/** node name */
-	UPROPERTY(Category=Description, EditAnywhere)
-		FString NodeName;
+	
 
 
 	UFUNCTION(BlueprintCallable, Category = "QuestSystemGraphNode")
@@ -75,8 +76,6 @@ public:
 
 	virtual FText GetDescription_Implementation() const;
 
-	/** @return name of node */
-	FString GetNodeName() const;
 
 	/** returns short name of object's class (BTTaskNode_Wait -> Wait) */
 	static FString GetShortTypeName(const UObject* Ob);
@@ -85,28 +84,25 @@ public:
 
 	//////////////////////////////////////////////////////////////////////////
 #if WITH_EDITORONLY_DATA
-	UPROPERTY(EditDefaultsOnly, Category = "QuestSystemGraphNode_Editor")
-		FText NodeTitle;
 
-	UPROPERTY(VisibleDefaultsOnly, Category = "QuestSystemGraphNode_Editor")
+
+	UPROPERTY(BlueprintReadOnly, Category = "QuestSystemGraphNode")
 		TSubclassOf<UQuestSystemGraph> CompatibleGraphType;
 
-	UPROPERTY(EditDefaultsOnly, Category = "QuestSystemGraphNode_Editor")
+	UPROPERTY(BlueprintReadOnly, Category = "QuestSystemGraphNode")
 		FLinearColor BackgroundColor;
 
-	UPROPERTY(EditDefaultsOnly, Category = "QuestSystemGraphNode_Editor")
-		FText ContextMenuName;
 
-	UPROPERTY(EditDefaultsOnly, Category = "QuestSystemGraphNode_Editor")
+	UPROPERTY(BlueprintReadOnly, Category = "QuestSystemGraphNode")
 		ENodeLimits ParentLimitType;
 
-	UPROPERTY(EditDefaultsOnly, Category = "QuestSystemGraphNode_Editor", meta = (ClampMin = "0", EditCondition = "ParentLimitType == ENodeLimit::Limited", EditConditionHides))
+	UPROPERTY(BlueprintReadOnly, Category = "QuestSystemGraphNode", meta = (ClampMin = "0", EditCondition = "ParentLimitType == ENodeLimits::Limited", EditConditionHides))
 		int32 ParentLimit;
 
-	UPROPERTY(EditDefaultsOnly, Category = "QuestSystemGraphNode_Editor")
+	UPROPERTY(BlueprintReadOnly, Category = "QuestSystemGraphNode")
 		ENodeLimits ChildrenLimitType;
 
-	UPROPERTY(EditDefaultsOnly, Category = "QuestSystemGraphNode_Editor", meta = (ClampMin = "0", EditCondition = "ChildrenLimitType == ENodeLimit::Limited", EditConditionHides))
+	UPROPERTY(BlueprintReadOnly, Category = "QuestSystemGraphNode", meta = (ClampMin = "0", EditCondition = "ChildrenLimitType == ENodeLimits::Limited", EditConditionHides))
 		int32 ChildrenLimit;
 
 
@@ -119,6 +115,8 @@ public:
 	virtual FLinearColor GetBackgroundColor() const;
 
 	virtual FText GetNodeTitle() const;
+
+	virtual FText GetNodeDescription() const;
 
 	virtual void SetNodeTitle(const FText& NewTitle);
 

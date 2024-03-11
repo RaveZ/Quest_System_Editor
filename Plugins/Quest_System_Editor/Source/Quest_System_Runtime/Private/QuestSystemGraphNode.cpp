@@ -27,19 +27,11 @@ UQuestSystemGraphEdge* UQuestSystemGraphNode::GetEdge(UQuestSystemGraphNode* Chi
 }
 
 
-
-
-
-
 FText UQuestSystemGraphNode::GetDescription_Implementation() const
 {
-	return LOCTEXT("NodeDesc", "Quest Graph Node");
+	return Description;
 }
 
-FString UQuestSystemGraphNode::GetNodeName() const
-{
-	return NodeName.Len() ? NodeName : UQuestSystemGraphNode::GetShortTypeName(this);
-}
 
 FString UQuestSystemGraphNode::GetShortTypeName(const UObject* Ob)
 {
@@ -76,12 +68,16 @@ FLinearColor UQuestSystemGraphNode::GetBackgroundColor() const
 
 FText UQuestSystemGraphNode::GetNodeTitle() const
 {
-	return NodeTitle.IsEmpty() ? GetDescription() : NodeTitle;
+	return FText::FromString(UQuestSystemGraphNode::GetShortTypeName(this));
+}
+
+FText UQuestSystemGraphNode::GetNodeDescription() const
+{
+	return FText::FromString(TEXT("This is NodeBase"));
 }
 
 void UQuestSystemGraphNode::SetNodeTitle(const FText& NewTitle)
 {
-	NodeTitle = NewTitle;
 }
 
 bool UQuestSystemGraphNode::CanCreateConnection(UQuestSystemGraphNode* Other, FText& ErrorMessage)
@@ -126,6 +122,7 @@ UQuestSystemGraph* UQuestSystemGraphNode::GetOwningQuest()
 
 	return QuestGraph;
 }
+
 
 AController* UQuestSystemGraphNode::GetOwningController()
 {

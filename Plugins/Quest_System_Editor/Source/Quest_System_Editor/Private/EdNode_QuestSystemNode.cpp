@@ -2,6 +2,7 @@
 
 
 #include "EdNode_QuestSystemNode.h"
+#include "QuestSystemGraphNode.h"
 
 UEdNode_QuestSystemNode::UEdNode_QuestSystemNode()
 {
@@ -72,7 +73,7 @@ void UEdNode_QuestSystemNode::AutowireNewNode(UEdGraphPin* FromPin)
 
 FText UEdNode_QuestSystemNode::GetDescription() const
 {
-	return FText();
+	return QuestSystemGraphNode->GetNodeDescription();
 }
 
 FLinearColor UEdNode_QuestSystemNode::GetBackgroundColor() const

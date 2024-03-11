@@ -6,6 +6,7 @@
 #include "QuestSystemGraphNode.h"
 #include "QuestSystemGraphEdge.h"
 #include "QuestSystemGraphNode_Task.h"
+#include "QuestSystemGraphNode_TaskManager.h"
 #include "QuestSystemGraphNode_Root.h"
 
 
@@ -61,9 +62,12 @@ void UQuestSystem::GoToNextNode()
 		{
 			//TODO: Make them able to detect the children node AND Check Condition feature
 			CurrentNode = Node;
-			if (UQuestSystemGraphNode_Task* TaskNode = Cast<UQuestSystemGraphNode_Task>(CurrentNode))
+			if (UQuestSystemGraphNode_TaskManager* TaskManagerNode = Cast<UQuestSystemGraphNode_TaskManager>(CurrentNode))
 			{
-				TaskNode->OnTaskBegin(GetOwningController());
+				for (UQuestSystemGraphNode_Task* TaskNode : TaskManagerNode->Tasks)
+				{
+					TaskNode->OnTaskBegin(GetOwningController());
+				}
 			}
 		}
 		//GoToNextNode();

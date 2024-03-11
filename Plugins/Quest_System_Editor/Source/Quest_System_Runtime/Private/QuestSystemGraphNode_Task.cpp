@@ -2,6 +2,7 @@
 
 
 #include "QuestSystemGraphNode_Task.h"
+#include "QuestSystemGraphNode_TaskManager.h"
 #include "QuestComponent.h"
 #include "QuestSystem.h"
 #include "QuestSystemGraphNode.h"
@@ -18,13 +19,15 @@ bool UQuestSystemGraphNode_Task::CompleteTask()
     if (QuestSystem == NULL)
         return false;
 
-    bool bSuccess = true;
-    QuestSystem->GoToNextNode();
+    TaskState = ETaskState::E_Complete;
+    TaskManager->UpdateTaskProgress();
     OnTaskCompleted();
     GetQuestComponent()->OnQuestObjectiveUpdated.Broadcast(QuestSystem);
     
-    return bSuccess;
+    return true;
 }
+
+
 
 void UQuestSystemGraphNode_Task::PostEditChangeProperty(FPropertyChangedEvent& PropertyChangedEvent)
 {
@@ -46,10 +49,12 @@ FText UQuestSystemGraphNode_Task::GetNodeTitle() const
 
 }
 
-void UQuestSystemGraphNode_Task::SetNodeTitle(const FText& NewTitle)
+FText UQuestSystemGraphNode_Task::GetNodeDescription() const
 {
-	Description = NewTitle;
+    return Description;
 }
+
+
 
 FLinearColor UQuestSystemGraphNode_Task::GetBackgroundColor() const
 {

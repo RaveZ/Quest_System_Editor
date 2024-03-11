@@ -16,6 +16,7 @@
 #include "GraphEditorSettings.h"
 #include "SCommentBubble.h"
 #include "SLevelOfDetailBranchNode.h"
+#include "QuestSystemGraphNode.h"
 
 #define LOCTEXT_NAMESPACE "EdNode_GenericGraph"
 
@@ -328,6 +329,14 @@ void SGraphNode_QuestSystemNode::UpdateGraphNode()
 																	[
 																		NodeTitle.ToSharedRef()
 																	]
+																	+ SVerticalBox::Slot()
+																	.AutoHeight()
+																	[
+																		// DESCRIPTION MESSAGE
+																		SAssignNew(DescriptionText, STextBlock)
+																			.Visibility(this, &SGraphNode_QuestSystemNode::GetDescriptionVisibility)
+																			.Text(this, &SGraphNode_QuestSystemNode::GetDescription)
+																	]
 															]
 													]
 											]
@@ -481,7 +490,10 @@ FText SGraphNode_QuestSystemNode::GetDescription() const
 }
 EVisibility SGraphNode_QuestSystemNode::GetDescriptionVisibility() const
 {
-	return EVisibility();
+	// LOD this out once things get too small
+	TSharedPtr<SGraphPanel> MyOwnerPanel = GetOwnerPanel();
+	return (!MyOwnerPanel.IsValid() || MyOwnerPanel->GetCurrentLOD() > EGraphRenderingLOD::LowDetail) ? EVisibility::Visible : EVisibility::Collapsed;
+
 }
 FText SGraphNode_QuestSystemNode::GetPinTooltip(UEdGraphPin* GraphPinObj) const
 {

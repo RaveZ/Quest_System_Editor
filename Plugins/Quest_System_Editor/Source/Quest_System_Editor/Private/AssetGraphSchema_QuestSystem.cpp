@@ -17,6 +17,7 @@
 #include "QuestSystemGraphEdge.h"
 #include "QuestSystemGraphNode_Root.h"
 #include "QuestSystemGraphNode_Task.h"
+#include "QuestSystemGraphNode_TaskManager.h"
 
 
 #define LOCTEXT_NAMESPACE "AssetSchema_QuestSystemGraph"
@@ -281,20 +282,20 @@ void UAssetGraphSchema_QuestSystem::GetGraphContextActions(FGraphContextMenuBuil
 
 	TSet<TSubclassOf<UQuestSystemGraphNode> > Visited;
 
-	FText Desc = Graph->NodeType.GetDefaultObject()->ContextMenuName;
+	/*FText Desc = Graph->NodeType.GetDefaultObject()->ContextMenuName;
 
 	if (Desc.IsEmpty())
 	{
 		FString Title = Graph->NodeType->GetName();
 		Title.RemoveFromEnd("_C");
 		Desc = FText::FromString(Title);
-	}
+	}*/
 
 	
 
 
 	//to check if we create another instance derived from UQuestSystemGraphNode and they will added automatically
-	for (TObjectIterator<UClass> It; It; ++It)
+	/*for (TObjectIterator<UClass> It; It; ++It)
 	{
 
 		if (It->IsChildOf(UQuestSystemGraphNode::StaticClass()) && !It->HasAnyClassFlags(CLASS_Abstract) && !Visited.Contains(*It))
@@ -324,7 +325,7 @@ void UAssetGraphSchema_QuestSystem::GetGraphContextActions(FGraphContextMenuBuil
 
 			Visited.Add(NodeType);
 		}
-	}
+	}*/
 
 
 	//Task
@@ -349,15 +350,22 @@ void UAssetGraphSchema_QuestSystem::GetGraphContextActions(FGraphContextMenuBuil
 
 		TSharedPtr<FAssetSchemaAction_QuestSystem_NewNode> AddOpAction = UAssetGraphSchema_QuestSystem::AddNewNodeAction(TasksBuilder, NodeClass.GetCategory(), NodeTypeName, FText::GetEmpty());
 		UClass* GraphNodeClass = UEdNode_QuestSystemTask::StaticClass();
-		
+
 
 		UEdNode_QuestSystemNode* OpNode = NewObject<UEdNode_QuestSystemNode>(ContextMenuBuilder.OwnerOfTemporaries, GraphNodeClass);
 		OpNode->ClassData = NodeClass;
 		AddOpAction->NodeTemplate = OpNode;
-		AddOpAction->NodeTemplate->QuestSystemGraphNode = NewObject<UQuestSystemGraphNode>(AddOpAction->NodeTemplate, NodeClass.GetClass(true));
-		AddOpAction->NodeTemplate->QuestSystemGraphNode->QuestGraph = Graph;
+		AddOpAction->NodeTemplate->QuestSystemGraphNode = NewObject<UQuestSystemGraphNode>(AddOpAction->NodeTemplate, UQuestSystemGraphNode_TaskManager::StaticClass());// NodeClass.GetClass(true));
+		if (UQuestSystemGraphNode_TaskManager* TaskManager = Cast< UQuestSystemGraphNode_TaskManager>(AddOpAction->NodeTemplate->QuestSystemGraphNode))
+		{
+			if (NodeClass.GetClass(true)->IsChildOf(UQuestSystemGraphNode_Task::StaticClass()))
+			{
+				//TSubclassOf<UQuestSystemGraphNode_Task> TaskNodeType = NodeClass.GetClass(true);
+				TaskManager->Tasks.Add(NewObject<UQuestSystemGraphNode_Task>(AddOpAction->NodeTemplate, NodeClass.GetClass(true)));
+			}
+			AddOpAction->NodeTemplate->QuestSystemGraphNode->QuestGraph = Graph;
+		}
 	}
-
 	ContextMenuBuilder.Append(TasksBuilder);
 }
 

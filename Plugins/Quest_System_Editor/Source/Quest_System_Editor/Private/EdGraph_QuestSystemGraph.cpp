@@ -7,6 +7,8 @@
 #include "EdNode_QuestSystemNode.h"
 #include "QuestSystemGraphEdge.h"
 #include "QuestSystemGraphNode.h"
+#include "QuestSystemGraphNode_Task.h"
+#include "QuestSystemGraphNode_TaskManager.h"
 
 UEdGraph_QuestSystemGraph::UEdGraph_QuestSystemGraph()
 {
@@ -72,6 +74,15 @@ void UEdGraph_QuestSystemGraph::RebuildQuestSystemGraph()
 					}
 				}
 			}
+
+			if (UQuestSystemGraphNode_TaskManager* TaskManagerNode = Cast<UQuestSystemGraphNode_TaskManager>(QuestSystemGraphNode))
+			{
+				for (UQuestSystemGraphNode_Task* TaskNode : TaskManagerNode->Tasks)
+				{
+					TaskNode->TaskManager = TaskManagerNode;
+				}
+			}
+
 		}
 		else if (UEdNode_QuestSystemEdge* EdgeNode = Cast<UEdNode_QuestSystemEdge>(Nodes[i]))
 		{
@@ -100,6 +111,7 @@ void UEdGraph_QuestSystemGraph::RebuildQuestSystemGraph()
 				continue;
 			QuestSystem->RootNodes.Add(RootNode->QuestSystemGraphNode);
 		}
+
 	}
 
 	for (int i = 0; i < QuestSystem->AllNodes.Num(); ++i)
@@ -118,11 +130,11 @@ void UEdGraph_QuestSystemGraph::RebuildQuestSystemGraph()
 	}
 
 	QuestSystem->RootNodes.Sort([&](const UQuestSystemGraphNode& L, const UQuestSystemGraphNode& R)
-		{
-			UEdNode_QuestSystemNode* EdNode_LNode = NodeMap[&L];
-			UEdNode_QuestSystemNode* EdNode_RNode = NodeMap[&R];
-			return EdNode_LNode->NodePosX < EdNode_RNode->NodePosX;
-		});
+	{
+		UEdNode_QuestSystemNode* EdNode_LNode = NodeMap[&L];
+		UEdNode_QuestSystemNode* EdNode_RNode = NodeMap[&R];
+		return EdNode_LNode->NodePosX < EdNode_RNode->NodePosX;
+	});
 }
 
 UQuestSystemGraph* UEdGraph_QuestSystemGraph::GetQuestSystemGraph() const

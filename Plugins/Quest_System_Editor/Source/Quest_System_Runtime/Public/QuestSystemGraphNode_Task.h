@@ -8,15 +8,16 @@
 #include "UObject/NoExportTypes.h"
 #include "QuestSystemGraphNode_Task.generated.h"
 
-UENUM(BlueprintType)
-enum class EClearCondition : uint8
-{
-    E_Default		UMETA(DisplayName = "DEFAULT"),
-    E_Slay			UMETA(DisplayName = "SLAY"),
-    E_Collect		UMETA(DisplayName = "COLLECT"),
-    E_Travel		UMETA(DisplayName = "TRAVEL"),
-};
+class UQuestSystemGraphNode_TaskManager;
 
+
+
+UENUM(BlueprintType)
+enum class ETaskState : uint8
+{
+    E_Active		UMETA(DisplayName = "ACTIVE"),
+    E_Complete		UMETA(DisplayName = "COMPLETE"),
+};
 
 UCLASS(Blueprintable, EditInlineNew, HideDropdown)
 class QUEST_SYSTEM_RUNTIME_API UQuestSystemGraphNode_Task : public UQuestSystemGraphNode, public FTickableGameObject
@@ -25,11 +26,15 @@ class QUEST_SYSTEM_RUNTIME_API UQuestSystemGraphNode_Task : public UQuestSystemG
 public:
     UQuestSystemGraphNode_Task();
 
-    UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Tasks")
-        FText Description;
+    UPROPERTY(BlueprintReadWrite)
+        int CurrentAmount;
 
-    UPROPERTY(Instanced, EditAnywhere, Category = "Tasks")
-        TArray<UQuestSystemGraphNode_Task*> Tasks;
+
+    UPROPERTY(BlueprintReadWrite, Category = "Tasks")
+        ETaskState TaskState = ETaskState::E_Active;
+
+    UPROPERTY(BlueprintReadOnly, Category = "Tasks")
+        UQuestSystemGraphNode_TaskManager* TaskManager;
 
     UFUNCTION(BlueprintImplementableEvent, BlueprintCallable, Category = "Tasks")
         void OnTaskBegin(AController* OwnerController);
@@ -42,6 +47,7 @@ public:
 
     UFUNCTION(BlueprintCallable, Category = "Tasks")
         bool CompleteTask();
+
 
     //UObject
     virtual void PostEditChangeProperty(struct FPropertyChangedEvent& PropertyChangedEvent) override;
@@ -61,7 +67,7 @@ public:
 #if WITH_EDITOR
     virtual FText GetNodeTitle() const override;
 
-    virtual void SetNodeTitle(const FText& NewTitle) override;
+    virtual FText GetNodeDescription() const override;
 
     virtual FLinearColor GetBackgroundColor() const override;
 #endif

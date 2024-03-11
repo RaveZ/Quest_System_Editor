@@ -2,6 +2,7 @@
 
 
 #include "AssetEditor_QuestSystem.h"
+#include "QuestSystemGraphNode_Root.h"
 #include "BlueprintEditor.h"
 #include "UObject/ObjectSaveContext.h"
 #include "GraphEditorActions.h"
@@ -21,7 +22,7 @@
 #include "Kismet2/BlueprintEditorUtils.h"
 #include "SMyQuest.h"
 #include "QuestSystemGraphNode_Task.h"
-#include <Quest_System_Editor.h>
+#include "Quest_System_Editor.h"
 #include <ContentBrowserFrontEndFilterExtension.h>
 #include "Kismet2/KismetDebugUtilities.h"
 #include "WorkflowOrientedApp/WorkflowUObjectDocuments.h"
@@ -1301,9 +1302,19 @@ void FAssetEditor_QuestSystem::OnSelectedNodesChanged(const TSet<class UObject*>
 		{
 			PropertyWidget->SetObject(QuestGraph->QuestSystem);
 		}
+	}
+	if (Selection.Num() == 1)
+	{
+		if (UQuestSystemGraphNode_Root* RootNode = Cast<UQuestSystemGraphNode_Root>(Selection[0]))
+		{
+			if (UEdGraph_QuestSystemGraph* QuestGraph = Cast<UEdGraph_QuestSystemGraph>(ViewportWidget->GetCurrentGraph()))
+			{
+				PropertyWidget->SetObject(QuestGraph->QuestSystem);
+			}
+		}
 		else
 		{
-			PropertyWidget->SetObject(nullptr);
+			PropertyWidget->SetObjects(Selection);
 		}
 	}
 	else

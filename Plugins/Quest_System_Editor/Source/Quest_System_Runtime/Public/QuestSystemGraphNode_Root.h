@@ -15,6 +15,9 @@ class QUEST_SYSTEM_RUNTIME_API UQuestSystemGraphNode_Root : public UQuestSystemG
 	GENERATED_BODY()
 
 public:
-		
+
+#if WITH_EDITOR
+	virtual FText GetNodeDescription() const override;
+#endif
 	
 };
