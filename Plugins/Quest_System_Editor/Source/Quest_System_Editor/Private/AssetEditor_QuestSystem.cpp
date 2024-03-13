@@ -3,6 +3,8 @@
 
 #include "AssetEditor_QuestSystem.h"
 #include "QuestSystemGraphNode_Root.h"
+#include "QuestCondition.h"
+#include "QuestEvent.h"
 #include "BlueprintEditor.h"
 #include "UObject/ObjectSaveContext.h"
 #include "GraphEditorActions.h"
@@ -242,11 +244,16 @@ void FAssetEditor_QuestSystem::BindCommands()
 		FIsActionButtonVisible::CreateSP(this, &FAssetEditor_QuestSystem::IsNewTaskButtonVisible)
 	);
 
-	ToolkitCommands->MapAction(FQuest_System_EditorCommands::Get().AutoArrange,
-		FExecuteAction::CreateSP(this, &FAssetEditor_QuestSystem::AutoArrange),
-		FCanExecuteAction::CreateSP(this, &FAssetEditor_QuestSystem::CanAutoArrange)
+	ToolkitCommands->MapAction(FQuest_System_EditorCommands::Get().NewQuestCondition,
+		FExecuteAction::CreateSP(this, &FAssetEditor_QuestSystem::CreateNewQuestCondition),
+		FCanExecuteAction::CreateSP(this, &FAssetEditor_QuestSystem::CanCreateQuestCondition)
 	);
 
+	ToolkitCommands->MapAction(FQuest_System_EditorCommands::Get().NewQuestEvent,
+		FExecuteAction::CreateSP(this, &FAssetEditor_QuestSystem::CreateNewQuestEvent),
+		FCanExecuteAction::CreateSP(this, &FAssetEditor_QuestSystem::CanCreateQuestEvent)
+	);
+	
 	ToolkitCommands->MapAction(FQuest_System_EditorCommands::Get().AddNewQuestGraph,
 		FExecuteAction::CreateSP(this, &FAssetEditor_QuestSystem::NewDocument_OnClicked, CGT_NewQuestGraph),
 		FCanExecuteAction::CreateSP(this, &FAssetEditor_QuestSystem::InEditingMode),
@@ -278,9 +285,14 @@ void FAssetEditor_QuestSystem::CreateCommandList()
 		FExecuteAction::CreateRaw(this, &FAssetEditor_QuestSystem::CreateNewTask),
 		FCanExecuteAction::CreateRaw(this, &FAssetEditor_QuestSystem::CanCreateNewTask));
 
-	GraphEditorCommands->MapAction(FQuest_System_EditorCommands::Get().AutoArrange,
-		FExecuteAction::CreateRaw(this, &FAssetEditor_QuestSystem::AutoArrange),
-		FCanExecuteAction::CreateRaw(this, &FAssetEditor_QuestSystem::CanAutoArrange));
+	GraphEditorCommands->MapAction(FQuest_System_EditorCommands::Get().NewQuestCondition,
+		FExecuteAction::CreateRaw(this, &FAssetEditor_QuestSystem::CreateNewQuestEvent),
+		FCanExecuteAction::CreateRaw(this, &FAssetEditor_QuestSystem::CanCreateQuestEvent));
+	
+	GraphEditorCommands->MapAction(FQuest_System_EditorCommands::Get().NewQuestEvent,
+		FExecuteAction::CreateRaw(this, &FAssetEditor_QuestSystem::CreateNewQuestCondition),
+		FCanExecuteAction::CreateRaw(this, &FAssetEditor_QuestSystem::CanCreateQuestCondition));
+
 
 	GraphEditorCommands->MapAction(FGenericCommands::Get().SelectAll,
 		FExecuteAction::CreateRaw(this, &FAssetEditor_QuestSystem::SelectAllNodes),
@@ -1243,11 +1255,19 @@ bool FAssetEditor_QuestSystem::IsNewTaskButtonVisible() const
 	return true;
 }
 
-void FAssetEditor_QuestSystem::AutoArrange()
+void FAssetEditor_QuestSystem::CreateNewQuestCondition()
 {
-	UE_LOG(LogTemp, Log, TEXT("Click"))
+	HandleNewNodeClassPicked(UQuestCondition::StaticClass());
 }
-bool FAssetEditor_QuestSystem::CanAutoArrange() const
+bool FAssetEditor_QuestSystem::CanCreateQuestCondition() const
+{
+	return true;
+}
+void FAssetEditor_QuestSystem::CreateNewQuestEvent()
+{
+	HandleNewNodeClassPicked(UQuestEvent::StaticClass());
+}
+bool FAssetEditor_QuestSystem::CanCreateQuestEvent() const
 {
 	return true;
 }
@@ -1303,7 +1323,7 @@ void FAssetEditor_QuestSystem::OnSelectedNodesChanged(const TSet<class UObject*>
 			PropertyWidget->SetObject(QuestGraph->QuestSystem);
 		}
 	}
-	if (Selection.Num() == 1)
+	else if (Selection.Num() == 1)
 	{
 		if (UQuestSystemGraphNode_Root* RootNode = Cast<UQuestSystemGraphNode_Root>(Selection[0]))
 		{

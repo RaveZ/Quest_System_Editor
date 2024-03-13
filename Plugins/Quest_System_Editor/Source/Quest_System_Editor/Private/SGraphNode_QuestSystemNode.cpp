@@ -284,13 +284,13 @@ void SGraphNode_QuestSystemNode::UpdateGraphNode()
 											[
 												SAssignNew(NodeBody, SVerticalBox)
 
-				//									// Title
+													// Title
 													+ SVerticalBox::Slot()
 													.AutoHeight()
 													[
 														SNew(SHorizontalBox)
 
-				//											// Error message
+															// Error message
 															+ SHorizontalBox::Slot()
 															.AutoWidth()
 															[
@@ -299,7 +299,7 @@ void SGraphNode_QuestSystemNode::UpdateGraphNode()
 																	.ToolTipText(this, &SGraphNode_QuestSystemNode::GetErrorMsgToolTip)
 															]
 
-				//											// Icon
+															// Icon
 															+ SHorizontalBox::Slot()
 															.AutoWidth()
 															.VAlign(VAlign_Center)
@@ -308,7 +308,7 @@ void SGraphNode_QuestSystemNode::UpdateGraphNode()
 																	.Image(NodeTypeIcon)
 															]
 
-				//											// Node Title
+															// Node Title
 															+ SHorizontalBox::Slot()
 															.Padding(FMargin(4.0f, 0.0f, 4.0f, 0.0f))
 															[

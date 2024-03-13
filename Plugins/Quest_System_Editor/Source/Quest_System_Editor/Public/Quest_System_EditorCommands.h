@@ -26,5 +26,6 @@ public:
 	
 	//Toolbar
 	TSharedPtr<FUICommandInfo> NewTask;
-	TSharedPtr<FUICommandInfo> AutoArrange;
+	TSharedPtr<FUICommandInfo> NewQuestCondition;
+	TSharedPtr<FUICommandInfo> NewQuestEvent;
 };

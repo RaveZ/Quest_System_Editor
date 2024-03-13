@@ -38,13 +38,35 @@ void FAssetEditorToolbar_QuestSystem::FillQuestSystemToolbar(FToolBarBuilder& To
 	}
 	ToolbarBuilder.EndSection();
 
-	ToolbarBuilder.BeginSection("Util");
+	ToolbarBuilder.BeginSection("Quest System");
 	{
-		ToolbarBuilder.AddToolBarButton(FQuest_System_EditorCommands::Get().AutoArrange,
+		const FText NewConditionLabel = LOCTEXT("NewQuestCondition_Label", "New Quest Condition");
+		const FText NewConditionTooltip = LOCTEXT("NewQuestCondition_ToolTip", "Create a new Quest Condition Blueprint from a base class");
+		const FSlateIcon NewConditionIcon = FSlateIcon(FAppStyle::GetAppStyleSetName(), "BTEditor.Graph.NewTask");
+
+
+		ToolbarBuilder.AddToolBarButton(FQuest_System_EditorCommands::Get().NewQuestCondition,
 			NAME_None,
-			LOCTEXT("AutoArrange_Label", "Auto Arrange"),
-			LOCTEXT("AutoArrange_ToolTip", "Auto arrange nodes, not perfect, but still handy"),
-			FSlateIcon(FQuest_System_EditorStyle::GetStyleSetName(), "QuestSystemEditor.AutoArrange"));
+			NewConditionLabel,
+			NewConditionTooltip,
+			NewConditionIcon
+		);
+	}
+	ToolbarBuilder.EndSection();
+
+	ToolbarBuilder.BeginSection("Quest System");
+	{
+		const FText NewEventLabel = LOCTEXT("NewQuestEvent_Label", "New Quest Event");
+		const FText NewEventTooltip = LOCTEXT("NewQuestEvent_ToolTip", "Create a new Quest Event Blueprint from a base class");
+		const FSlateIcon NewEventIcon = FSlateIcon(FAppStyle::GetAppStyleSetName(), "BTEditor.Graph.NewTask");
+
+
+		ToolbarBuilder.AddToolBarButton(FQuest_System_EditorCommands::Get().NewQuestEvent,
+			NAME_None,
+			NewEventLabel,
+			NewEventTooltip,
+			NewEventIcon
+		);
 	}
 	ToolbarBuilder.EndSection();
 }

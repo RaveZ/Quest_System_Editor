@@ -80,6 +80,8 @@ void UEdGraph_QuestSystemGraph::RebuildQuestSystemGraph()
 				for (UQuestSystemGraphNode_Task* TaskNode : TaskManagerNode->Tasks)
 				{
 					TaskNode->TaskManager = TaskManagerNode;
+					TaskNode->QuestGraph = TaskManagerNode->QuestGraph;
+					TaskNode->QuestSystem = TaskManagerNode->QuestSystem;
 				}
 			}
 

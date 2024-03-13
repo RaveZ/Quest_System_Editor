@@ -9,6 +9,8 @@
 
 class UQuestSystemGraph;
 class UQuestSystem;
+class UQuestCondition;
+class UQuestEvent;
 class UQuestSystemGraphEdge;
 
 UENUM(BlueprintType)
@@ -32,6 +34,12 @@ public:
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Detail")
 		FText Description;
+
+	UPROPERTY(Instanced, EditAnywhere, BlueprintReadOnly, Category = "QuestCondition")
+		TArray<UQuestCondition*> Condition;
+
+	UPROPERTY(Instanced, EditAnywhere, BlueprintReadOnly, Category = "QuestEvent")
+		TArray<UQuestEvent*> Event;
 
 	UPROPERTY(BlueprintReadOnly, Category = "QuestSystemGraphNode")
 		UQuestSystemGraph* QuestGraph;

@@ -11,6 +11,7 @@
 #include "Widgets/Input/SSearchBox.h"
 #include "Quest_System_EditorCommands.h"
 #include "SlateOptMacros.h"
+#include "SQuestPalette.h"
 
 
 #define LOCTEXT_NAMESPACE "MyQuest"
@@ -292,7 +293,7 @@ void SMyQuest::ClearGraphActionMenuSelection()
 
 TSharedRef<SWidget> SMyQuest::OnCreateWidgetForAction(FCreateWidgetForActionData* const InCreateData)
 {
-	return QuestEditorPtr.IsValid() ? SNew(SGraphPaletteItem, InCreateData) : SNew(SGraphPaletteItem, InCreateData);
+	return QuestEditorPtr.IsValid() ? SNew(SQuestPaletteItem, InCreateData, QuestEditorPtr.Pin()) : SNew(SQuestPaletteItem, InCreateData, GetQuestSystemObj());
 }
 
 void SMyQuest::CollectAllActions(FGraphActionListBuilderBase& OutAllActions)

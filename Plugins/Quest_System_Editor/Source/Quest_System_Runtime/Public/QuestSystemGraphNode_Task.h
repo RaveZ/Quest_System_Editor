@@ -26,26 +26,29 @@ class QUEST_SYSTEM_RUNTIME_API UQuestSystemGraphNode_Task : public UQuestSystemG
 public:
     UQuestSystemGraphNode_Task();
 
-    UPROPERTY(BlueprintReadWrite)
+    UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
         int CurrentAmount;
 
+    UPROPERTY(BlueprintReadWrite)
+        float DistanceToTarget;
 
-    UPROPERTY(BlueprintReadWrite, Category = "Tasks")
+
+    UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Task")
         ETaskState TaskState = ETaskState::E_Active;
 
     UPROPERTY(BlueprintReadOnly, Category = "Tasks")
         UQuestSystemGraphNode_TaskManager* TaskManager;
 
-    UFUNCTION(BlueprintImplementableEvent, BlueprintCallable, Category = "Tasks")
+    UFUNCTION(BlueprintImplementableEvent, BlueprintCallable, Category = "Task")
         void OnTaskBegin(AController* OwnerController);
 
-    UFUNCTION(BlueprintImplementableEvent, BlueprintCallable, Category = "Tasks")
+    UFUNCTION(BlueprintImplementableEvent, BlueprintCallable, Category = "Task")
         void OnTaskCompleted();
 
-    UFUNCTION(BlueprintImplementableEvent, BlueprintCallable, Category = "Tasks")
+    UFUNCTION(BlueprintImplementableEvent, BlueprintCallable, Category = "Task")
         void OnTaskTick();
 
-    UFUNCTION(BlueprintCallable, Category = "Tasks")
+    UFUNCTION(BlueprintCallable, Category = "Task")
         bool CompleteTask();
 
 

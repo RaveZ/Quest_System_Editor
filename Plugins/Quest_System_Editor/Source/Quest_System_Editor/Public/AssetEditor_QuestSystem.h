@@ -9,6 +9,8 @@
 #include "WorkflowOrientedApp/WorkflowTabManager.h"
 #include "QuestSystemGraph.h"
 
+class SMyQuest;
+
 namespace QuestSectionID
 {
 	enum Type
@@ -157,8 +159,10 @@ public:
 	/** Checks to see if the provided graph is contained within the current QuestSystemGraph */
 	bool IsGraphInCurrentQuestGraph(const UEdGraph* InGraph) const;
 
-
 	UQuestEditorSettings* GetSettings() const;
+
+	//Getter
+	TSharedPtr<SMyQuest> GetMyQuestWidget() const { return MyQuestWidget; }
 
 private:
 	/** Helper to move focused graph when clicking on graph breadcrumb */
@@ -212,8 +216,11 @@ protected:
 	bool CanCreateNewTask() const;
 	bool IsNewTaskButtonVisible() const;
 
-	void AutoArrange();
-	bool CanAutoArrange() const;
+	void CreateNewQuestCondition();
+	bool CanCreateQuestCondition() const;
+
+	void CreateNewQuestEvent();
+	bool CanCreateQuestEvent() const;
 	
 	void OnRenameNode();
 	bool CanRenameNodes() const;
@@ -225,6 +232,7 @@ protected:
 	void OnNodeDoubleClicked(UEdGraphNode* Node);
 	
 	void OnFinishedChangingProperties(const FPropertyChangedEvent& PropertyChangedEvent);
+
 
 #if ENGINE_MAJOR_VERSION < 5
 	void OnPackageSaved(const FString& PackageFileName, UObject* Outer);

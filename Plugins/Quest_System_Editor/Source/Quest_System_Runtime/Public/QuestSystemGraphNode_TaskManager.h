@@ -21,7 +21,6 @@ public:
 	UPROPERTY(Instanced, EditAnywhere, BlueprintReadOnly)
 		TArray<UQuestSystemGraphNode_Task*> Tasks;
 	
-	void UpdateTaskProgress();
 
 
 #if WITH_EDITOR

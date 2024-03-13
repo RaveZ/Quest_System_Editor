@@ -6,23 +6,6 @@
 #include "QuestSystem.h"
 #include "QuestComponent.h"
 
-void UQuestSystemGraphNode_TaskManager::UpdateTaskProgress()
-{
-    int progress = 0; 
-    for (UQuestSystemGraphNode_Task* Task : Tasks)
-    {
-        if (Task->TaskState == ETaskState::E_Complete)
-        {
-            progress++;
-        }
-    }
-
-    if (progress >= Tasks.Num())
-    {
-        QuestSystem->GoToNextNode();
-        GetQuestComponent()->OnQuestObjectiveUpdated.Broadcast(QuestSystem);
-    }
-}
 
 FText UQuestSystemGraphNode_TaskManager::GetNodeTitle() const
 {

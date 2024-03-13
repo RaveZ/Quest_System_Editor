@@ -20,7 +20,6 @@ bool UQuestSystemGraphNode_Task::CompleteTask()
         return false;
 
     TaskState = ETaskState::E_Complete;
-    TaskManager->UpdateTaskProgress();
     OnTaskCompleted();
     GetQuestComponent()->OnQuestObjectiveUpdated.Broadcast(QuestSystem);
     
