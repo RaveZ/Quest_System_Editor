@@ -18,8 +18,6 @@ public:
 	UEdNode_QuestSystemState();
 	//virtual void PostPlacedNewNode() override;
 	virtual void AllocateDefaultPins() override;
-	virtual bool CanDuplicateNode() const override { return false; }
-	virtual bool CanUserDeleteNode() const override { return false; }
 	//virtual bool HasErrors() const override { return false; }
 	//virtual bool RefreshNodeClass() override { return false; }
 	virtual FText GetNodeTitle(ENodeTitleType::Type TitleType) const override;

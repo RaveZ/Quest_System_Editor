@@ -164,6 +164,13 @@ public:
 	//Getter
 	TSharedPtr<SMyQuest> GetMyQuestWidget() const { return MyQuestWidget; }
 
+
+	FGraphAppearanceInfo GetGraphAppearance() const;
+	bool InEditingMode(bool bGraphIsEditable) const;
+
+	static bool IsPIESimulating();
+	static bool IsPIENotSimulating();
+
 private:
 	/** Helper to move focused graph when clicking on graph breadcrumb */
 	void OnChangeBreadCrumbGraph(class UEdGraph* InGraph);

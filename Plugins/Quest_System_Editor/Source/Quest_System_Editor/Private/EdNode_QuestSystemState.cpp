@@ -6,7 +6,6 @@
 
 UEdNode_QuestSystemState::UEdNode_QuestSystemState()
 {
-	bCanRenameNode = false;
 }
 
 void UEdNode_QuestSystemState::AllocateDefaultPins()

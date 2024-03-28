@@ -19,17 +19,17 @@ enum class ETaskState : uint8
     E_Complete		UMETA(DisplayName = "COMPLETE"),
 };
 
-UCLASS(Blueprintable, EditInlineNew, HideDropdown)
+UCLASS(Blueprintable, EditInlineNew, HideDropdown, HideCategories = ("Event&Condition"))
 class QUEST_SYSTEM_RUNTIME_API UQuestSystemGraphNode_Task : public UQuestSystemGraphNode, public FTickableGameObject
 {
 	GENERATED_BODY()
 public:
     UQuestSystemGraphNode_Task();
 
-    UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
+    UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Task")
         int CurrentAmount;
 
-    UPROPERTY(BlueprintReadWrite)
+    UPROPERTY(BlueprintReadWrite, Category = "Task")
         float DistanceToTarget;
 
 

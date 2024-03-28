@@ -74,6 +74,8 @@ void UQuestSystem::GoToNextNode()
 	}
 }
 
+
+
 int UQuestSystem::GetLevelNum() const
 {
 	int Level = 0;

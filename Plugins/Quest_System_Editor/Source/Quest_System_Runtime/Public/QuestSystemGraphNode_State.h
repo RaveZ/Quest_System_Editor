@@ -17,6 +17,9 @@ public:
     UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "State")
     EQuestState QuestState;
 
+    UFUNCTION(BlueprintCallable, Category = "State")
+        void BeginState();
+
 #if WITH_EDITOR
     virtual FText GetNodeTitle() const override;
 

@@ -22,6 +22,9 @@ public:
 		TArray<UQuestSystemGraphNode_Task*> Tasks;
 	
 
+	UFUNCTION(BlueprintCallable, Category = "TaskManager")
+		bool IsAllTaskCompleted();
+
 
 #if WITH_EDITOR
 	virtual FText GetNodeTitle() const override;

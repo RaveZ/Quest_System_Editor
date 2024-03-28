@@ -3,3 +3,6 @@
 
 #include "QuestEvent.h"
 
+void UQuestEvent::BeginEvent_Implementation() const
+{
+}

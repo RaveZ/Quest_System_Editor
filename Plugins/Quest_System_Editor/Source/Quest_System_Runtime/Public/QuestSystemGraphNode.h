@@ -35,11 +35,11 @@ public:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Detail")
 		FText Description;
 
-	UPROPERTY(Instanced, EditAnywhere, BlueprintReadOnly, Category = "QuestCondition")
-		TArray<UQuestCondition*> Condition;
-
-	UPROPERTY(Instanced, EditAnywhere, BlueprintReadOnly, Category = "QuestEvent")
-		TArray<UQuestEvent*> Event;
+	UPROPERTY(Instanced, EditAnywhere, BlueprintReadOnly, Category = "Event&Condition")
+		TArray<UQuestCondition*> Conditions;
+	
+	UPROPERTY(Instanced, EditAnywhere, BlueprintReadOnly, Category = "Event&Condition")
+		TArray<UQuestEvent*> Events;
 
 	UPROPERTY(BlueprintReadOnly, Category = "QuestSystemGraphNode")
 		UQuestSystemGraph* QuestGraph;
@@ -55,8 +55,6 @@ public:
 
 	UPROPERTY(BlueprintReadOnly, Category = "QuestSystemGraphNode")
 		TMap<UQuestSystemGraphNode*, UQuestSystemGraphEdge*> Edges;
-
-	
 
 
 	UFUNCTION(BlueprintCallable, Category = "QuestSystemGraphNode")

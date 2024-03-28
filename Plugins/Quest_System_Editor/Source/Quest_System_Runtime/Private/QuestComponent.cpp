@@ -3,8 +3,11 @@
 
 #include "QuestComponent.h"
 #include "QuestSystem.h"
+#include "QuestCondition.h"
 #include "QuestSystemGraph.h"
+#include "QuestSystemGraphNode_State.h"
 #include "QuestSystemGraphNode_Task.h"
+#include "QuestSystemGraphNode_TaskManager.h"
 
 
 
@@ -15,14 +18,12 @@ UQuestComponent::UQuestComponent()
 	// Set this component to be initialized when the game starts, and to be ticked every frame.  You can turn these features
 	// off to improve performance if you don't need them.
 	PrimaryComponentTick.bCanEverTick = true;
-	QuestAssets.Empty();
-
 	// ...
 }
 
-bool UQuestComponent::StartQuest(UQuestSystemGraph* QuestAsset)
+bool UQuestComponent::StartQuest(UQuestSystemGraph* QuestGraph)
 {
-	if (QuestAsset == NULL)
+	if (QuestGraph == NULL)
 	{
 		UE_LOG(LogTemp, Warning, TEXT("RunQuest: Unable to run NULL Quest Graph"));
 		return false;
@@ -34,14 +35,14 @@ bool UQuestComponent::StartQuest(UQuestSystemGraph* QuestAsset)
 	QuestComponent = this;
 
 	//Set Quest Asset Dependency
-	QuestAsset->OwningController = OwningController;
-	QuestAsset->OwningPawn = OwningPawn;
-	QuestAsset->QuestComponent = QuestComponent;
+	QuestGraph->OwningController = OwningController;
+	QuestGraph->OwningPawn = OwningPawn;
+	QuestGraph->QuestComponent = QuestComponent;
 
-	QuestAssets.Add(QuestAsset);
+	QuestGraphs.Add(QuestGraph);
 
 	bool bSuccess = true;
-	for (UQuestSystem* QuestSystem : QuestAsset->QuestSystems)
+	for (UQuestSystem* QuestSystem : QuestGraph->QuestSystems)
 	{
 		for (UQuestSystemGraphNode* Node : QuestSystem->RootNodes)
 		{
@@ -58,12 +59,87 @@ bool UQuestComponent::StartQuest(UQuestSystemGraph* QuestAsset)
 	return bSuccess;
 }
 
+void UQuestComponent::OnUpdateQuest(UQuestSystem* UpdatedQuest)
+{
+	for (UQuestSystemGraph* QuestGraph : QuestGraphs)
+	{
+		for (UQuestSystem* QuestSystem : QuestGraph->QuestSystems)
+		{
+			if (UQuestSystemGraphNode_TaskManager* NodeTaskManager = Cast<UQuestSystemGraphNode_TaskManager>(QuestSystem->CurrentNode))
+			{
+				if (NodeTaskManager->IsAllTaskCompleted())
+				{
+					//launch node events
+
+
+					//evaluate next node condition
+					EvaluateNextNodeCondition(QuestSystem);
+				}
+			}
+		}
+	}
+}
+
+void UQuestComponent::EvaluateNextNodeCondition(UQuestSystem* QuestParam)
+{
+	UQuestSystemGraphNode* NextNode = nullptr;
+	for (UQuestSystemGraphNode* Node : QuestParam->CurrentNode->ChildrenNodes)
+	{
+		if (NextNode == nullptr && Node->Conditions.IsEmpty())
+		{
+			NextNode = Node;
+		}
+		else if (!Node->Conditions.IsEmpty())
+		{
+			int SumConditionMet = 0;
+			for (UQuestCondition* Condition : Node->Conditions)
+			{
+				if (Condition->IsConditionMet())
+				{
+					SumConditionMet++;
+				}
+			}
+			if (SumConditionMet >= Node->Conditions.Num())
+			{
+				NextNode = Node;
+				//break loop to ensure the met condition doesn't get overrided
+				break;
+			}
+		}
+	}
+
+	if (NextNode)
+	{
+		//Go to next node if exist or condition met
+		GoToNextNode(QuestParam, NextNode);
+	}
+	
+}
+
+void UQuestComponent::GoToNextNode(UQuestSystem* QuestParam, UQuestSystemGraphNode* NodeParam)
+{
+	QuestParam->CurrentNode = NodeParam;
+	if (UQuestSystemGraphNode_TaskManager* TaskManagerNode = Cast<UQuestSystemGraphNode_TaskManager>(QuestParam->CurrentNode))
+	{
+		for (UQuestSystemGraphNode_Task* TaskNode : TaskManagerNode->Tasks)
+		{
+			TaskNode->OnTaskBegin(OwningController);
+		}
+	}
+
+	if (UQuestSystemGraphNode_State* StateNode = Cast<UQuestSystemGraphNode_State>(QuestParam->CurrentNode))
+	{
+		StateNode->BeginState();
+	}
+}
+
 
 // Called when the game starts
 void UQuestComponent::BeginPlay()
 {
 	Super::BeginPlay();
-
+	QuestGraphs.Empty();
+	OnQuestObjectiveUpdated.AddDynamic(this, &UQuestComponent::OnUpdateQuest);
 	// ...
 	
 }

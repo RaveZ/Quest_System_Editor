@@ -4,6 +4,10 @@
 #include "AssetEditor_QuestSystem.h"
 #include "QuestSystemGraphNode_Root.h"
 #include "QuestCondition.h"
+#include "EngineGlobals.h"
+#include "Editor/EditorEngine.h"
+#include "Editor.h"
+#include "UnrealEdGlobals.h"
 #include "QuestEvent.h"
 #include "BlueprintEditor.h"
 #include "UObject/ObjectSaveContext.h"
@@ -811,6 +815,37 @@ UQuestEditorSettings* FAssetEditor_QuestSystem::GetSettings() const
 	return QuestGraphEditorSettings;
 }
 
+FGraphAppearanceInfo FAssetEditor_QuestSystem::GetGraphAppearance() const
+{
+	FGraphAppearanceInfo AppearanceInfo;
+
+	if (FAssetEditor_QuestSystem::IsPIESimulating())
+	{
+		AppearanceInfo.PIENotifyText = LOCTEXT("Active", "ACTIVE");
+	}
+	else
+	{
+		AppearanceInfo.CornerText = LOCTEXT("AppearanceCornerText", "Quest Editor");
+	}
+	return AppearanceInfo;
+}
+
+bool FAssetEditor_QuestSystem::InEditingMode(bool bGraphIsEditable) const
+{
+	return bGraphIsEditable && FAssetEditor_QuestSystem::IsPIENotSimulating();
+}
+
+
+bool FAssetEditor_QuestSystem::IsPIESimulating()
+{
+	return GEditor->bIsSimulatingInEditor || GEditor->PlayWorld;
+}
+
+bool FAssetEditor_QuestSystem::IsPIENotSimulating()
+{
+	return !GEditor->bIsSimulatingInEditor && (GEditor->PlayWorld == NULL);
+}
+
 void FAssetEditor_QuestSystem::OnChangeBreadCrumbGraph(UEdGraph* InGraph)
 {
 }
@@ -893,8 +928,6 @@ void FAssetEditor_QuestSystem::CreateInternalWidgets()
 
 TSharedRef<SGraphEditor> FAssetEditor_QuestSystem::CreateGraphEditorWidget(TSharedRef<class FTabInfo> InTabInfo, UEdGraph* InGraph)
 {
-	FGraphAppearanceInfo AppearanceInfo;
-	AppearanceInfo.CornerText = LOCTEXT("AppearanceCornerText_GenericGraph", "Quest System Graph");
 
 	// Create the title bar widget
 	TSharedPtr<SWidget> TitleBarWidget = CreateGraphTitleBarWidget(InTabInfo, InGraph);
@@ -905,11 +938,13 @@ TSharedRef<SGraphEditor> FAssetEditor_QuestSystem::CreateGraphEditorWidget(TShar
 	InEvents.OnSelectionChanged = SGraphEditor::FOnSelectionChanged::CreateSP(this, &FAssetEditor_QuestSystem::OnSelectedNodesChanged);
 	InEvents.OnNodeDoubleClicked = FSingleNodeEvent::CreateSP(this, &FAssetEditor_QuestSystem::OnNodeDoubleClicked);
 
+	// Make full graph editor
+	const bool bGraphIsEditable = InGraph->bEditable;
 	return SNew(SGraphEditor)
 		.AdditionalCommands(GraphEditorCommands)
-		.IsEditable(true)
+		.IsEditable(this, &FAssetEditor_QuestSystem::InEditingMode, bGraphIsEditable)
 		.TitleBar(TitleBarWidget)
-		.Appearance(AppearanceInfo)
+		.Appearance(this, &FAssetEditor_QuestSystem::GetGraphAppearance)
 		.GraphToEdit(InGraph)
 		.GraphEvents(InEvents)
 		.AutoExpandActionMenu(true)

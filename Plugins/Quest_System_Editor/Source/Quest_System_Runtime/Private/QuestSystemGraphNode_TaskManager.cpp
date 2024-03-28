@@ -7,6 +7,28 @@
 #include "QuestComponent.h"
 
 
+bool UQuestSystemGraphNode_TaskManager::IsAllTaskCompleted()
+{
+    int progress = 0;
+    for (UQuestSystemGraphNode_Task* NodeTask : Tasks)
+    {
+        if (NodeTask->TaskState == ETaskState::E_Complete)
+        {
+            progress++;
+        }
+    }
+
+    if (progress >= Tasks.Num())
+    {
+        return true;
+    }
+    else
+    {
+        return false;
+    }
+    
+}
+
 FText UQuestSystemGraphNode_TaskManager::GetNodeTitle() const
 {
     return ID.IsEmpty() ? FText::FromString(UQuestSystemGraphNode::GetShortTypeName(this)) : ID;

@@ -13,5 +13,10 @@ UCLASS(Blueprintable, EditInlineNew, HideDropdown)
 class QUEST_SYSTEM_RUNTIME_API UQuestEvent : public UObject
 {
 	GENERATED_BODY()
-	
+public:
+
+	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable, Category = "QuestEvent")
+		void BeginEvent() const;
+
+	virtual void BeginEvent_Implementation() const;
 };

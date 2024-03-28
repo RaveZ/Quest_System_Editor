@@ -2,6 +2,16 @@
 
 
 #include "QuestSystemGraphNode_State.h"
+#include "QuestComponent.h"
+#include "QuestSystem.h"
+
+
+void UQuestSystemGraphNode_State::BeginState()
+{
+    QuestSystem->QuestState = QuestState;
+
+    GetQuestComponent()->OnQuestObjectiveUpdated.Broadcast(QuestSystem);
+}
 
 FText UQuestSystemGraphNode_State::GetNodeTitle() const
 {

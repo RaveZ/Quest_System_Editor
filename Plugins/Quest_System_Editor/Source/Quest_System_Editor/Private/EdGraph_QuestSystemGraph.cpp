@@ -55,7 +55,7 @@ void UEdGraph_QuestSystemGraph::RebuildQuestSystemGraph()
 					}
 					else if (UEdNode_QuestSystemEdge* EdNode_Edge = Cast<UEdNode_QuestSystemEdge>(Pin->LinkedTo[LinkToIdx]->GetOwningNode()))
 					{
-						UEdNode_QuestSystemNode* Child = EdNode_Edge->GetEndNode();;
+						UEdNode_QuestSystemNode* Child = EdNode_Edge->GetEndNode();
 						if (Child != nullptr)
 						{
 							ChildNode = Child->QuestSystemGraphNode;

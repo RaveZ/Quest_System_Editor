@@ -26,8 +26,6 @@ bool UQuestSystemGraphNode_Task::CompleteTask()
     return true;
 }
 
-
-
 void UQuestSystemGraphNode_Task::PostEditChangeProperty(FPropertyChangedEvent& PropertyChangedEvent)
 {
     Super::PostEditChangeProperty(PropertyChangedEvent);

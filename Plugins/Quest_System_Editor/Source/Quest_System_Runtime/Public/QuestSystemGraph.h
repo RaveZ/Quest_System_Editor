@@ -12,6 +12,7 @@ class UQuestComponent;
 class UQuestSystemGraphNode;
 class UQuestSystemGraphEdge;
 
+
 UCLASS(Blueprintable)
 class QUEST_SYSTEM_RUNTIME_API UQuestSystemGraph : public UObject
 {
@@ -74,3 +75,4 @@ public:
 	/** Get all graphs in this QuestEditor */
 	void GetAllGraphs(TArray<UEdGraph*>& Graphs) const;
 };
+
