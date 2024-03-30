@@ -49,30 +49,6 @@ void UQuestSystem::Print(bool ToConsole, bool ToScreen)
 	}
 }
 
-void UQuestSystem::GoToNextNode()
-{
-	if (QuestGraph == NULL)
-		return;
-	if (CurrentNode == NULL)
-		return;
-
-	if (CurrentNode->ChildrenNodes.Num() > 0)
-	{
-		for (UQuestSystemGraphNode* Node : CurrentNode->ChildrenNodes)
-		{
-			//TODO: Make them able to detect the children node AND Check Condition feature
-			CurrentNode = Node;
-			if (UQuestSystemGraphNode_TaskManager* TaskManagerNode = Cast<UQuestSystemGraphNode_TaskManager>(CurrentNode))
-			{
-				for (UQuestSystemGraphNode_Task* TaskNode : TaskManagerNode->Tasks)
-				{
-					TaskNode->OnTaskBegin(GetOwningController());
-				}
-			}
-		}
-		//GoToNextNode();
-	}
-}
 
 
 
@@ -156,7 +132,7 @@ UQuestComponent* UQuestSystem::GetQuestComponent()
 	return QuestGraph->QuestComponent;
 }
 
-UQuestSystemGraph* UQuestSystem::GetOwningQuest() const
+UQuestSystemGraph* UQuestSystem::GetOwningQuestGraph() const
 {
 	if (!QuestGraph)
 		return nullptr;

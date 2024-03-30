@@ -485,7 +485,7 @@ const FPinConnectionResponse UAssetGraphSchema_QuestSystem::CanCreateConnection(
 	}*/
 
 
-	if (EdNode_Out->QuestSystemGraphNode->GetOwningQuest()->bEdgeEnabled)
+	if (EdNode_Out->QuestSystemGraphNode->GetOwningQuestGraph()->bEdgeEnabled)
 	{
 		return FPinConnectionResponse(CONNECT_RESPONSE_MAKE_WITH_CONVERSION_NODE, LOCTEXT("PinConnect", "Connect nodes with edge"));
 	}
@@ -550,7 +550,7 @@ bool UAssetGraphSchema_QuestSystem::CreateAutomaticConversionNodeAndConnections(
 	if (!NodeA || !NodeA->GetOutputPin() || !NodeB || !NodeB->GetInputPin())
 		return false;
 
-	UQuestSystemGraph* Graph = NodeA->QuestSystemGraphNode->GetOwningQuest();
+	UQuestSystemGraph* Graph = NodeA->QuestSystemGraphNode->GetOwningQuestGraph();
 
 	FVector2D InitPos((NodeA->NodePosX + NodeB->NodePosX) / 2, (NodeA->NodePosY + NodeB->NodePosY) / 2);
 

@@ -15,10 +15,10 @@ class QUEST_SYSTEM_RUNTIME_API UQuestSystemGraphNode_TaskManager : public UQuest
 
 public:
 	/** @return Node Title */
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Detail")
-		FText ID;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Detail")
+		FName TaskID;
 
-	UPROPERTY(Instanced, EditAnywhere, BlueprintReadOnly)
+	UPROPERTY(Instanced, EditAnywhere, BlueprintReadOnly, Category = "TaskManager")
 		TArray<UQuestSystemGraphNode_Task*> Tasks;
 	
 

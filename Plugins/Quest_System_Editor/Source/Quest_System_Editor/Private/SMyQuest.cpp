@@ -352,16 +352,32 @@ FReply SMyQuest::OnCategoryDragged(const FText& InCategory, const FPointerEvent&
 void SMyQuest::OnActionSelected(const TArray<TSharedPtr<FEdGraphSchemaAction>>& InActions)
 {
 	TSharedPtr<FEdGraphSchemaAction> InAction(InActions.Num() > 0 ? InActions[0] : NULL);
+	if (InAction.IsValid())
+	{
+		FAssetSchemaAction_QuestSystemGraph* GraphAction = (FAssetSchemaAction_QuestSystemGraph*)InAction.Get();
+		QuestEditorPtr.Pin()->FocusedEdGraph = GraphAction->EdGraph;
 
-	
+		if (GraphAction->EdGraph)
+		{
+			TSharedPtr<FAssetEditor_QuestSystem> QuestEditor = QuestEditorPtr.Pin();
+
+			if (UEdGraph_QuestSystemGraph* QuestGraph = Cast<UEdGraph_QuestSystemGraph>(QuestEditor->FocusedEdGraph))
+			{
+				QuestEditor->PropertyWidget->SetObject(QuestGraph->QuestSystem);
+			}
+		}
+	}
 }
+
 void SMyQuest::OnGlobalActionSelected(const TArray<TSharedPtr<FEdGraphSchemaAction>>& InActions, ESelectInfo::Type InSelectionType)
 {
 	if (InSelectionType == ESelectInfo::OnMouseClick || InSelectionType == ESelectInfo::OnKeyPress || InSelectionType == ESelectInfo::OnNavigation || InActions.Num() == 0)
 	{
 		OnActionSelected(InActions);
+
 	}
 }
+
 void SMyQuest::OnActionDoubleClicked(const TArray<TSharedPtr<FEdGraphSchemaAction>>& InActions)
 {
 	if (!QuestEditorPtr.IsValid())

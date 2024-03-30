@@ -7,6 +7,8 @@
 #include "QuestComponent.h"
 
 
+#define LOCTEXT_NAMESPACE "QuestSystemGraphNode_TaskManager"
+
 bool UQuestSystemGraphNode_TaskManager::IsAllTaskCompleted()
 {
     int progress = 0;
@@ -29,14 +31,15 @@ bool UQuestSystemGraphNode_TaskManager::IsAllTaskCompleted()
     
 }
 
+#if WITH_EDITOR
 FText UQuestSystemGraphNode_TaskManager::GetNodeTitle() const
 {
-    return ID.IsEmpty() ? FText::FromString(UQuestSystemGraphNode::GetShortTypeName(this)) : ID;
+    return FText::FromName(TaskID).IsEmpty() ? FText::FromString(UQuestSystemGraphNode::GetShortTypeName(this)) : FText::FromName(TaskID);
 }
 
 void UQuestSystemGraphNode_TaskManager::SetNodeTitle(const FText& NewTitle)
 {
-    ID = NewTitle;
+    TaskID = FName(NewTitle.ToString());
 }
 
 FText UQuestSystemGraphNode_TaskManager::GetNodeDescription() const
@@ -61,3 +64,6 @@ FText UQuestSystemGraphNode_TaskManager::GetNodeDescription() const
 
     return FText::FromString(BulletedList);
 }
+#endif
+
+#undef LOCTEXT_NAMESPACE

@@ -4,6 +4,7 @@
 #include "QuestComponent.h"
 #include "QuestSystem.h"
 #include "QuestCondition.h"
+#include "QuestEvent.h"
 #include "QuestSystemGraph.h"
 #include "QuestSystemGraphNode_State.h"
 #include "QuestSystemGraphNode_Task.h"
@@ -21,7 +22,7 @@ UQuestComponent::UQuestComponent()
 	// ...
 }
 
-bool UQuestComponent::StartQuest(UQuestSystemGraph* QuestGraph)
+bool UQuestComponent::RunQuest(UQuestSystemGraph* QuestGraph)
 {
 	if (QuestGraph == NULL)
 	{
@@ -46,17 +47,31 @@ bool UQuestComponent::StartQuest(UQuestSystemGraph* QuestGraph)
 	{
 		for (UQuestSystemGraphNode* Node : QuestSystem->RootNodes)
 		{
-			//TODO : pengecekan state quest dan state custom untuk menggantikan ENUM QuestState
 			if (QuestSystem->QuestState == EQuestState::E_Active)
 			{
-				QuestSystem->CurrentNode = Node;
-				QuestSystem->GoToNextNode();
+				//TODO : Restart quest ganti dengan start quest, termasuk cek save data 
+				StartQuest(QuestSystem);
+			
 			}
 		}
 
 	}
 
 	return bSuccess;
+}
+
+void UQuestComponent::StartQuest(UQuestSystem* QuestParam)
+{
+	QuestParam->CurrentNode = QuestParam->RootNodes[0];
+	EvaluateNextNodeCondition(QuestParam);
+}
+
+void UQuestComponent::RestartQuest(UQuestSystem* QuestParam)
+{
+}
+
+void UQuestComponent::FailQuest(UQuestSystem* QuestParam)
+{
 }
 
 void UQuestComponent::OnUpdateQuest(UQuestSystem* UpdatedQuest)
@@ -69,9 +84,6 @@ void UQuestComponent::OnUpdateQuest(UQuestSystem* UpdatedQuest)
 			{
 				if (NodeTaskManager->IsAllTaskCompleted())
 				{
-					//launch node events
-
-
 					//evaluate next node condition
 					EvaluateNextNodeCondition(QuestSystem);
 				}
@@ -110,8 +122,17 @@ void UQuestComponent::EvaluateNextNodeCondition(UQuestSystem* QuestParam)
 
 	if (NextNode)
 	{
+		//End of a Node, Launch Event with the End and Both Type
+		for (UQuestEvent* Event : QuestParam->CurrentNode->Events)
+		{
+			if (Event->EventRunType == EEventRunType::E_Both || Event->EventRunType == EEventRunType::E_End)
+			{
+				Event->BeginEvent();
+			}
+		}
 		//Go to next node if exist or condition met
 		GoToNextNode(QuestParam, NextNode);
+
 	}
 	
 }
@@ -119,11 +140,22 @@ void UQuestComponent::EvaluateNextNodeCondition(UQuestSystem* QuestParam)
 void UQuestComponent::GoToNextNode(UQuestSystem* QuestParam, UQuestSystemGraphNode* NodeParam)
 {
 	QuestParam->CurrentNode = NodeParam;
+
+	//Start of the Node, Launch Event with the Start and Both Type
+	for (UQuestEvent* Event : QuestParam->CurrentNode->Events)
+	{
+		if (Event->EventRunType == EEventRunType::E_Both || Event->EventRunType == EEventRunType::E_Start)
+		{
+			Event->BeginEvent();
+		}
+	}
+
+	//Begin Node Functionality
 	if (UQuestSystemGraphNode_TaskManager* TaskManagerNode = Cast<UQuestSystemGraphNode_TaskManager>(QuestParam->CurrentNode))
 	{
 		for (UQuestSystemGraphNode_Task* TaskNode : TaskManagerNode->Tasks)
 		{
-			TaskNode->OnTaskBegin(OwningController);
+			TaskNode->OnTaskBegin();
 		}
 	}
 
@@ -131,6 +163,24 @@ void UQuestComponent::GoToNextNode(UQuestSystem* QuestParam, UQuestSystemGraphNo
 	{
 		StateNode->BeginState();
 	}
+}
+
+UQuestSystem*  UQuestComponent::GetQuestByID(FName QuestID)
+{
+	UQuestSystem* FoundedQuest = nullptr;
+	for (UQuestSystemGraph* QuestGraph : QuestGraphs)
+	{
+		for (UQuestSystem* QuestSystem : QuestGraph->QuestSystems)
+		{
+			if (QuestSystem->QuestID == QuestID)
+			{
+				FoundedQuest = QuestSystem;
+				break;
+			}
+		}
+	}
+
+	return FoundedQuest;
 }
 
 

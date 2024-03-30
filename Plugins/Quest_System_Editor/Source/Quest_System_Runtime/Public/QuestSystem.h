@@ -53,8 +53,6 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "QuestSystem")
 		void Print(bool ToConsole = true, bool ToScreen = true);
 
-	UFUNCTION(BlueprintCallable, Category = "QuestSystem")
-		void GoToNextNode();
 
 	UFUNCTION(BlueprintCallable, Category = "QuestSystem")
 		int GetLevelNum() const;
@@ -72,6 +70,26 @@ public:
 		UQuestComponent* GetQuestComponent();
 
 	UFUNCTION(BlueprintCallable, Category = "QuestSystem")
-		UQuestSystemGraph* GetOwningQuest() const;
+		UQuestSystemGraph* GetOwningQuestGraph() const;
 	void ClearGraph();
+
+
+	UFUNCTION(CallInEditor, BlueprintCallable, Category = "QuestSystem")
+	static TArray<FName> GetAllQuest() 
+	{
+		return { FName("test1"), FName("test2") };
+	}
+
+};
+
+USTRUCT(BlueprintType)
+struct QUEST_SYSTEM_RUNTIME_API FQuestIDHandle
+{
+	GENERATED_USTRUCT_BODY()
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = QuestIDHandle, meta = (GetOptions = "Quest_System_Runtime.QuestSystem.GetAllQuest"))
+		FName QuestID;
+	
+	
+
 };

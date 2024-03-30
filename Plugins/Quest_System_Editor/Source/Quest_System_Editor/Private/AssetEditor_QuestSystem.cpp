@@ -917,7 +917,7 @@ void FAssetEditor_QuestSystem::CreateInternalWidgets()
 
 	FPropertyEditorModule& PropertyModule = FModuleManager::LoadModuleChecked<FPropertyEditorModule>("PropertyEditor");
 	PropertyWidget = PropertyModule.CreateDetailView(Args);
-	PropertyWidget->SetObject(EditingQuestGraph);
+	PropertyWidget->SetObject(nullptr);
 	PropertyWidget->OnFinishedChangingProperties().AddSP(this, &FAssetEditor_QuestSystem::OnFinishedChangingProperties);
 
 	EditorSettingsWidget = PropertyModule.CreateDetailView(Args);

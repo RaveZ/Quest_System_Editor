@@ -3,7 +3,6 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "AIGraphTypes.h"
 #include "UObject/NoExportTypes.h"
 #include "QuestSystemGraphNode.generated.h"
 
@@ -35,10 +34,10 @@ public:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Detail")
 		FText Description;
 
-	UPROPERTY(Instanced, EditAnywhere, BlueprintReadOnly, Category = "Event&Condition")
+	UPROPERTY(Instanced, EditAnywhere, BlueprintReadOnly, Category = "Conditions")
 		TArray<UQuestCondition*> Conditions;
 	
-	UPROPERTY(Instanced, EditAnywhere, BlueprintReadOnly, Category = "Event&Condition")
+	UPROPERTY(Instanced, EditAnywhere, BlueprintReadOnly, Category = "Events")
 		TArray<UQuestEvent*> Events;
 
 	UPROPERTY(BlueprintReadOnly, Category = "QuestSystemGraphNode")
@@ -65,16 +64,19 @@ public:
 
 
 	UFUNCTION(BlueprintCallable, Category = "QuestSystemGraphNode")
-		AController* GetOwningController();
+		AController* GetOwningController() const;
 
 	UFUNCTION(BlueprintCallable, Category = "QuestSystemGraphNode")
-		APawn* GetOwningPawn();
+		APawn* GetOwningPawn() const;
 
 	UFUNCTION(BlueprintCallable, Category = "QuestSystemGraphNode")
-		UQuestComponent* GetQuestComponent();
+		UQuestComponent* GetQuestComponent() const;
 
 	UFUNCTION(BlueprintCallable, Category = "QuestSystemGraphNode")
-		UQuestSystemGraph* GetOwningQuest();
+		UQuestSystemGraph* GetOwningQuestGraph() const;
+
+	UFUNCTION(BlueprintCallable, Category = "QuestSystemGraphNode")
+		UQuestSystem* GetOwningQuestSystem() const;
 
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "QuestSystemGraphNode")
 		FText GetDescription() const;

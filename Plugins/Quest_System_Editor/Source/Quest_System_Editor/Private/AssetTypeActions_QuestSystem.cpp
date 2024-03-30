@@ -40,7 +40,6 @@ void FAssetTypeActions_QuestSystem::OpenAssetEditor(const TArray<UObject*>& InOb
 
 			TSharedRef<FAssetEditor_QuestSystem> NewGraphEditor(new FAssetEditor_QuestSystem());
 			NewGraphEditor->InitQuestSystemGraphAssetEditor(Mode, EditWithinLevelEditor, Graph);
-
 		}
 	}
 }

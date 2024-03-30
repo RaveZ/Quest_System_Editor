@@ -115,7 +115,7 @@ bool UQuestSystemGraphNode::IsLeafNode() const
 	return ChildrenNodes.Num() == 0;
 }
 
-UQuestSystemGraph* UQuestSystemGraphNode::GetOwningQuest()
+UQuestSystemGraph* UQuestSystemGraphNode::GetOwningQuestGraph() const
 {
 	if (!QuestGraph)
 		return nullptr;
@@ -123,8 +123,13 @@ UQuestSystemGraph* UQuestSystemGraphNode::GetOwningQuest()
 	return QuestGraph;
 }
 
+UQuestSystem* UQuestSystemGraphNode::GetOwningQuestSystem() const
+{
+	return QuestSystem;
+}
 
-AController* UQuestSystemGraphNode::GetOwningController()
+
+AController* UQuestSystemGraphNode::GetOwningController() const
 {
 	if (!QuestGraph)
 		return nullptr;
@@ -133,7 +138,7 @@ AController* UQuestSystemGraphNode::GetOwningController()
 	return QuestGraph->OwningController;
 }
 
-APawn* UQuestSystemGraphNode::GetOwningPawn()
+APawn* UQuestSystemGraphNode::GetOwningPawn() const
 {
 	if (!QuestGraph)
 		return nullptr;
@@ -141,7 +146,7 @@ APawn* UQuestSystemGraphNode::GetOwningPawn()
 	return QuestGraph->OwningPawn;
 }
 
-UQuestComponent* UQuestSystemGraphNode::GetQuestComponent()
+UQuestComponent* UQuestSystemGraphNode::GetQuestComponent() const
 {
 	if (!QuestGraph)
 		return nullptr;

@@ -19,7 +19,7 @@ enum class ETaskState : uint8
     E_Complete		UMETA(DisplayName = "COMPLETE"),
 };
 
-UCLASS(Blueprintable, EditInlineNew, HideDropdown, HideCategories = ("Event&Condition"))
+UCLASS(Blueprintable, EditInlineNew, HideDropdown, HideCategories = ("Events", "Conditions"))
 class QUEST_SYSTEM_RUNTIME_API UQuestSystemGraphNode_Task : public UQuestSystemGraphNode, public FTickableGameObject
 {
 	GENERATED_BODY()
@@ -40,7 +40,7 @@ public:
         UQuestSystemGraphNode_TaskManager* TaskManager;
 
     UFUNCTION(BlueprintImplementableEvent, BlueprintCallable, Category = "Task")
-        void OnTaskBegin(AController* OwnerController);
+        void OnTaskBegin();
 
     UFUNCTION(BlueprintImplementableEvent, BlueprintCallable, Category = "Task")
         void OnTaskCompleted();
@@ -52,9 +52,7 @@ public:
         bool CompleteTask();
 
 
-    //UObject
-    virtual void PostEditChangeProperty(struct FPropertyChangedEvent& PropertyChangedEvent) override;
-
+   
     // FTickableGameObject Begin
     virtual void Tick(float DeltaTime) override;
     virtual ETickableTickType GetTickableTickType() const override

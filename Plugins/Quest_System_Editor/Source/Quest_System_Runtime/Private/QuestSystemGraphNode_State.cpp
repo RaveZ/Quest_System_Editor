@@ -13,6 +13,7 @@ void UQuestSystemGraphNode_State::BeginState()
     GetQuestComponent()->OnQuestObjectiveUpdated.Broadcast(QuestSystem);
 }
 
+#if WITH_EDITOR
 FText UQuestSystemGraphNode_State::GetNodeTitle() const
 {
     switch (QuestState)
@@ -39,3 +40,4 @@ FLinearColor UQuestSystemGraphNode_State::GetBackgroundColor() const
             return FLinearColor::Black;
     }
 }
+#endif

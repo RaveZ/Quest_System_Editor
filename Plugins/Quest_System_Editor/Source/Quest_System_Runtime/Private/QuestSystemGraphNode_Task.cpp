@@ -13,7 +13,6 @@ UQuestSystemGraphNode_Task::UQuestSystemGraphNode_Task()
 {
 }
 
-#if WITH_EDITOR
 bool UQuestSystemGraphNode_Task::CompleteTask()
 {
     if (QuestSystem == NULL)
@@ -26,10 +25,7 @@ bool UQuestSystemGraphNode_Task::CompleteTask()
     return true;
 }
 
-void UQuestSystemGraphNode_Task::PostEditChangeProperty(FPropertyChangedEvent& PropertyChangedEvent)
-{
-    Super::PostEditChangeProperty(PropertyChangedEvent);
-}
+
 
 void UQuestSystemGraphNode_Task::Tick(float DeltaTime)
 {
@@ -40,6 +36,7 @@ void UQuestSystemGraphNode_Task::Tick(float DeltaTime)
     LastFrameNumberWeTicked = GFrameCounter;
 }
 
+#if WITH_EDITOR
 FText UQuestSystemGraphNode_Task::GetNodeTitle() const
 {
     return Super::GetNodeTitle();

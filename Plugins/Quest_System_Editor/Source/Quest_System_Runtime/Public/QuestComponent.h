@@ -32,7 +32,16 @@ public:
 		TArray<UQuestSystemGraph*> QuestGraphs;
 
 	UFUNCTION(BlueprintCallable, Category = "QuestComponent")
-		bool StartQuest(UQuestSystemGraph* QuestAsset);
+		bool RunQuest(UQuestSystemGraph* QuestAsset);
+
+	UFUNCTION(BlueprintCallable, Category = "QuestComponent")
+		void StartQuest(UQuestSystem* QuestParam);
+
+	UFUNCTION(BlueprintCallable, Category = "QuestComponent")
+		void RestartQuest(UQuestSystem* QuestParam);
+	
+	UFUNCTION(BlueprintCallable, Category = "QuestComponent")
+		void FailQuest(UQuestSystem* QuestParam);
 
 	UPROPERTY(BlueprintAssignable, BlueprintCallable, Category = "QuestComponent")
 		FQuestObjectiveUpdated OnQuestObjectiveUpdated;
@@ -45,6 +54,10 @@ public:
 
 	UFUNCTION(BlueprintCallable, Category = "QuestComponent")
 		void GoToNextNode(UQuestSystem* QuestParam, UQuestSystemGraphNode* NodeParam);
+
+
+	UFUNCTION(BlueprintCallable, Category = "QuestComponent")
+		UQuestSystem* GetQuestByID(FName QuestID);
 
 protected:
 	// Called when the game starts

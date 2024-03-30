@@ -9,6 +9,9 @@
 #include "QuestSystemGraphNode.h"
 #include "QuestSystemGraphNode_Task.h"
 #include "QuestSystemGraphNode_TaskManager.h"
+#include "QuestCondition.h"
+#include "QuestEvent.h"
+
 
 UEdGraph_QuestSystemGraph::UEdGraph_QuestSystemGraph()
 {
@@ -80,9 +83,21 @@ void UEdGraph_QuestSystemGraph::RebuildQuestSystemGraph()
 				for (UQuestSystemGraphNode_Task* TaskNode : TaskManagerNode->Tasks)
 				{
 					TaskNode->TaskManager = TaskManagerNode;
-					TaskNode->QuestGraph = TaskManagerNode->QuestGraph;
-					TaskNode->QuestSystem = TaskManagerNode->QuestSystem;
+					TaskNode->QuestGraph = Graph;
+					TaskNode->QuestSystem = QuestSystem;
 				}
+			}
+
+			for (UQuestCondition* QuestCondition : QuestSystemGraphNode->Conditions)
+			{
+				QuestCondition->QuestGraph = Graph;
+				QuestCondition->QuestSystem = QuestSystem;
+			}
+			
+			for (UQuestEvent* QuestEvent : QuestSystemGraphNode->Events)
+			{
+				QuestEvent->QuestGraph = Graph;
+				QuestEvent->QuestSystem = QuestSystem;
 			}
 
 		}
