@@ -5,7 +5,6 @@
 #include "Quest_System_EditorCommands.h"
 #include "AssetTypeActions_QuestSystem.h"
 #include "QuestSystemGraphNode.h"
-#include "QuestSystemGraphNode_Task.h"
 #include "QuestTask.h"
 #include "IAssetTools.h"
 #include "LevelEditor.h"

@@ -7,7 +7,6 @@
 #include "EdNode_QuestSystemNode.h"
 #include "QuestSystemGraphEdge.h"
 #include "QuestSystemGraphNode.h"
-#include "QuestSystemGraphNode_Task.h"
 #include "QuestSystemGraphNode_TaskManager.h"
 #include "QuestCondition.h"
 #include "QuestEvent.h"

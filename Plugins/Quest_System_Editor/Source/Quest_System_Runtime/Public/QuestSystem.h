@@ -10,7 +10,6 @@
 class UQuestSystemGraphNode;
 class UQuestSystemGraphEdge;
 class UQuestSystemGraphNode_Root;
-class UQuestSystemGraphNode_Task;
 
 UENUM(BlueprintType)
 enum class EQuestState : uint8
