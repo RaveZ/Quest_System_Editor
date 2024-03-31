@@ -28,6 +28,7 @@
 #include "Kismet2/BlueprintEditorUtils.h"
 #include "SMyQuest.h"
 #include "QuestSystemGraphNode_Task.h"
+#include "QuestTask.h"
 #include "Quest_System_Editor.h"
 #include <ContentBrowserFrontEndFilterExtension.h>
 #include "Kismet2/KismetDebugUtilities.h"
@@ -1229,7 +1230,7 @@ bool FAssetEditor_QuestSystem::CanDuplicateNodes()
 }
 void FAssetEditor_QuestSystem::CreateNewTask()
 {
-	HandleNewNodeClassPicked(UQuestSystemGraphNode_Task::StaticClass());
+	HandleNewNodeClassPicked(UQuestTask::StaticClass());
 }
 
 void FAssetEditor_QuestSystem::HandleNewNodeClassPicked(UClass* InClass) const

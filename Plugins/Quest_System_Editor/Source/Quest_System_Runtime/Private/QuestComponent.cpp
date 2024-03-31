@@ -5,6 +5,7 @@
 #include "QuestSystem.h"
 #include "QuestCondition.h"
 #include "QuestEvent.h"
+#include "QuestTask.h"
 #include "QuestSystemGraph.h"
 #include "QuestSystemGraphNode_State.h"
 #include "QuestSystemGraphNode_Task.h"
@@ -153,9 +154,10 @@ void UQuestComponent::GoToNextNode(UQuestSystem* QuestParam, UQuestSystemGraphNo
 	//Begin Node Functionality
 	if (UQuestSystemGraphNode_TaskManager* TaskManagerNode = Cast<UQuestSystemGraphNode_TaskManager>(QuestParam->CurrentNode))
 	{
-		for (UQuestSystemGraphNode_Task* TaskNode : TaskManagerNode->Tasks)
+		for (UQuestTask* Task : TaskManagerNode->Tasks)
 		{
-			TaskNode->OnTaskBegin();
+			Task->TaskBegin();
+			
 		}
 	}
 

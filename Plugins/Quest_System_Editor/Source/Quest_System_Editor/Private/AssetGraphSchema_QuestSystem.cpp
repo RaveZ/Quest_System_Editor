@@ -20,6 +20,7 @@
 #include "QuestSystemGraphNode_Task.h"
 #include "QuestSystemGraphNode_State.h"
 #include "QuestSystemGraphNode_TaskManager.h"
+#include "QuestTask.h"
 
 
 #define LOCTEXT_NAMESPACE "AssetSchema_QuestSystemGraph"
@@ -338,12 +339,12 @@ void UAssetGraphSchema_QuestSystem::GetGraphContextActions(FGraphContextMenuBuil
 	FCategorizedGraphActionListBuilder TasksBuilder(TEXT("Task"));
 
 	TArray<FGraphNodeClassData> NodeClasses;
-	ClassCache->GatherClasses(UQuestSystemGraphNode_Task::StaticClass(), NodeClasses);
+	ClassCache->GatherClasses(UQuestTask::StaticClass(), NodeClasses);
 	
 
 	for (auto& NodeClass : NodeClasses)
 	{
-		if (NodeClass.GetClass(true) == UQuestSystemGraphNode_Task::StaticClass())
+		if (NodeClass.GetClass(true) == UQuestTask::StaticClass())
 			continue;
 
 
@@ -361,9 +362,9 @@ void UAssetGraphSchema_QuestSystem::GetGraphContextActions(FGraphContextMenuBuil
 		AddOpAction->NodeTemplate->QuestSystemGraphNode = NewObject<UQuestSystemGraphNode>(AddOpAction->NodeTemplate, UQuestSystemGraphNode_TaskManager::StaticClass());// NodeClass.GetClass(true));
 		if (UQuestSystemGraphNode_TaskManager* TaskManager = Cast< UQuestSystemGraphNode_TaskManager>(AddOpAction->NodeTemplate->QuestSystemGraphNode))
 		{
-			if (NodeClass.GetClass(true)->IsChildOf(UQuestSystemGraphNode_Task::StaticClass()))
+			if (NodeClass.GetClass(true)->IsChildOf(UQuestTask::StaticClass()))
 			{
-				TaskManager->Tasks.Add(NewObject<UQuestSystemGraphNode_Task>(AddOpAction->NodeTemplate, NodeClass.GetClass(true)));
+				TaskManager->Tasks.Add(NewObject<UQuestTask>(AddOpAction->NodeTemplate, NodeClass.GetClass(true)));
 			}
 			AddOpAction->NodeTemplate->QuestSystemGraphNode->QuestGraph = Graph;
 			AddOpAction->NodeTemplate->QuestSystemGraphNode->QuestGraph->QuestSystems = Graph->QuestSystems;

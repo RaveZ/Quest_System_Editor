@@ -3,6 +3,7 @@
 
 #include "QuestSystemGraphNode_TaskManager.h"
 #include "QuestSystemGraphNode_Task.h"
+#include "QuestTask.h"
 #include "QuestSystem.h"
 #include "QuestComponent.h"
 
@@ -12,7 +13,7 @@
 bool UQuestSystemGraphNode_TaskManager::IsAllTaskCompleted()
 {
     int progress = 0;
-    for (UQuestSystemGraphNode_Task* NodeTask : Tasks)
+    for (UQuestTask* NodeTask : Tasks)
     {
         if (NodeTask->TaskState == ETaskState::E_Complete)
         {
@@ -51,7 +52,7 @@ FText UQuestSystemGraphNode_TaskManager::GetNodeDescription() const
 
     FString BulletedList;
 
-    for (const UQuestSystemGraphNode_Task* Task : Tasks)
+    for (const UQuestTask* Task : Tasks)
     {
         if (Task)
         {

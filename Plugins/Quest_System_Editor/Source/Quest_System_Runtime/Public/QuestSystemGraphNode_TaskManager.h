@@ -7,6 +7,7 @@
 #include "QuestSystemGraphNode_TaskManager.generated.h"
 
 class UQuestSystemGraphNode_Task;
+class UQuestTask;
 
 UCLASS(Blueprintable)
 class QUEST_SYSTEM_RUNTIME_API UQuestSystemGraphNode_TaskManager : public UQuestSystemGraphNode
@@ -18,8 +19,9 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Detail")
 		FName TaskID;
 
+
 	UPROPERTY(Instanced, EditAnywhere, BlueprintReadOnly, Category = "TaskManager")
-		TArray<UQuestSystemGraphNode_Task*> Tasks;
+		TArray<UQuestTask*> Tasks;
 	
 
 	UFUNCTION(BlueprintCallable, Category = "TaskManager")

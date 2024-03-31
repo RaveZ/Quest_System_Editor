@@ -6,6 +6,7 @@
 #include "AssetTypeActions_QuestSystem.h"
 #include "QuestSystemGraphNode.h"
 #include "QuestSystemGraphNode_Task.h"
+#include "QuestTask.h"
 #include "IAssetTools.h"
 #include "LevelEditor.h"
 #include "Widgets/Docking/SDockTab.h"
@@ -118,8 +119,8 @@ void FQuest_System_EditorModule::CheckClassCache()
 {
 	if (!ClassCache.IsValid())
 	{
-		ClassCache = MakeShareable(new FGraphNodeClassHelper(UQuestSystemGraphNode::StaticClass()));
-		FGraphNodeClassHelper::AddObservedBlueprintClasses(UQuestSystemGraphNode_Task::StaticClass());
+		ClassCache = MakeShareable(new FGraphNodeClassHelper(UQuestTask::StaticClass()));
+		FGraphNodeClassHelper::AddObservedBlueprintClasses(UQuestTask::StaticClass());
 		ClassCache->UpdateAvailableBlueprintClasses();
 	}
 }

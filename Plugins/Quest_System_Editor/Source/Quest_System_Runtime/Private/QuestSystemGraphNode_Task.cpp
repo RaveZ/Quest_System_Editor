@@ -5,6 +5,7 @@
 #include "QuestSystemGraphNode_TaskManager.h"
 #include "QuestComponent.h"
 #include "QuestSystem.h"
+#include "QuestSystemGraph.h"
 #include "QuestSystemGraphNode.h"
 
 #define LOCTEXT_NAMESPACE "QuestSystemGraphNode_Task"
@@ -15,17 +16,59 @@ UQuestSystemGraphNode_Task::UQuestSystemGraphNode_Task()
 
 bool UQuestSystemGraphNode_Task::CompleteTask()
 {
-    if (QuestSystem == NULL)
+   /* if (QuestSystem == NULL)
         return false;
 
     TaskState = ETaskState::E_Complete;
     OnTaskCompleted();
     GetQuestComponent()->OnQuestObjectiveUpdated.Broadcast(QuestSystem);
-    
+    */
     return true;
 }
 
 
+
+FText UQuestSystemGraphNode_Task::GetDescription_Implementation() const
+{
+    return Description;
+}
+
+AController* UQuestSystemGraphNode_Task::GetOwningController() const
+{
+    if (!QuestGraph)
+        return nullptr;
+
+    return QuestGraph->OwningController;
+}
+
+APawn* UQuestSystemGraphNode_Task::GetOwningPawn() const
+{
+    if (!QuestGraph)
+        return nullptr;
+
+    return QuestGraph->OwningPawn;
+}
+
+UQuestComponent* UQuestSystemGraphNode_Task::GetQuestComponent() const
+{
+    if (!QuestGraph)
+        return nullptr;
+
+    return QuestGraph->QuestComponent;
+}
+
+UQuestSystemGraph* UQuestSystemGraphNode_Task::GetOwningQuestGraph() const
+{
+    if (!QuestGraph)
+        return nullptr;
+
+    return QuestGraph;
+}
+
+UQuestSystem* UQuestSystemGraphNode_Task::GetOwningQuestSystem() const
+{
+    return QuestSystem;
+}
 
 void UQuestSystemGraphNode_Task::Tick(float DeltaTime)
 {
@@ -36,38 +79,6 @@ void UQuestSystemGraphNode_Task::Tick(float DeltaTime)
     LastFrameNumberWeTicked = GFrameCounter;
 }
 
-#if WITH_EDITOR
-FText UQuestSystemGraphNode_Task::GetNodeTitle() const
-{
-    return Super::GetNodeTitle();
 
-}
-
-FText UQuestSystemGraphNode_Task::GetNodeDescription() const
-{
-    return Description;
-}
-
-
-
-FLinearColor UQuestSystemGraphNode_Task::GetBackgroundColor() const
-{
-    return Super::GetBackgroundColor();
-    /*UQuestSystemGraph* Graph = Cast<UQuestSystemGraph>(GetGraph());
-
-    if (Graph == nullptr)
-        return Super::GetBackgroundColor();*/
-
-    /*switch (DialoguerPostion)
-    {
-    case EDialoguerPostion::Left:
-        return Graph->LeftDialoguerBgColor;
-    case EDialoguerPostion::Right:
-        return Graph->RightDialoguerBgColor;
-    default:
-        return FLinearColor::Black;
-    }*/
-}
-#endif
 
 #undef LOCTEXT_NAMESPACE

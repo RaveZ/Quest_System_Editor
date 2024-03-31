@@ -15,7 +15,7 @@ class QUEST_SYSTEM_RUNTIME_API UQuestSystemGraphNode_State : public UQuestSystem
 public:
 
     UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "State")
-    EQuestState QuestState;
+        EQuestState QuestState;
 
     UFUNCTION(BlueprintCallable, Category = "State")
         void BeginState();

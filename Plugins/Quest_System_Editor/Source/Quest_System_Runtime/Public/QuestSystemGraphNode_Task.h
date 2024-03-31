@@ -3,28 +3,32 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "QuestSystemGraphNode.h"
 #include "Tickable.h"
 #include "UObject/NoExportTypes.h"
 #include "QuestSystemGraphNode_Task.generated.h"
 
 class UQuestSystemGraphNode_TaskManager;
+class UQuestSystemGraph;
+class UQuestSystem;
 
 
 
-UENUM(BlueprintType)
-enum class ETaskState : uint8
-{
-    E_Active		UMETA(DisplayName = "ACTIVE"),
-    E_Complete		UMETA(DisplayName = "COMPLETE"),
-};
 
 UCLASS(Blueprintable, EditInlineNew, HideDropdown, HideCategories = ("Events", "Conditions"))
-class QUEST_SYSTEM_RUNTIME_API UQuestSystemGraphNode_Task : public UQuestSystemGraphNode, public FTickableGameObject
+class QUEST_SYSTEM_RUNTIME_API UQuestSystemGraphNode_Task : public UObject, public FTickableGameObject
 {
 	GENERATED_BODY()
 public:
     UQuestSystemGraphNode_Task();
+
+    UPROPERTY(BlueprintReadOnly, Category = "Task")
+        UQuestSystemGraph* QuestGraph;
+
+    UPROPERTY(BlueprintReadOnly, Category = "Task")
+        UQuestSystem* QuestSystem;
+
+    UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Detail")
+        FText Description;
 
     UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Task")
         int CurrentAmount;
@@ -33,8 +37,6 @@ public:
         float DistanceToTarget;
 
 
-    UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Task")
-        ETaskState TaskState = ETaskState::E_Active;
 
     UPROPERTY(BlueprintReadOnly, Category = "Tasks")
         UQuestSystemGraphNode_TaskManager* TaskManager;
@@ -51,7 +53,26 @@ public:
     UFUNCTION(BlueprintCallable, Category = "Task")
         bool CompleteTask();
 
+    UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "Task")
+    FText GetDescription() const;
 
+
+    virtual FText GetDescription_Implementation() const;
+
+    UFUNCTION(BlueprintCallable, Category = "Task")
+        AController* GetOwningController() const;
+
+    UFUNCTION(BlueprintCallable, Category = "Task")
+        APawn* GetOwningPawn() const;
+
+    UFUNCTION(BlueprintCallable, Category = "Task")
+        UQuestComponent* GetQuestComponent() const;
+
+    UFUNCTION(BlueprintCallable, Category = "Task")
+        UQuestSystemGraph* GetOwningQuestGraph() const;
+
+    UFUNCTION(BlueprintCallable, Category = "Task")
+        UQuestSystem* GetOwningQuestSystem() const;
    
     // FTickableGameObject Begin
     virtual void Tick(float DeltaTime) override;
@@ -65,13 +86,7 @@ public:
     }
     
 
-#if WITH_EDITOR
-    virtual FText GetNodeTitle() const override;
 
-    virtual FText GetNodeDescription() const override;
-
-    virtual FLinearColor GetBackgroundColor() const override;
-#endif
 private:
     // The last frame number we were ticked.
     // We don't want to tick multiple times per frame 
