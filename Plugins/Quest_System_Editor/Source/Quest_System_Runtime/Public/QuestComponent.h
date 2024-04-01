@@ -6,6 +6,7 @@
 #include "Components/ActorComponent.h"
 #include "QuestComponent.generated.h"
 
+class UQuestSaveObject;
 
 //Delegate
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FQuestObjectiveUpdated, UQuestSystem*, UpdatedQuest);
@@ -19,16 +20,16 @@ public:
 	// Sets default values for this component's properties
 	UQuestComponent();
 
-	UPROPERTY(BlueprintReadWrite, Category = "QuestComponent")
+	UPROPERTY(BlueprintReadOnly, Category = "QuestComponent")
 		UQuestComponent* QuestComponent;
 
 	UPROPERTY(BlueprintReadOnly, Category = "QuestComponent")
 		AController* OwningController;
 
-	UPROPERTY(BlueprintReadWrite, Category = "QuestComponent")
+	UPROPERTY(BlueprintReadOnly, Category = "QuestComponent")
 		APawn* OwningPawn;
 
-	UPROPERTY(BlueprintReadOnly, Category = "QuestComponent")
+	UPROPERTY(BlueprintReadWrite, Category = "QuestComponent")
 		TArray<UQuestSystemGraph*> QuestGraphs;
 
 	UFUNCTION(BlueprintCallable, Category = "QuestComponent")
@@ -55,9 +56,22 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "QuestComponent")
 		void GoToNextNode(UQuestSystem* QuestParam, UQuestSystemGraphNode* NodeParam);
 
+	UFUNCTION(BlueprintCallable, Category = "QuestComponent")
+		void BeginNode(UQuestSystem* QuestParam);
 
 	UFUNCTION(BlueprintCallable, Category = "QuestComponent")
 		UQuestSystem* GetQuestByID(FName QuestID);
+
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
+		void Save(const FString& SaveFileName, int SlotIndex) const;
+
+	virtual void Save_Implementation(const FString& SaveFileName, int SlotIndex) const;
+	
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
+		void Load(const FString& SaveFileName, int SlotIndex) const;
+
+	virtual void Load_Implementation(const FString& SaveFileName, int SlotIndex) const;
+
 
 protected:
 	// Called when the game starts

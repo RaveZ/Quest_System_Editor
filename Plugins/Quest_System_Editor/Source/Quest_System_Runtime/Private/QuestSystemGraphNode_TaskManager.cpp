@@ -34,12 +34,12 @@ bool UQuestSystemGraphNode_TaskManager::IsAllTaskCompleted()
 #if WITH_EDITOR
 FText UQuestSystemGraphNode_TaskManager::GetNodeTitle() const
 {
-    return FText::FromName(TaskID).IsEmpty() ? FText::FromString(UQuestSystemGraphNode::GetShortTypeName(this)) : FText::FromName(TaskID);
+    return FText::FromName(ID).IsEmpty() ? FText::FromString(UQuestSystemGraphNode::GetShortTypeName(this)) : FText::FromName(ID);
 }
 
 void UQuestSystemGraphNode_TaskManager::SetNodeTitle(const FText& NewTitle)
 {
-    TaskID = FName(NewTitle.ToString());
+    ID = FName(NewTitle.ToString());
 }
 
 FText UQuestSystemGraphNode_TaskManager::GetNodeDescription() const

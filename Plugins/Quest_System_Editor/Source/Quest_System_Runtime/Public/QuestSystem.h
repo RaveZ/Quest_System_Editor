@@ -40,7 +40,7 @@ public:
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "QuestSystem")
 		EQuestState QuestState = EQuestState::E_Active;
 	
-	UPROPERTY(BlueprintReadOnly, Category = "QuestSystem")
+	UPROPERTY(BlueprintReadWrite, Category = "QuestSystem")
 		UQuestSystemGraphNode* CurrentNode;
 
 	UPROPERTY(BlueprintReadOnly, Category = "QuestSystem")
