@@ -38,13 +38,10 @@ public:
 		bool RunQuest(UQuestSystemGraph* QuestAsset);
 
 	UFUNCTION(BlueprintCallable, Category = "QuestComponent")
-		void StartQuestFromNode(FName QuestID, FName NodeID);
-
-	UFUNCTION(BlueprintCallable, Category = "QuestComponent")
-		void RestartQuest(FName QuestID);
+		void RestartQuest(FName QuestID, FName NodeID = NAME_None, bool bStartFromNodeID = false);
 	
 	UFUNCTION(BlueprintCallable, Category = "QuestComponent")
-		void FailQuest(UQuestSystem* QuestParam);
+		void FailQuest(FName QuestID);
 
 	UPROPERTY(BlueprintAssignable, BlueprintCallable, Category = "QuestComponent")
 		FQuestObjectiveUpdated OnQuestObjectiveUpdated;

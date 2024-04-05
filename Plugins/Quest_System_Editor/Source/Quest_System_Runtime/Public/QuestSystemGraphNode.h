@@ -37,7 +37,6 @@ public:
 	UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly, Category = "Detail")
 		FName ID;
 
-
 	UPROPERTY(Instanced, EditAnywhere, BlueprintReadOnly, Category = "Conditions")
 		TArray<UQuestCondition*> Conditions;
 	

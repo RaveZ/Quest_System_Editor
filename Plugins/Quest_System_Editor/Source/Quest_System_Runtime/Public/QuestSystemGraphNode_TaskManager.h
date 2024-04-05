@@ -14,9 +14,6 @@ class QUEST_SYSTEM_RUNTIME_API UQuestSystemGraphNode_TaskManager : public UQuest
 	GENERATED_BODY()
 
 public:
-	
-
-
 	UPROPERTY(Instanced, EditAnywhere, BlueprintReadOnly, Category = "TaskManager")
 		TArray<UQuestTask*> Tasks;
 	

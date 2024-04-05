@@ -49,6 +49,10 @@ public:
 	/** Map of Node ID and it's Node Data Struct */
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, meta = (DisplayName = "NodeMapData"))
 		TMap<FName, FNodeData> NodeMapData;
+
+	/** List of All Visited Node IDs in Sequence*/
+	UPROPERTY(BlueprintReadWrite, EditAnywhere)
+		TArray<FName> VisitedNodeIDs;
 };
 
 UCLASS(Blueprintable)

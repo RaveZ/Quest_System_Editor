@@ -35,7 +35,9 @@ public:
 	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "QuestSystem")
 		FText Description;
 
-		
+	/** List of All Visited Node IDs in Sequence*/
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "QuestSystem")
+		TArray<FName> VisitedNodeIDs;
 	
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "QuestSystem")
 		EQuestState QuestState = EQuestState::E_Active;
@@ -77,36 +79,9 @@ public:
 	void ClearGraph();
 
 
-	UFUNCTION(CallInEditor, BlueprintCallable, Category = "QuestSystem")
-	static TArray<FName> GetAllQuestID() 
-	{
-		TArray<FName> QuestIDs;
-		for (TObjectIterator<UQuestSystem> It; It; ++It)
-		{
-			if (UQuestSystem* QuestSystem = Cast<UQuestSystem>(*It))
-			{
-				QuestIDs.Add(QuestSystem->QuestID);
-			}
-		}
-
-		for (int i = 0; i < 100; i++)
-		{
-			QuestIDs.Add(FName("Test"));
-		}
-		return QuestIDs;
-	}
+	
 
 	
 
 };
 
-USTRUCT(BlueprintType)
-struct QUEST_SYSTEM_RUNTIME_API FQuestIDHandle
-{
-	GENERATED_USTRUCT_BODY()
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = QuestIDHandle, meta = (GetOptions = "Quest_System_Runtime.QuestSystem.GetAllQuestID"))
-		FName QuestID;
-	
-	
-};

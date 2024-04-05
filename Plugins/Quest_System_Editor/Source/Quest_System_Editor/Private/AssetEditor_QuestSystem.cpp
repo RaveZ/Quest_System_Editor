@@ -8,7 +8,7 @@
 #include "Editor/EditorEngine.h"
 #include "Editor.h"
 #include "UnrealEdGlobals.h"
-#include "QuestEvent.h"
+#include "Event/QuestEvent.h"
 #include "BlueprintEditor.h"
 #include "UObject/ObjectSaveContext.h"
 #include "GraphEditorActions.h"

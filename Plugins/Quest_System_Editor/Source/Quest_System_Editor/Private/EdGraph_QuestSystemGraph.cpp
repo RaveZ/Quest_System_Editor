@@ -9,7 +9,7 @@
 #include "QuestSystemGraphNode.h"
 #include "QuestSystemGraphNode_TaskManager.h"
 #include "QuestCondition.h"
-#include "QuestEvent.h"
+#include "Event/QuestEvent.h"
 #include "QuestTask.h"
 
 

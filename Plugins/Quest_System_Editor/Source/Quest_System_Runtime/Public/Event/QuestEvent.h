@@ -7,6 +7,8 @@
 #include "QuestEvent.generated.h"
 
 class UQuestSystemGraph;
+class UQuestSystemGraphNode;
+class UQuestSystem;
 
 UENUM(BlueprintType)
 enum class EEventRunType : uint8
@@ -21,6 +23,8 @@ class QUEST_SYSTEM_RUNTIME_API UQuestEvent : public UObject
 {
 	GENERATED_BODY()
 public:
+	UQuestEvent();
+
 	UPROPERTY(BlueprintReadOnly, Category = "QuestEvent")
 		UQuestSystemGraph* QuestGraph;
 		
@@ -30,8 +34,11 @@ public:
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "QuestEvent")
 		EEventRunType EventRunType = EEventRunType::E_Start;
 
-	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable, Category = "QuestEvent")
+
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "QuestEvent")
 		void BeginEvent();
+
+	virtual void BeginEvent_Implementation();
 
 	UFUNCTION(BlueprintCallable, Category = "QuestEvent")
 		AController* GetOwningController() const;
@@ -47,4 +54,10 @@ public:
 
 	UFUNCTION(BlueprintCallable, Category = "QuestEvent")
 		UQuestSystem* GetOwningQuestSystem() const;
+
+	UFUNCTION(CallInEditor)
+	TArray<FName> GetAllQuestID();
+
+	
+
 };

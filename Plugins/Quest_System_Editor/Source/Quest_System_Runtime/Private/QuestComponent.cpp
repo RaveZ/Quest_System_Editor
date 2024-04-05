@@ -4,7 +4,7 @@
 #include "QuestComponent.h"
 #include "QuestSystem.h"
 #include "QuestCondition.h"
-#include "QuestEvent.h"
+#include "Event/QuestEvent.h"
 #include "QuestTask.h"
 #include "QuestSaveObject.h"
 #include "QuestSystemGraph.h"
@@ -46,15 +46,21 @@ bool UQuestComponent::RunQuest(UQuestSystemGraph* QuestGraph)
 
 
 	bool bSuccess = true;
+	
+	//Add All Quest To QuestSystemMap
 	for (UQuestSystem* QuestSystem : QuestGraph->QuestSystems)
 	{
 		QuestSystemMap.Emplace(QuestSystem->QuestID, QuestSystem);
+	}
+
+	//Begin the Quest
+	for (UQuestSystem* QuestSystem : QuestGraph->QuestSystems)
+	{
 		for (UQuestSystemGraphNode* Node : QuestSystem->RootNodes)
 		{
 			if (QuestSystem->QuestState == EQuestState::E_Active)
 			{
-				QuestSystem->CurrentNode = QuestSystem->RootNodes[0];
-				EvaluateNextNodeCondition(QuestSystem);
+				RestartQuest(QuestSystem->QuestID);
 			}
 		}
 	}
@@ -62,36 +68,55 @@ bool UQuestComponent::RunQuest(UQuestSystemGraph* QuestGraph)
 	return bSuccess;
 }
 
-void UQuestComponent::StartQuestFromNode(FName QuestID, FName NodeID)
+
+
+
+void UQuestComponent::RestartQuest(FName QuestID, FName NodeID, bool bStartFromNodeID)
 {
-	UQuestSystem* QuestSystem = *QuestSystemMap.Find(QuestID);
-	if (QuestSystem)
-	{
-		UQuestSystemGraphNode* QuestNode = *QuestSystem->NodeMap.Find(NodeID);
-		if (QuestNode)
-		{
-			QuestSystem->QuestState = EQuestState::E_Active;
-			QuestSystem->CurrentNode = QuestSystem->RootNodes[0];
-			EvaluateNextNodeCondition(QuestSystem);
-		}
-	}
-}
-
-
-
-void UQuestComponent::RestartQuest(FName QuestID)
-{
-	UQuestSystem* QuestSystem = *QuestSystemMap.Find(QuestID);
-	if (QuestSystem)
+	if (UQuestSystem* QuestSystem = *QuestSystemMap.Find(QuestID))
 	{
 		QuestSystem->QuestState = EQuestState::E_Active;
-		QuestSystem->CurrentNode = QuestSystem->RootNodes[0];
-		EvaluateNextNodeCondition(QuestSystem);
+
+		for (UQuestSystemGraphNode* Node : QuestSystem->AllNodes)
+		{
+			if (UQuestSystemGraphNode_TaskManager* TaskManagerNode = Cast<UQuestSystemGraphNode_TaskManager>(Node))
+			{
+				for (UQuestTask* Task : TaskManagerNode->Tasks)
+				{
+					Task->TaskState = ETaskState::E_Active;
+					Task->CurrentAmount = 0;
+				}
+			}
+		}
+		if (bStartFromNodeID)
+		{
+			if (UQuestSystemGraphNode* FoundedNode = *QuestSystem->NodeMap.Find(NodeID))
+			{
+				QuestSystem->CurrentNode = FoundedNode;
+			}
+			else
+			{
+				QuestSystem->CurrentNode = QuestSystem->RootNodes[0];
+			}
+		}
+		else
+		{
+			QuestSystem->CurrentNode = QuestSystem->RootNodes[0];
+		}
+		
+
+		QuestSystem->VisitedNodeIDs.Empty();
+		BeginNode(QuestSystem);
 	}
 }
 
-void UQuestComponent::FailQuest(UQuestSystem* QuestParam)
+void UQuestComponent::FailQuest(FName QuestID)
 {
+	if (UQuestSystem* QuestSystem = *QuestSystemMap.Find(QuestID))
+	{
+		QuestSystem->QuestState = EQuestState::E_Fail;
+		QuestSystem->CurrentNode = nullptr;
+	}
 }
 
 void UQuestComponent::OnUpdateQuest(UQuestSystem* UpdatedQuest)
@@ -165,6 +190,9 @@ void UQuestComponent::GoToNextNode(UQuestSystem* QuestParam, UQuestSystemGraphNo
 
 void UQuestComponent::BeginNode(UQuestSystem* QuestParam)
 {
+	//add visited node
+	QuestParam->VisitedNodeIDs.AddUnique(QuestParam->CurrentNode->ID);
+
 	if (UQuestSystemGraphNode_Root* RootNode = Cast<UQuestSystemGraphNode_Root>(QuestParam->CurrentNode))
 	{
 		EvaluateNextNodeCondition(QuestParam);
@@ -232,6 +260,7 @@ void UQuestComponent::Save_Implementation(const FString& SaveFileName, int SlotI
 				QuestData.CurrentNodeID = QuestSystem->CurrentNode->ID;
 				QuestData.QuestState = QuestSystem->QuestState;
 				QuestData.NodeMapData = NodeMapData;
+				QuestData.VisitedNodeIDs = QuestSystem->VisitedNodeIDs;
 				QuestSaveObject->QuestMapData.Emplace(QuestSystem->QuestID, QuestData);
 			
 		}
@@ -266,6 +295,7 @@ void UQuestComponent::LoadGameDelegateFunction(const FString& SlotName, const in
 				//Fill Quest Data Here
 				FoundedQuest->QuestState = QuestData.QuestState;
 				FoundedQuest->CurrentNode = *FoundedQuest->NodeMap.Find(QuestData.CurrentNodeID);
+				FoundedQuest->VisitedNodeIDs = QuestData.VisitedNodeIDs;
 
 				for (const auto& NodeIt : QuestData.NodeMapData)
 				{
