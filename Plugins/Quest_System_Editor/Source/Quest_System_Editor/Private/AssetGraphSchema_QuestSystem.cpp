@@ -8,6 +8,7 @@
 #include "ConnectionDrawPolicy_QuestSystem.h"
 #include "Framework/Commands/GenericCommands.h"
 #include "Settings/EditorStyleSettings.h"
+#include "QuestSystemEditorUtils.h"
 #include "EdNode_QuestSystemNode.h"
 #include "EdNode_QuestSystemTask.h"
 #include "EdNode_QuestSystemState.h"
@@ -259,6 +260,7 @@ void UAssetGraphSchema_QuestSystem::CreateDefaultNodesForGraph(UEdGraph& Graph) 
 	FGraphNodeCreator<UEdNode_QuestSystemRoot> NodeCreator(Graph);
 	UEdNode_QuestSystemRoot* RootNode = NodeCreator.CreateNode();
 	RootNode->QuestSystemGraphNode = NewObject<UQuestSystemGraphNode>(RootNode, UQuestSystemGraphNode_Root::StaticClass());
+	RootNode->QuestSystemGraphNode->ID = FQuestSystemEditorUtils::FindUniqueNodeName("RootNode");
 	RootNode->QuestSystemGraphNode->QuestGraph = QuestGraph;
 	RootNode->QuestSystemGraphNode->QuestGraph->QuestSystems = QuestGraph->QuestSystems;
 	NodeCreator.Finalize();
@@ -366,6 +368,7 @@ void UAssetGraphSchema_QuestSystem::GetGraphContextActions(FGraphContextMenuBuil
 				TaskManager->Tasks.Add(NewObject<UQuestTask>(AddOpAction->NodeTemplate, NodeClass.GetClass(true)));
 			}
 			AddOpAction->NodeTemplate->QuestSystemGraphNode->QuestGraph = Graph;
+			AddOpAction->NodeTemplate->QuestSystemGraphNode->ID = FQuestSystemEditorUtils::FindUniqueNodeName("TaskNode");
 			AddOpAction->NodeTemplate->QuestSystemGraphNode->QuestGraph->QuestSystems = Graph->QuestSystems;
 		}
 	}
@@ -379,6 +382,7 @@ void UAssetGraphSchema_QuestSystem::GetGraphContextActions(FGraphContextMenuBuil
 	AddOpAction->NodeTemplate = OpNode;
 	AddOpAction->NodeTemplate->QuestSystemGraphNode = NewObject<UQuestSystemGraphNode>(AddOpAction->NodeTemplate, UQuestSystemGraphNode_State::StaticClass());
 	AddOpAction->NodeTemplate->QuestSystemGraphNode->QuestGraph = Graph;
+	AddOpAction->NodeTemplate->QuestSystemGraphNode->ID = FQuestSystemEditorUtils::FindUniqueNodeName("StateNode");
 	AddOpAction->NodeTemplate->QuestSystemGraphNode->QuestGraph->QuestSystems = Graph->QuestSystems;
 	if (UQuestSystemGraphNode_State* NodeState = Cast< UQuestSystemGraphNode_State>(AddOpAction->NodeTemplate->QuestSystemGraphNode))
 	{
@@ -390,6 +394,7 @@ void UAssetGraphSchema_QuestSystem::GetGraphContextActions(FGraphContextMenuBuil
 	AddOpAction->NodeTemplate = OpNode;
 	AddOpAction->NodeTemplate->QuestSystemGraphNode = NewObject<UQuestSystemGraphNode>(AddOpAction->NodeTemplate, UQuestSystemGraphNode_State::StaticClass());
 	AddOpAction->NodeTemplate->QuestSystemGraphNode->QuestGraph = Graph;
+	AddOpAction->NodeTemplate->QuestSystemGraphNode->ID = FQuestSystemEditorUtils::FindUniqueNodeName("StateNode");
 	AddOpAction->NodeTemplate->QuestSystemGraphNode->QuestGraph->QuestSystems = Graph->QuestSystems;
 	if (UQuestSystemGraphNode_State* NodeState = Cast< UQuestSystemGraphNode_State>(AddOpAction->NodeTemplate->QuestSystemGraphNode))
 	{

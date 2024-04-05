@@ -258,6 +258,9 @@ public:
 	/** Currently focused graph editor */
 	TSharedPtr<SGraphEditor> ViewportWidget;
 
+	/** determine if node should be checked for new unique ID*/
+	bool ShouldGetNewID = false;
+
 protected:
 
 	/** Factory that spawns graph editors; used to look up all tabs spawned by it. */

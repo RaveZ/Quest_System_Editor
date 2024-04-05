@@ -8,7 +8,7 @@
 #include "QuestSystemGraphNode_State.generated.h"
 
 
-UCLASS(HideCategories = ("Detail"))
+UCLASS(/*HideCategories = ("Detail")*/)
 class QUEST_SYSTEM_RUNTIME_API UQuestSystemGraphNode_State : public UQuestSystemGraphNode
 {
 	GENERATED_BODY()

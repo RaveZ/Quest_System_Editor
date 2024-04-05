@@ -12,7 +12,7 @@
 
 class FToolBarBuilder;
 class FMenuBuilder;
-
+class UQuestSystem;
 
 /**
  * Quest editor public interface
@@ -95,7 +95,8 @@ public:
 	TSharedPtr<struct FGraphNodeClassHelper> GetClassCache() { return ClassCache; }
 	
 	void CheckClassCache();
-	
+
+
 private:
 
 	void RegisterMenus();

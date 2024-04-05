@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/SaveGame.h"
+#include "QuestSystem.h"
 #include "QuestTask.h"
 #include "QuestSaveObject.generated.h"
 
@@ -27,10 +28,10 @@ struct FNodeData
 	GENERATED_BODY()
 public:
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, meta = (DisplayName = "NodeID", MakeStructureDefaultValue = "None"))
-	FName NodeID;
+		FName NodeID;
 
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, meta = (DisplayName = "TaskDatas"))
-	TArray<FTaskData> TaskDatas;
+		TArray<FTaskData> TaskDatas;
 };
 
 /** Quest Data To Be Saved */
@@ -40,11 +41,14 @@ struct FQuestData
 	GENERATED_BODY()
 public:
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, meta = (DisplayName = "QuestID", MakeStructureDefaultValue = "None"))
-	FName QuestID;
+		FName CurrentNodeID;
+
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, meta = (DisplayName = "QuestState"))
+		EQuestState QuestState;
 	
 	/** Map of Node ID and it's Node Data Struct */
-	UPROPERTY(BlueprintReadWrite, EditAnywhere, meta = (DisplayName = "NodeMapData", MakeStructureDefaultValue = "()"))
-	TMap<FName, FNodeData> NodeMapData;
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, meta = (DisplayName = "NodeMapData"))
+		TMap<FName, FNodeData> NodeMapData;
 };
 
 UCLASS(Blueprintable)
@@ -52,6 +56,8 @@ class QUEST_SYSTEM_RUNTIME_API UQuestSaveObject : public USaveGame
 {
 	GENERATED_BODY()
 public:
+
+	/** Map of Quest ID and it's Quest Data Struct */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-		TArray<FQuestData> QuestDatas;
+		TMap<FName,FQuestData> QuestMapData;
 };

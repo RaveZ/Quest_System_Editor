@@ -6,7 +6,6 @@
 #include "QuestSystemGraphNode.h"
 #include "QuestSystemGraphNode_TaskManager.generated.h"
 
-class UQuestSystemGraphNode_Task;
 class UQuestTask;
 
 UCLASS(Blueprintable)

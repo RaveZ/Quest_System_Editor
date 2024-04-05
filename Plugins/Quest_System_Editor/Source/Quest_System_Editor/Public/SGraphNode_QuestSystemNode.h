@@ -24,9 +24,14 @@ public:
 	virtual FText GetDescription() const;
 	virtual EVisibility GetDescriptionVisibility() const;
 
-	FText GetPinTooltip(UEdGraphPin* GraphPinObj) const;
+	
+	/** Called when text is being committed to check for validity */
+	bool OnVerifyNameTextChanged ( const FText& InText, FText& OutErrorMessage );
 
+	/* Called when text is committed on the node */
 	void OnNameTextCommited(const FText& InText, ETextCommit::Type CommitInfo);
+
+	FText GetPinTooltip(UEdGraphPin* GraphPinObj) const;
 
 	virtual FSlateColor GetBorderBackgroundColor() const;
 	virtual FSlateColor GetBackgroundColor() const;

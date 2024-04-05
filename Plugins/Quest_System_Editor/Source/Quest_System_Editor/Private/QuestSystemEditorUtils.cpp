@@ -1,7 +1,8 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 #include "QuestSystemEditorUtils.h"
-
+#include "QuestSystemGraphNode.h"
+#include "QuestSystemGraph.h"
 
 
 #define LOCTEXT_NAMESPACE "QuestSystemEditorUtils"
@@ -14,7 +15,7 @@ FQuestSystemEditorUtils::~FQuestSystemEditorUtils()
 {
 }
 
-FName FQuestSystemEditorUtils::FindUniqueQuestName(const UQuestSystemGraph* InQuestSystemGraph, const FString& InBaseName, UStruct* InScope)
+FName FQuestSystemEditorUtils::FindUniqueQuestName(const FString& InBaseName)
 {
 	// Start with the base name
 	FString UniqueName = InBaseName;
@@ -25,15 +26,54 @@ FName FQuestSystemEditorUtils::FindUniqueQuestName(const UQuestSystemGraph* InQu
 		bool bIsUnique = true;
 
 		// Check if the current name already exists in the quest graph pages
-		for (int j = 0; j < InQuestSystemGraph->QuestGraphPages.Num(); j++)
+		for (TObjectIterator<UQuestSystem> It; It; ++It)
 		{
-			FString FullName = InQuestSystemGraph->QuestGraphPages[j].GetFName().ToString();
-
-			// If the current name matches a quest graph page name, it's not unique
-			if (FullName == UniqueName)
+			if (UQuestSystem* QuestSystem = Cast<UQuestSystem>(*It))
 			{
-				bIsUnique = false;
-				break;
+				FString FullName = QuestSystem->QuestID.ToString();
+
+				// If the current name matches a quest graph page name, it's not unique
+				if (FullName == UniqueName)
+				{
+					bIsUnique = false;
+					break;
+				}
+			}
+		}
+
+		// If the current name is unique, return it
+		if (bIsUnique)
+		{
+			return FName(*UniqueName);
+		}
+
+		// If the current name is not unique, append a number to it and try again
+		UniqueName = FString::Printf(TEXT("%s_%d"), *InBaseName, i + 1);
+	}
+}
+
+FName FQuestSystemEditorUtils::FindUniqueNodeName(const FString& InBaseName)
+{
+	// Start with the base name
+	FString UniqueName = InBaseName;// Iterate through the quest graph pages until we find a unique name
+	
+	for (int i = 0;; i++)
+	{
+		bool bIsUnique = true;
+
+		// Check if the current name already exists in the quest graph pages
+		for (TObjectIterator<UQuestSystemGraphNode> It; It; ++It)
+		{
+			if (UQuestSystemGraphNode* Node = Cast<UQuestSystemGraphNode>(*It))
+			{
+				FString NodeID = Node->ID.ToString();
+
+				// If the current name matches a quest graph page name, it's not unique
+				if (NodeID == UniqueName)
+				{
+					bIsUnique = false;
+					break;
+				}
 			}
 		}
 
@@ -51,33 +91,11 @@ FName FQuestSystemEditorUtils::FindUniqueQuestName(const UQuestSystemGraph* InQu
 UEdGraph* FQuestSystemEditorUtils::CreateNewGraph(UObject* ParentScope, const FName& GraphName, TSubclassOf<class UEdGraph> GraphClass, TSubclassOf<class UEdGraphSchema> SchemaClass)
 {
 	UEdGraph* NewGraph = nullptr;
-	bool bRename = false;
 
-	// Ensure this name isn't already being used for a graph
-	if (GraphName != NAME_None)
-	{
-		if (UObject* ExistingObject = FindObject<UObject>(ParentScope, *(GraphName.ToString())))
-		{
-			if (ExistingObject->IsA<UEdGraph>())
-			{
-				// Rename the old graph out of the way - this may confuse the user somewhat - and even
-				// break their logic. But name collisions are not avoidable e.g. someone can add
-				// a function to an interface that conflicts with something in a class hierarchy
-				ExistingObject->Rename(nullptr, ExistingObject->GetOuter(), REN_DoNotDirty | REN_ForceNoResetLoaders);
-			}
-		}
-
-		// Construct new graph with the supplied name
-		NewGraph = NewObject<UEdGraph>(ParentScope, GraphClass, NAME_None, RF_Transactional);
-		bRename = true;
-	}
-	else
-	{
-		// Construct a new graph with a default name
-		NewGraph = NewObject<UEdGraph>(ParentScope, GraphClass, NAME_None, RF_Transactional);
-	}
-
-
+	
+	// Construct a new graph with a default name
+	NewGraph = NewObject<UEdGraph>(ParentScope, GraphClass, NAME_None, RF_Transactional);
+	
 	NewGraph->Schema = SchemaClass;
 	NewGraph->GetSchema()->CreateDefaultNodesForGraph(*NewGraph);
 	
@@ -85,18 +103,14 @@ UEdGraph* FQuestSystemEditorUtils::CreateNewGraph(UObject* ParentScope, const FN
 	{
 		QuestGraph->QuestSystem = NewObject<UQuestSystem>(ParentScope, UQuestSystem::StaticClass(), NAME_None, RF_Transactional);
 		QuestGraph->QuestSystem->QuestGraph = QuestGraph->GetQuestSystemGraph();
-
+		QuestGraph->QuestSystem->QuestID = GraphName;
 		if (UQuestSystemGraph* QuestSystemGraph = Cast<UQuestSystemGraph>(QuestGraph->GetQuestSystemGraph()))
 		{
 			QuestSystemGraph->QuestSystems.Add(QuestGraph->QuestSystem);
 		}
 	}
 
-	// Now move to where we want it to. Workaround to ensure transaction buffer is correctly utilized
-	if (bRename)
-	{
-		NewGraph->Rename(*(GraphName.ToString()), ParentScope, REN_DoNotDirty | REN_ForceNoResetLoaders);
-	}
+	
 	return NewGraph;
 }
 

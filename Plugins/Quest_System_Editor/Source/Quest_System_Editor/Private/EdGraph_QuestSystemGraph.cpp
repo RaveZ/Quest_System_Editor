@@ -41,6 +41,7 @@ void UEdGraph_QuestSystemGraph::RebuildQuestSystemGraph()
 			NodeMap.Add(QuestSystemGraphNode, EdNode);
 
 			QuestSystem->AllNodes.Add(QuestSystemGraphNode);
+			QuestSystem->NodeMap.Emplace(QuestSystemGraphNode->ID, QuestSystemGraphNode);
 
 			for (int PinIdx = 0; PinIdx < EdNode->Pins.Num(); ++PinIdx)
 			{

@@ -7,11 +7,12 @@
 #include "QuestComponent.generated.h"
 
 class UQuestSaveObject;
+class USaveGame;
 
 //Delegate
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FQuestObjectiveUpdated, UQuestSystem*, UpdatedQuest);
 
-UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent), Blueprintable, HideDropdown)
+UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent), Blueprintable, HideDropdown, ClassGroup = "Quest")
 class QUEST_SYSTEM_RUNTIME_API UQuestComponent : public UActorComponent
 {
 	GENERATED_BODY()
@@ -29,17 +30,18 @@ public:
 	UPROPERTY(BlueprintReadOnly, Category = "QuestComponent")
 		APawn* OwningPawn;
 
+	/** Map of Quest ID and attached Quest System*/
 	UPROPERTY(BlueprintReadWrite, Category = "QuestComponent")
-		TArray<UQuestSystemGraph*> QuestGraphs;
+		TMap<FName, UQuestSystem*> QuestSystemMap;
 
 	UFUNCTION(BlueprintCallable, Category = "QuestComponent")
 		bool RunQuest(UQuestSystemGraph* QuestAsset);
 
 	UFUNCTION(BlueprintCallable, Category = "QuestComponent")
-		void StartQuest(UQuestSystem* QuestParam);
+		void StartQuestFromNode(FName QuestID, FName NodeID);
 
 	UFUNCTION(BlueprintCallable, Category = "QuestComponent")
-		void RestartQuest(UQuestSystem* QuestParam);
+		void RestartQuest(FName QuestID);
 	
 	UFUNCTION(BlueprintCallable, Category = "QuestComponent")
 		void FailQuest(UQuestSystem* QuestParam);
@@ -59,8 +61,6 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "QuestComponent")
 		void BeginNode(UQuestSystem* QuestParam);
 
-	UFUNCTION(BlueprintCallable, Category = "QuestComponent")
-		UQuestSystem* GetQuestByID(FName QuestID);
 
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
 		void Save(const FString& SaveFileName, int SlotIndex) const;
@@ -72,6 +72,9 @@ public:
 
 	virtual void Load_Implementation(const FString& SaveFileName, int SlotIndex) const;
 
+	
+
+	void LoadGameDelegateFunction(const FString& SlotName, const int32 UserIndex, USaveGame* LoadedGameData) const;
 
 protected:
 	// Called when the game starts

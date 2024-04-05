@@ -554,7 +554,7 @@ void FAssetEditor_QuestSystem::NewDocument_OnClicked(ECreatedQuestDocumentType G
 	
 
 	// Make sure the new name is valid
-	DocumentName = FQuestSystemEditorUtils::FindUniqueQuestName(GetQuestSystemObj(), DocumentNameText.ToString());
+	DocumentName = FQuestSystemEditorUtils::FindUniqueQuestName(DocumentNameText.ToString());
 		
 	//check(IsEditingSingleBlueprint());
 
@@ -960,12 +960,6 @@ void FAssetEditor_QuestSystem::RebuildQuestSystemGraph()
 		return;
 	}
 
-	/*for (UEdGraph* EdGraph : EditingQuestGraph->QuestGraphPages)
-	{
-		UEdGraph_QuestSystemGraph* QuestGraph = Cast<UEdGraph_QuestSystemGraph>(EdGraph);
-		check(EdGraph != nullptr);
-		QuestGraph->Clear();
-	}*/
 	for (UEdGraph* EdGraph : EditingQuestGraph->QuestGraphPages)
 	{
 		UEdGraph_QuestSystemGraph* QuestGraph = Cast<UEdGraph_QuestSystemGraph>(EdGraph);
@@ -1076,6 +1070,7 @@ void FAssetEditor_QuestSystem::CutSelectedNodes()
 {
 	CopySelectedNodes();
 	DeleteSelectedDuplicatableNodes();
+	ShouldGetNewID = false;
 }
 bool FAssetEditor_QuestSystem::CanCutNodes()
 {
@@ -1088,6 +1083,8 @@ void FAssetEditor_QuestSystem::CopySelectedNodes()
 	FGraphPanelSelectionSet SelectedNodes = GetSelectedNodes();
 
 	FString ExportedText;
+
+	ShouldGetNewID = true;
 
 	for (FGraphPanelSelectionSet::TIterator SelectedIter(SelectedNodes); SelectedIter; ++SelectedIter)
 	{
@@ -1173,6 +1170,18 @@ void FAssetEditor_QuestSystem::PasteNodesHere(UEdGraph* DestinationGraph, const 
 			UEdGraphNode* Node = *It;
 			AvgNodePosition.X += Node->NodePosX;
 			AvgNodePosition.Y += Node->NodePosY;
+
+			if (ShouldGetNewID)
+			{
+				if (UEdNode_QuestSystemNode* EdNode = Cast<UEdNode_QuestSystemNode>(*It))
+				{
+					EdNode->QuestSystemGraphNode->ID = FQuestSystemEditorUtils::FindUniqueNodeName(EdNode->QuestSystemGraphNode->ID.ToString());
+				}
+			}
+			else
+			{
+				ShouldGetNewID = true;
+			}
 		}
 
 		float InvNumNodes = 1.0f / float(PastedNodes.Num());
@@ -1220,6 +1229,7 @@ bool FAssetEditor_QuestSystem::CanPasteNodes() const
 }
 void FAssetEditor_QuestSystem::DuplicateNodes()
 {
+	ShouldGetNewID = true;
 	CopySelectedNodes();
 	PasteNodes();
 }
@@ -1412,7 +1422,7 @@ void FAssetEditor_QuestSystem::OnFinishedChangingProperties(const FPropertyChang
 
 void FAssetEditor_QuestSystem::OnPackageSaved(const FString& PackageFileName, UObject* Outer)
 {
-	RebuildGenericGraph();
+	RebuildQuestSystemGraph();
 }
 #else // #if ENGINE_MAJOR_VERSION < 5
 void FAssetEditor_QuestSystem::OnPackageSavedWithContext(const FString& PackageFileName, UPackage* Package, FObjectPostSaveContext ObjectSaveContext)

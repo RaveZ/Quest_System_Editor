@@ -9,6 +9,7 @@
 #include "QuestSaveObject.h"
 #include "QuestSystemGraph.h"
 #include "QuestSystemGraphNode_State.h"
+#include "QuestSystemGraphNode_Root.h"
 #include "QuestSystemGraphNode_TaskManager.h"
 #include "Kismet/GameplayStatics.h"
 
@@ -37,45 +38,56 @@ bool UQuestComponent::RunQuest(UQuestSystemGraph* QuestGraph)
 	OwningPawn = OwningController->K2_GetPawn();
 	QuestComponent = this;
 
+
 	//Set Quest Asset Dependency
 	QuestGraph->OwningController = OwningController;
 	QuestGraph->OwningPawn = OwningPawn;
 	QuestGraph->QuestComponent = QuestComponent;
 
-	QuestGraphs.Add(QuestGraph);
 
 	bool bSuccess = true;
 	for (UQuestSystem* QuestSystem : QuestGraph->QuestSystems)
 	{
+		QuestSystemMap.Emplace(QuestSystem->QuestID, QuestSystem);
 		for (UQuestSystemGraphNode* Node : QuestSystem->RootNodes)
 		{
 			if (QuestSystem->QuestState == EQuestState::E_Active)
 			{
-				if (QuestSystem->CurrentNode != nullptr)
-				{
-					//TODO : Restart quest ganti dengan start quest, termasuk cek save data 
-					BeginNode(QuestSystem);
-				}
-				else
-				{
-					RestartQuest(QuestSystem);
-				}
+				QuestSystem->CurrentNode = QuestSystem->RootNodes[0];
+				EvaluateNextNodeCondition(QuestSystem);
 			}
 		}
-
 	}
 
 	return bSuccess;
 }
 
-void UQuestComponent::StartQuest(UQuestSystem* QuestParam)
+void UQuestComponent::StartQuestFromNode(FName QuestID, FName NodeID)
 {
+	UQuestSystem* QuestSystem = *QuestSystemMap.Find(QuestID);
+	if (QuestSystem)
+	{
+		UQuestSystemGraphNode* QuestNode = *QuestSystem->NodeMap.Find(NodeID);
+		if (QuestNode)
+		{
+			QuestSystem->QuestState = EQuestState::E_Active;
+			QuestSystem->CurrentNode = QuestSystem->RootNodes[0];
+			EvaluateNextNodeCondition(QuestSystem);
+		}
+	}
 }
 
-void UQuestComponent::RestartQuest(UQuestSystem* QuestParam)
+
+
+void UQuestComponent::RestartQuest(FName QuestID)
 {
-	QuestParam->CurrentNode = QuestParam->RootNodes[0];
-	EvaluateNextNodeCondition(QuestParam);
+	UQuestSystem* QuestSystem = *QuestSystemMap.Find(QuestID);
+	if (QuestSystem)
+	{
+		QuestSystem->QuestState = EQuestState::E_Active;
+		QuestSystem->CurrentNode = QuestSystem->RootNodes[0];
+		EvaluateNextNodeCondition(QuestSystem);
+	}
 }
 
 void UQuestComponent::FailQuest(UQuestSystem* QuestParam)
@@ -84,17 +96,17 @@ void UQuestComponent::FailQuest(UQuestSystem* QuestParam)
 
 void UQuestComponent::OnUpdateQuest(UQuestSystem* UpdatedQuest)
 {
-	for (UQuestSystemGraph* QuestGraph : QuestGraphs)
+	for (const auto& It : QuestSystemMap)
 	{
-		for (UQuestSystem* QuestSystem : QuestGraph->QuestSystems)
+		FName Key = It.Key;
+		UQuestSystem* QuestSystem = It.Value;
+
+		if (UQuestSystemGraphNode_TaskManager* NodeTaskManager = Cast<UQuestSystemGraphNode_TaskManager>(QuestSystem->CurrentNode))
 		{
-			if (UQuestSystemGraphNode_TaskManager* NodeTaskManager = Cast<UQuestSystemGraphNode_TaskManager>(QuestSystem->CurrentNode))
+			if (NodeTaskManager->IsAllTaskCompleted())
 			{
-				if (NodeTaskManager->IsAllTaskCompleted())
-				{
-					//evaluate next node condition
-					EvaluateNextNodeCondition(QuestSystem);
-				}
+				//evaluate next node condition
+				EvaluateNextNodeCondition(QuestSystem);
 			}
 		}
 	}
@@ -153,6 +165,12 @@ void UQuestComponent::GoToNextNode(UQuestSystem* QuestParam, UQuestSystemGraphNo
 
 void UQuestComponent::BeginNode(UQuestSystem* QuestParam)
 {
+	if (UQuestSystemGraphNode_Root* RootNode = Cast<UQuestSystemGraphNode_Root>(QuestParam->CurrentNode))
+	{
+		EvaluateNextNodeCondition(QuestParam);
+		return;
+	}
+
 	//Start of the Node, Launch Event with the Start and Both Type
 	for (UQuestEvent* Event : QuestParam->CurrentNode->Events)
 	{
@@ -178,23 +196,7 @@ void UQuestComponent::BeginNode(UQuestSystem* QuestParam)
 	}
 }
 
-UQuestSystem*  UQuestComponent::GetQuestByID(FName QuestID)
-{
-	UQuestSystem* FoundedQuest = nullptr;
-	for (UQuestSystemGraph* QuestGraph : QuestGraphs)
-	{
-		for (UQuestSystem* QuestSystem : QuestGraph->QuestSystems)
-		{
-			if (QuestSystem->QuestID == QuestID)
-			{
-				FoundedQuest = QuestSystem;
-				break;
-			}
-		}
-	}
 
-	return FoundedQuest;
-}
 
 
 void UQuestComponent::Save_Implementation(const FString& SaveFileName, int SlotIndex) const
@@ -203,10 +205,10 @@ void UQuestComponent::Save_Implementation(const FString& SaveFileName, int SlotI
 	if (UQuestSaveObject* QuestSaveObject = Cast<UQuestSaveObject>(UGameplayStatics::CreateSaveGameObject(UQuestSaveObject::StaticClass())))
 	{
 		//Start Saving Data
-		for (UQuestSystemGraph* QuestGraph : QuestGraphs)
+		for (const auto& It : QuestSystemMap)
 		{
-			for (UQuestSystem* QuestSystem : QuestGraph->QuestSystems)
-			{
+			FName Key = It.Key;
+			UQuestSystem* QuestSystem = It.Value;
 				TMap<FName, FNodeData> NodeMapData;
 				for (UQuestSystemGraphNode* Node : QuestSystem->AllNodes)
 				{
@@ -224,13 +226,14 @@ void UQuestComponent::Save_Implementation(const FString& SaveFileName, int SlotI
 					FNodeData NodeData;
 					NodeData.NodeID = Node->ID;
 					NodeData.TaskDatas = TaskDataArray;
-					NodeMapData.Add(Node->ID, NodeData);
+					NodeMapData.Emplace(Node->ID, NodeData);
 				}
 				FQuestData QuestData;
-				QuestData.QuestID = QuestSystem->QuestID;
+				QuestData.CurrentNodeID = QuestSystem->CurrentNode->ID;
+				QuestData.QuestState = QuestSystem->QuestState;
 				QuestData.NodeMapData = NodeMapData;
-				QuestSaveObject->QuestDatas.Add(QuestData);
-			}
+				QuestSaveObject->QuestMapData.Emplace(QuestSystem->QuestID, QuestData);
+			
 		}
 
 		UGameplayStatics::AsyncSaveGameToSlot(QuestSaveObject, SaveFileName, SlotIndex);
@@ -242,13 +245,66 @@ void UQuestComponent::Save_Implementation(const FString& SaveFileName, int SlotI
 
 void UQuestComponent::Load_Implementation(const FString& SaveFileName, int SlotIndex) const
 {
+	FAsyncLoadGameFromSlotDelegate LoadedDelegate;
+	// USomeUObjectClass::LoadGameDelegateFunction is a void function that takes the following parameters: const FString& SlotName, const int32 UserIndex, USaveGame* LoadedGameData
+	LoadedDelegate.BindUObject(this, &UQuestComponent::LoadGameDelegateFunction);
+	UGameplayStatics::AsyncLoadGameFromSlot(SaveFileName, SlotIndex, LoadedDelegate);
+}
+
+void UQuestComponent::LoadGameDelegateFunction(const FString& SlotName, const int32 UserIndex, USaveGame* LoadedGameData) const
+{
+	if (UQuestSaveObject* LoadedData = Cast<UQuestSaveObject>(LoadedGameData))
+	{
+		for (const auto& QuestIt : LoadedData->QuestMapData)
+		{
+			FName QuestID = QuestIt.Key;
+			FQuestData QuestData = QuestIt.Value;
+
+			UQuestSystem* FoundedQuest = *QuestSystemMap.Find(QuestID);
+			if (FoundedQuest != nullptr)
+			{
+				//Fill Quest Data Here
+				FoundedQuest->QuestState = QuestData.QuestState;
+				FoundedQuest->CurrentNode = *FoundedQuest->NodeMap.Find(QuestData.CurrentNodeID);
+
+				for (const auto& NodeIt : QuestData.NodeMapData)
+				{
+					FName NodeID = NodeIt.Key;
+					FNodeData NodeData = NodeIt.Value;
+					
+					UQuestSystemGraphNode* FoundedNode = *FoundedQuest->NodeMap.Find(NodeID);
+					if (FoundedNode != nullptr)
+					{
+						//Fill Node Data Here
+						if (UQuestSystemGraphNode_TaskManager* TaskManagerNode = Cast<UQuestSystemGraphNode_TaskManager>(FoundedNode))
+						{
+							for (int i = 0; i<TaskManagerNode->Tasks.Num(); i++)
+							{
+								if (i >= NodeData.TaskDatas.Num() - 1)
+								{
+									break;
+								}
+								else
+								{
+									//fill task data here
+									TaskManagerNode->Tasks[i]->CurrentAmount = NodeData.TaskDatas[i].CurrentAmount;
+									TaskManagerNode->Tasks[i]->TaskState = NodeData.TaskDatas[i].TaskState;
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+
+	}
 }
 
 // Called when the game starts
 void UQuestComponent::BeginPlay()
 {
 	Super::BeginPlay();
-	QuestGraphs.Empty();
+	QuestSystemMap.Empty();
 	OnQuestObjectiveUpdated.AddDynamic(this, &UQuestComponent::OnUpdateQuest);
 	// ...
 	

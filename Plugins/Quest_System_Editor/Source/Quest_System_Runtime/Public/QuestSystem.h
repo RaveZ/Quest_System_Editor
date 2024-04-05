@@ -29,7 +29,7 @@ public:
 		UQuestSystemGraph* QuestGraph;
 
 	/** Quest ID */
-	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "QuestSystem")
+	UPROPERTY(BlueprintReadOnly, VisibleDefaultsOnly, Category = "QuestSystem")
 		FName QuestID;
 
 	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "QuestSystem")
@@ -48,6 +48,10 @@ public:
 
 	UPROPERTY(BlueprintReadOnly, Category = "QuestSystem")
 		TArray<UQuestSystemGraphNode*> AllNodes;
+
+	UPROPERTY(BlueprintReadOnly, Category = "QuestSystem")
+		TMap<FName, UQuestSystemGraphNode*> NodeMap;
+
 
 	UFUNCTION(BlueprintCallable, Category = "QuestSystem")
 		void Print(bool ToConsole = true, bool ToScreen = true);
@@ -74,10 +78,25 @@ public:
 
 
 	UFUNCTION(CallInEditor, BlueprintCallable, Category = "QuestSystem")
-	static TArray<FName> GetAllQuest() 
+	static TArray<FName> GetAllQuestID() 
 	{
-		return { FName("test1"), FName("test2") };
+		TArray<FName> QuestIDs;
+		for (TObjectIterator<UQuestSystem> It; It; ++It)
+		{
+			if (UQuestSystem* QuestSystem = Cast<UQuestSystem>(*It))
+			{
+				QuestIDs.Add(QuestSystem->QuestID);
+			}
+		}
+
+		for (int i = 0; i < 100; i++)
+		{
+			QuestIDs.Add(FName("Test"));
+		}
+		return QuestIDs;
 	}
+
+	
 
 };
 
@@ -86,9 +105,8 @@ struct QUEST_SYSTEM_RUNTIME_API FQuestIDHandle
 {
 	GENERATED_USTRUCT_BODY()
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = QuestIDHandle, meta = (GetOptions = "Quest_System_Runtime.QuestSystem.GetAllQuest"))
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = QuestIDHandle, meta = (GetOptions = "Quest_System_Runtime.QuestSystem.GetAllQuestID"))
 		FName QuestID;
 	
 	
-
 };

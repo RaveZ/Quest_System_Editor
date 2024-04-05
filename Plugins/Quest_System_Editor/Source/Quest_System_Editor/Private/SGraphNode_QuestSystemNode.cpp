@@ -495,6 +495,44 @@ EVisibility SGraphNode_QuestSystemNode::GetDescriptionVisibility() const
 	return (!MyOwnerPanel.IsValid() || MyOwnerPanel->GetCurrentLOD() > EGraphRenderingLOD::LowDetail) ? EVisibility::Visible : EVisibility::Collapsed;
 
 }
+bool SGraphNode_QuestSystemNode::OnVerifyNameTextChanged(const FText& InText, FText& OutErrorMessage)
+{
+	FString TextAsString = InText.ToString();
+
+	FName OriginalName;
+
+	bool bValid(true);
+
+	if ((GetEditableNodeTitle() != InText.ToString()) && OnVerifyTextCommit.IsBound())
+	{
+		OutErrorMessage = LOCTEXT("RenameFailed_NotValid", "Name Not Valid.");
+		bValid = OnVerifyTextCommit.Execute(InText, GraphNode, OutErrorMessage);
+	}
+
+	if (UEdNode_QuestSystemNode* MyNode = Cast<UEdNode_QuestSystemNode>(GraphNode))
+	{
+		OriginalName = MyNode->QuestSystemGraphNode->ID;
+	}
+
+	for (TObjectIterator<UQuestSystemGraphNode> It; It; ++It)
+	{
+		if (UQuestSystemGraphNode* QuestSystem = Cast<UQuestSystemGraphNode>(*It))
+		{
+			if (FName(InText.ToString()) == OriginalName)
+			{
+				return true;
+			}
+			if (QuestSystem->ID == FName(InText.ToString()))
+			{
+				OutErrorMessage = LOCTEXT("RenameFailed_NotValid", "This ID is already used in another Node.");
+				return false;
+			}
+		}
+	}
+
+
+	return bValid;
+}
 FText SGraphNode_QuestSystemNode::GetPinTooltip(UEdGraphPin* GraphPinObj) const
 {
 	return FText();

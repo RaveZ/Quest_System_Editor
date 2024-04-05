@@ -15,17 +15,12 @@ public:
 	FQuestSystemEditorUtils();
 	~FQuestSystemEditorUtils();
 
-	/**
-	 * Finds a unique name with a base of the passed in string, appending numbers as needed
-	 *
-	 * @param InBlueprint		The blueprint the kismet object's name needs to be unique in
-	 * @param InBaseName		The base name to use
-	 * @param InScope			Scope, if any, of the unique kismet name to generate, used for locals
-	 *
-	 * @return					A unique name that will not conflict in the Blueprint
-	 */
-	static FName FindUniqueQuestName(const UQuestSystemGraph* InQuestSystemGraph, const FString& InBaseName, UStruct* InScope = NULL);
 
+	static FName FindUniqueQuestName(const FString& InBaseName);
+
+	
+
+	static FName FindUniqueNodeName(const FString& InBaseName);
 
 	/**
 	 * Creates a new empty graph.

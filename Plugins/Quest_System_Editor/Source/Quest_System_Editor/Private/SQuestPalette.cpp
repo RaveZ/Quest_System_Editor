@@ -8,7 +8,10 @@
 #include "Widgets/Text/SInlineEditableTextBlock.h"
 #include "AssetGraphSchema_QuestSystem.h"
 #include "EdGraph_QuestSystemGraph.h"
+#include "QuestSystemGraph.h"
 
+
+#define LOCTEXT_NAMESPACE "QuestPaletteItem"
 
 
 BEGIN_SLATE_FUNCTION_BUILD_OPTIMIZATION
@@ -158,6 +161,30 @@ bool SQuestPaletteItem::OnNameTextVerifyChanged(const FText& InNewText, FText& O
 
 	FName OriginalName;
 
+	FAssetSchemaAction_QuestSystemGraph* QuestGraphAction = (FAssetSchemaAction_QuestSystemGraph*)ActionPtr.Pin().Get();
+	if (UEdGraph_QuestSystemGraph* QuestEdGraph = Cast<UEdGraph_QuestSystemGraph>(QuestGraphAction->EdGraph))
+	{
+		OriginalName = QuestEdGraph->QuestSystem->QuestID;
+	}
+
+	
+
+	for (TObjectIterator<UQuestSystem> It; It; ++It)
+	{
+		if (UQuestSystem* QuestSystem = Cast<UQuestSystem>(*It))
+		{
+			if (FName(InNewText.ToString()) == OriginalName)
+			{
+				return true;
+			}
+			if (QuestSystem->QuestID == FName(InNewText.ToString()))
+			{
+				OutErrorMessage = LOCTEXT("RenameFailed_NotValid", "This ID is already used in another Quest.");
+				return false;
+			}
+		}
+	}
+
 	UStruct* ValidationScope = nullptr;
 
 	const UEdGraphSchema* Schema = nullptr;
@@ -177,7 +204,7 @@ void SQuestPaletteItem::OnNameTextCommitted(const FText& NewText, ETextCommit::T
 		}
 	QuestEditorPtr.Pin()->GetMyQuestWidget()->Refresh();
 
-	
+	QuestEditorPtr.Pin()->GetQuestSystemObj()->Modify();
 }
 
 TSharedPtr<SToolTip> SQuestPaletteItem::ConstructToolTipWidget() const
@@ -198,3 +225,5 @@ void SQuestPalette::Construct(const FArguments& InArgs, TWeakPtr<FAssetEditor_Qu
 void SQuestPalette::OnSplitterResized() const
 {
 }
+
+#undef LOCTEXT_NAMESPACE
