@@ -11,6 +11,7 @@ void FQuest_System_EditorCommands::RegisterCommands()
 	UI_COMMAND(NewQuestCondition, "New Quest Condition", "New Quest Condition", EUserInterfaceActionType::Button, FInputChord());
 	UI_COMMAND(NewQuestEvent, "New Quest Event", "New Quest Event", EUserInterfaceActionType::Button, FInputChord());
 	UI_COMMAND(AddNewQuestGraph, "New Quest Graph", "New Quest Graph", EUserInterfaceActionType::Button, FInputChord(EModifierKey::Control, EKeys::Q));
+	UI_COMMAND(QuestSetting, "Quest Setting", "Open Quest Setting", EUserInterfaceActionType::Button, FInputChord());
 }
 
 #undef LOCTEXT_NAMESPACE

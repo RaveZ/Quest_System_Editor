@@ -24,7 +24,6 @@ public:
 
 		virtual bool IsConditionMet_Implementation() const;
 
-
 	UFUNCTION(BlueprintCallable, Category = "QuestCondition")
 		AController* GetOwningController() const;
 
@@ -39,5 +38,9 @@ public:
 
 	UFUNCTION(BlueprintCallable, Category = "QuestCondition")
 		UQuestSystem* GetOwningQuestSystem() const;
+
+
+	UFUNCTION(CallInEditor)
+		TArray<FName> GetAllQuestID();
 	
 };

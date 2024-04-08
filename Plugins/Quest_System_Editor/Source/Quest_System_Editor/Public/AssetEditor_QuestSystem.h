@@ -229,6 +229,9 @@ protected:
 	void CreateNewQuestEvent();
 	bool CanCreateQuestEvent() const;
 	
+	void OpenQuestSetting();
+	bool CanOpenQuestSetting() const;
+
 	void OnRenameNode();
 	bool CanRenameNodes() const;
 

@@ -3,7 +3,7 @@
 
 #include "AssetEditor_QuestSystem.h"
 #include "QuestSystemGraphNode_Root.h"
-#include "QuestCondition.h"
+#include "Condition/QuestCondition.h"
 #include "EngineGlobals.h"
 #include "Editor/EditorEngine.h"
 #include "Editor.h"
@@ -27,7 +27,7 @@
 #include "QuestEditorFactory.h"
 #include "Kismet2/BlueprintEditorUtils.h"
 #include "SMyQuest.h"
-#include "QuestTask.h"
+#include "Task/QuestTask.h"
 #include "Quest_System_Editor.h"
 #include <ContentBrowserFrontEndFilterExtension.h>
 #include "Kismet2/KismetDebugUtilities.h"
@@ -136,12 +136,12 @@ void FAssetEditor_QuestSystem::InitQuestSystemGraphAssetEditor(const EToolkitMod
 						->SetSizeCoefficient(0.55f)
 						->AddTab(FQuestSystemAssetEditorTabs::GenericGraphPropertyID, ETabState::OpenedTab)
 					)
-					->Split
+					/*->Split
 					(
 						FTabManager::NewStack()
 						->SetSizeCoefficient(0.45f)
 						->AddTab(FQuestSystemAssetEditorTabs::GenericGraphEditorSettingsID, ETabState::OpenedTab)
-					)
+					)*/
 				)
 			)
 		);
@@ -219,10 +219,10 @@ void FAssetEditor_QuestSystem::RegisterTabSpawners(const TSharedRef<FTabManager>
 		.SetGroup(WorkspaceMenuCategoryRef)
 		.SetIcon(FSlateIcon(FAppStyle::GetAppStyleSetName(), "LevelEditor.Tabs.Details"));
 
-	InTabManager->RegisterTabSpawner(FQuestSystemAssetEditorTabs::GenericGraphEditorSettingsID, FOnSpawnTab::CreateSP(this, &FAssetEditor_QuestSystem::SpawnTab_EditorSettings))
+	/*InTabManager->RegisterTabSpawner(FQuestSystemAssetEditorTabs::GenericGraphEditorSettingsID, FOnSpawnTab::CreateSP(this, &FAssetEditor_QuestSystem::SpawnTab_EditorSettings))
 		.SetDisplayName(LOCTEXT("EditorSettingsTab", "Generic Graph Editor Setttings"))
 		.SetGroup(WorkspaceMenuCategoryRef)
-		.SetIcon(FSlateIcon(FAppStyle::GetAppStyleSetName(), "LevelEditor.Tabs.Details"));
+		.SetIcon(FSlateIcon(FAppStyle::GetAppStyleSetName(), "LevelEditor.Tabs.Details"));*/
 }
 
 void FAssetEditor_QuestSystem::UnregisterTabSpawners(const TSharedRef<FTabManager>& InTabManager)
@@ -256,6 +256,11 @@ void FAssetEditor_QuestSystem::BindCommands()
 	ToolkitCommands->MapAction(FQuest_System_EditorCommands::Get().NewQuestEvent,
 		FExecuteAction::CreateSP(this, &FAssetEditor_QuestSystem::CreateNewQuestEvent),
 		FCanExecuteAction::CreateSP(this, &FAssetEditor_QuestSystem::CanCreateQuestEvent)
+	); 
+	
+	ToolkitCommands->MapAction(FQuest_System_EditorCommands::Get().QuestSetting,
+		FExecuteAction::CreateSP(this, &FAssetEditor_QuestSystem::OpenQuestSetting),
+		FCanExecuteAction::CreateSP(this, &FAssetEditor_QuestSystem::CanOpenQuestSetting)
 	);
 	
 	ToolkitCommands->MapAction(FQuest_System_EditorCommands::Get().AddNewQuestGraph,
@@ -296,6 +301,10 @@ void FAssetEditor_QuestSystem::CreateCommandList()
 	GraphEditorCommands->MapAction(FQuest_System_EditorCommands::Get().NewQuestEvent,
 		FExecuteAction::CreateRaw(this, &FAssetEditor_QuestSystem::CreateNewQuestCondition),
 		FCanExecuteAction::CreateRaw(this, &FAssetEditor_QuestSystem::CanCreateQuestCondition));
+
+	GraphEditorCommands->MapAction(FQuest_System_EditorCommands::Get().QuestSetting,
+		FExecuteAction::CreateRaw(this, &FAssetEditor_QuestSystem::OpenQuestSetting),
+		FCanExecuteAction::CreateRaw(this, &FAssetEditor_QuestSystem::CanOpenQuestSetting));
 
 
 	GraphEditorCommands->MapAction(FGenericCommands::Get().SelectAll,
@@ -818,15 +827,21 @@ UQuestEditorSettings* FAssetEditor_QuestSystem::GetSettings() const
 FGraphAppearanceInfo FAssetEditor_QuestSystem::GetGraphAppearance() const
 {
 	FGraphAppearanceInfo AppearanceInfo;
+	AppearanceInfo.CornerText = LOCTEXT("AppearanceCornerText", "Quest Editor");
 
 	if (FAssetEditor_QuestSystem::IsPIESimulating())
 	{
-		AppearanceInfo.PIENotifyText = LOCTEXT("Active", "ACTIVE");
+		if (GetQuestSystemObj()->QuestComponent)
+		{
+			AppearanceInfo.PIENotifyText = LOCTEXT("ActiveLabel", "ACTIVE");
+		}
+		else
+		{
+			AppearanceInfo.PIENotifyText = LOCTEXT("InactiveLabel", "INACTIVE");
+		}
 	}
-	else
-	{
-		AppearanceInfo.CornerText = LOCTEXT("AppearanceCornerText", "Quest Editor");
-	}
+	
+	
 	return AppearanceInfo;
 }
 
@@ -947,8 +962,7 @@ TSharedRef<SGraphEditor> FAssetEditor_QuestSystem::CreateGraphEditorWidget(TShar
 		.Appearance(this, &FAssetEditor_QuestSystem::GetGraphAppearance)
 		.GraphToEdit(InGraph)
 		.GraphEvents(InEvents)
-		.AutoExpandActionMenu(true)
-		.ShowGraphStateOverlay(false);
+		.AutoExpandActionMenu(true);
 }
 
 
@@ -1021,6 +1035,9 @@ void FAssetEditor_QuestSystem::DeleteSelectedNodes()
 }
 bool FAssetEditor_QuestSystem::CanDeleteNodes()
 {
+	if (IsPIESimulating())
+		return false;
+
 	// If any of the nodes can be deleted then we should allow deleting
 	const FGraphPanelSelectionSet SelectedNodes = GetSelectedNodes();
 	for (FGraphPanelSelectionSet::TConstIterator SelectedIter(SelectedNodes); SelectedIter; ++SelectedIter)
@@ -1074,6 +1091,8 @@ void FAssetEditor_QuestSystem::CutSelectedNodes()
 }
 bool FAssetEditor_QuestSystem::CanCutNodes()
 {
+	if (IsPIESimulating())
+		return false;
 	return CanCopyNodes() && CanDeleteNodes();
 }
 
@@ -1313,6 +1332,14 @@ void FAssetEditor_QuestSystem::CreateNewQuestEvent()
 	HandleNewNodeClassPicked(UQuestEvent::StaticClass());
 }
 bool FAssetEditor_QuestSystem::CanCreateQuestEvent() const
+{
+	return true;
+}
+void FAssetEditor_QuestSystem::OpenQuestSetting()
+{
+	PropertyWidget->SetObject(GetQuestSystemObj());
+}
+bool FAssetEditor_QuestSystem::CanOpenQuestSetting() const
 {
 	return true;
 }

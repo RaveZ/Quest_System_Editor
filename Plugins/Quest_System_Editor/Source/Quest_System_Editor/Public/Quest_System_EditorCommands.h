@@ -28,4 +28,5 @@ public:
 	TSharedPtr<FUICommandInfo> NewTask;
 	TSharedPtr<FUICommandInfo> NewQuestCondition;
 	TSharedPtr<FUICommandInfo> NewQuestEvent;
+	TSharedPtr<FUICommandInfo> QuestSetting;
 };

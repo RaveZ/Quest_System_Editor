@@ -10,7 +10,11 @@ class UQuestSaveObject;
 class USaveGame;
 
 //Delegate
+/** This Delegate will be called if a quest objective has been completed*/
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FQuestObjectiveUpdated, UQuestSystem*, UpdatedQuest);
+
+/** This Delegate will be called if a quest is unlocked or has failed. Used for notification widget*/
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FQuestStateUpdated, UQuestSystem*, UpdatedQuest);
 
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent), Blueprintable, HideDropdown, ClassGroup = "Quest")
 class QUEST_SYSTEM_RUNTIME_API UQuestComponent : public UActorComponent
@@ -30,7 +34,11 @@ public:
 	UPROPERTY(BlueprintReadOnly, Category = "QuestComponent")
 		APawn* OwningPawn;
 
-	/** Map of Quest ID and attached Quest System*/
+	/** Array of QuestGraph that is Running*/
+	UPROPERTY(BlueprintReadWrite, Category = "QuestComponent")
+		TArray<UQuestSystemGraph*> QuestGraphs;
+
+	/** Map of Quest ID and attached Quest System That is Running*/
 	UPROPERTY(BlueprintReadWrite, Category = "QuestComponent")
 		TMap<FName, UQuestSystem*> QuestSystemMap;
 
@@ -45,6 +53,9 @@ public:
 
 	UPROPERTY(BlueprintAssignable, BlueprintCallable, Category = "QuestComponent")
 		FQuestObjectiveUpdated OnQuestObjectiveUpdated;
+
+	UPROPERTY(BlueprintAssignable, BlueprintCallable, Category = "QuestComponent")
+		FQuestStateUpdated OnQuestStateUpdated;
 
 	UFUNCTION(BlueprintCallable, Category = "QuestComponent")
 		void OnUpdateQuest(UQuestSystem* UpdatedQuest);

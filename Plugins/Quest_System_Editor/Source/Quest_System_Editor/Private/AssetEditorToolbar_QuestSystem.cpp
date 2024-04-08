@@ -69,6 +69,22 @@ void FAssetEditorToolbar_QuestSystem::FillQuestSystemToolbar(FToolBarBuilder& To
 		);
 	}
 	ToolbarBuilder.EndSection();
+
+	ToolbarBuilder.BeginSection("Quest System");
+	{
+		const FText QuestSettingLabel = LOCTEXT("QuestSetting_Label", "Quest Setting");
+		const FText QuestSettingTooltip = LOCTEXT("QuestSetting_ToolTip", "Access Quest Graph Setting");
+		const FSlateIcon QuestSettingIcon = FSlateIcon(FAppStyle::GetAppStyleSetName(), "ProjectSettings.TabIcon");
+
+
+		ToolbarBuilder.AddToolBarButton(FQuest_System_EditorCommands::Get().QuestSetting,
+			NAME_None,
+			QuestSettingLabel,
+			QuestSettingTooltip,
+			QuestSettingIcon
+		);
+	}
+	ToolbarBuilder.EndSection();
 }
 
 

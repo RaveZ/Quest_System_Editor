@@ -111,106 +111,6 @@ void SGraphNode_QuestSystemNode::UpdateGraphNode()
 	TSharedPtr<SNodeTitle> NodeTitle = SNew(SNodeTitle, GraphNode);
 	TWeakPtr<SNodeTitle> WeakNodeTitle = NodeTitle;
 
-	//this->ContentScale.Bind(this, &SGraphNode::GetContentScale);
-	//this->GetOrAddSlot(ENodeZone::Center)
-	//	.HAlign(HAlign_Fill)
-	//	.VAlign(VAlign_Center)
-	//	[
-	//		SNew(SBorder)
-	//			.BorderImage(FAppStyle::GetBrush("Graph.StateNode.Body"))
-	//			.Padding(0.0f)
-	//			.BorderBackgroundColor(this, &SGraphNode_QuestSystemNode::GetBorderBackgroundColor)
-	//			[
-	//				SNew(SOverlay)
-
-	//					+ SOverlay::Slot()
-	//					.HAlign(HAlign_Fill)
-	//					.VAlign(VAlign_Fill)
-	//					[
-	//						SNew(SVerticalBox)
-
-	//							// Input Pin Area
-	//							+ SVerticalBox::Slot()
-	//							.FillHeight(1)
-	//							[
-	//								SAssignNew(LeftNodeBox, SVerticalBox)
-	//							]
-
-	//							// Output Pin Area	
-	//							+ SVerticalBox::Slot()
-	//							.FillHeight(1)
-	//							[
-	//								SAssignNew(RightNodeBox, SVerticalBox)
-	//							]
-	//					]
-
-	//					+ SOverlay::Slot()
-	//					.HAlign(HAlign_Center)
-	//					.VAlign(VAlign_Center)
-	//					.Padding(8.0f)
-	//					[
-	//						SNew(SBorder)
-	//							.BorderImage(FAppStyle::GetBrush("Graph.StateNode.ColorSpill"))
-	//							.BorderBackgroundColor(TitleShadowColor)
-	//							.HAlign(HAlign_Center)
-	//							.VAlign(VAlign_Center)
-	//							.Visibility(EVisibility::SelfHitTestInvisible)
-	//							.Padding(6.0f)
-	//							[
-	//								SAssignNew(NodeBody, SVerticalBox)
-
-	//									// Title
-	//									+ SVerticalBox::Slot()
-	//									.AutoHeight()
-	//									[
-	//										SNew(SHorizontalBox)
-
-	//											// Error message
-	//											+ SHorizontalBox::Slot()
-	//											.AutoWidth()
-	//											[
-	//												SAssignNew(ErrorText, SErrorText)
-	//													.BackgroundColor(this, &SGraphNode_QuestSystemNode::GetErrorColor)
-	//													.ToolTipText(this, &SGraphNode_QuestSystemNode::GetErrorMsgToolTip)
-	//											]
-
-	//											// Icon
-	//											+ SHorizontalBox::Slot()
-	//											.AutoWidth()
-	//											.VAlign(VAlign_Center)
-	//											[
-	//												SNew(SImage)
-	//													.Image(NodeTypeIcon)
-	//											]
-
-	//											// Node Title
-	//											+ SHorizontalBox::Slot()
-	//											.Padding(FMargin(4.0f, 0.0f, 4.0f, 0.0f))
-	//											[
-	//												SNew(SVerticalBox)
-	//													+ SVerticalBox::Slot()
-	//													.AutoHeight()
-	//													[
-	//														SAssignNew(InlineEditableText, SInlineEditableTextBlock)
-	//															.Style(FAppStyle::Get(), "Graph.StateNode.NodeTitleInlineEditableText")
-	//															.Text(NodeTitle.Get(), &SNodeTitle::GetHeadTitle)
-	//															.OnVerifyTextChanged(this, &SGraphNode_QuestSystemNode::OnVerifyNameTextChanged)
-	//															.OnTextCommitted(this, &SGraphNode_QuestSystemNode::OnNameTextCommited)
-	//															.IsReadOnly(this, &SGraphNode_QuestSystemNode::IsNameReadOnly)
-	//															.IsSelected(this, &SGraphNode_QuestSystemNode::IsSelectedExclusively)
-	//													]
-	//													+ SVerticalBox::Slot()
-	//													.AutoHeight()
-	//													[
-	//														NodeTitle.ToSharedRef()
-	//													]
-	//											]
-	//									]
-	//							]
-	//					]
-	//			]
-	//	];
-
 	TSharedPtr<STextBlock> DescriptionText;
 	auto GetNodeTitlePlaceholderWidth = [WeakNodeTitle]() -> FOptionalSize
 		{
@@ -229,168 +129,165 @@ void SGraphNode_QuestSystemNode::UpdateGraphNode()
 	.HAlign(HAlign_Fill)
 	.VAlign(VAlign_Center)
 	[
-	SNew(SBorder)
-		.BorderImage(FAppStyle::GetBrush("Graph.StateNode.Body"))
-		.Padding(0.0f)
-		.BorderBackgroundColor(this, &SGraphNode_QuestSystemNode::GetBorderBackgroundColor)
-		//.OnMouseButtonDown(this, &SGraphNode_QuestSystemNode::OnMouseDown)
-		[
-			SNew(SOverlay)
+		SNew(SBorder)
+			.BorderImage(FAppStyle::GetBrush("Graph.StateNode.Body"))
+			.Padding(3.0f)
+			.BorderBackgroundColor(this, &SGraphNode_QuestSystemNode::GetHighlightColor)
+			[
+				SNew(SBorder)
+					.BorderImage(FAppStyle::GetBrush("Graph.StateNode.Body"))
+					.Padding(0.0f)
+					.BorderBackgroundColor(this, &SGraphNode_QuestSystemNode::GetBorderBackgroundColor)
+					//.OnMouseButtonDown(this, &SGraphNode_QuestSystemNode::OnMouseDown)
+					[
+						SNew(SOverlay)
 
-				// Pins and node details
-				+ SOverlay::Slot()
-				.HAlign(HAlign_Fill)
-				.VAlign(VAlign_Fill)
-				[
-					SNew(SHorizontalBox)
+							// Pins and node details
+							+ SOverlay::Slot()
+							.HAlign(HAlign_Fill)
+							.VAlign(VAlign_Fill)
+							[
+								SNew(SHorizontalBox)
 
-						// INPUT PIN AREA
-						+ SHorizontalBox::Slot()
-						.AutoWidth()
-						[
-							SNew(SBox)
-								.MinDesiredHeight(NodePadding.Top)
-								[
-									SAssignNew(LeftNodeBox, SVerticalBox)
-								]
-						]
-
-						// STATE NAME AREA
-						+ SHorizontalBox::Slot()
-						.Padding(FMargin(NodePadding.Left, 0.0f, NodePadding.Right, 0.0f))
-						[
-							SNew(SVerticalBox)
-								/*+ SVerticalBox::Slot()
-								.AutoHeight()
-								[
-									DecoratorsBox.ToSharedRef()
-								]*/
-								+ SVerticalBox::Slot()
-								.AutoHeight()
-								[
-									SNew(SOverlay)
-									+ SOverlay::Slot()
-									.HAlign(HAlign_Center)
-									.VAlign(VAlign_Center)
-									.Padding(8.0f)
+									// INPUT PIN AREA
+									+ SHorizontalBox::Slot()
+									.AutoWidth()
 									[
-										SNew(SBorder)
-											.BorderImage(FAppStyle::GetBrush("Graph.StateNode.ColorSpill"))
-											.BorderBackgroundColor(TitleShadowColor)
-											.HAlign(HAlign_Center)
-											.VAlign(VAlign_Center)
-											.Visibility(EVisibility::SelfHitTestInvisible)
-											.Padding(6.0f)
+										SNew(SBox)
+											.MinDesiredHeight(NodePadding.Top)
 											[
-												SAssignNew(NodeBody, SVerticalBox)
-
-													// Title
-													+ SVerticalBox::Slot()
-													.AutoHeight()
-													[
-														SNew(SHorizontalBox)
-
-															// Error message
-															+ SHorizontalBox::Slot()
-															.AutoWidth()
-															[
-																SAssignNew(ErrorText, SErrorText)
-																	.BackgroundColor(this, &SGraphNode_QuestSystemNode::GetErrorColor)
-																	.ToolTipText(this, &SGraphNode_QuestSystemNode::GetErrorMsgToolTip)
-															]
-
-															// Icon
-															+ SHorizontalBox::Slot()
-															.AutoWidth()
-															.VAlign(VAlign_Center)
-															[
-																SNew(SImage)
-																	.Image(NodeTypeIcon)
-															]
-
-															// Node Title
-															+ SHorizontalBox::Slot()
-															.Padding(FMargin(4.0f, 0.0f, 4.0f, 0.0f))
-															[
-																SNew(SVerticalBox)
-																	+ SVerticalBox::Slot()
-																	.AutoHeight()
-																	[
-																		SAssignNew(InlineEditableText, SInlineEditableTextBlock)
-																			.Style(FAppStyle::Get(), "Graph.StateNode.NodeTitleInlineEditableText")
-																			.Text(NodeTitle.Get(), &SNodeTitle::GetHeadTitle)
-																			.OnVerifyTextChanged(this, &SGraphNode_QuestSystemNode::OnVerifyNameTextChanged)
-																			.OnTextCommitted(this, &SGraphNode_QuestSystemNode::OnNameTextCommited)
-																			.IsReadOnly(this, &SGraphNode_QuestSystemNode::IsNameReadOnly)
-																			.IsSelected(this, &SGraphNode_QuestSystemNode::IsSelectedExclusively)
-																	]
-																	+ SVerticalBox::Slot()
-																	.AutoHeight()
-																	[
-																		NodeTitle.ToSharedRef()
-																	]
-																	+ SVerticalBox::Slot()
-																	.AutoHeight()
-																	[
-																		// DESCRIPTION MESSAGE
-																		SAssignNew(DescriptionText, STextBlock)
-																			.Visibility(this, &SGraphNode_QuestSystemNode::GetDescriptionVisibility)
-																			.Text(this, &SGraphNode_QuestSystemNode::GetDescription)
-																	]
-															]
-													]
+												SAssignNew(LeftNodeBox, SVerticalBox)
 											]
 									]
-								]
+
+									// STATE NAME AREA
+									+ SHorizontalBox::Slot()
+									.Padding(FMargin(NodePadding.Left, 0.0f, NodePadding.Right, 0.0f))
+									[
+										SNew(SVerticalBox)
+											/*+ SVerticalBox::Slot()
+											.AutoHeight()
+											[
+												DecoratorsBox.ToSharedRef()
+											]*/
+											+ SVerticalBox::Slot()
+											.AutoHeight()
+											[
+												SNew(SOverlay)
+												+ SOverlay::Slot()
+												.HAlign(HAlign_Center)
+												.VAlign(VAlign_Center)
+												.Padding(8.0f)
+												[
+													SNew(SBorder)
+														.BorderImage(FAppStyle::GetBrush("Graph.StateNode.ColorSpill"))
+														.BorderBackgroundColor(TitleShadowColor)
+														.HAlign(HAlign_Center)
+														.VAlign(VAlign_Center)
+														.Visibility(EVisibility::SelfHitTestInvisible)
+														.Padding(6.0f)
+														[
+															SAssignNew(NodeBody, SVerticalBox)
+
+																// Title
+																+ SVerticalBox::Slot()
+																.AutoHeight()
+																[
+																	SNew(SHorizontalBox)
+
+																		// Error message
+																		+ SHorizontalBox::Slot()
+																		.AutoWidth()
+																		[
+																			SAssignNew(ErrorText, SErrorText)
+																				.BackgroundColor(this, &SGraphNode_QuestSystemNode::GetErrorColor)
+																				.ToolTipText(this, &SGraphNode_QuestSystemNode::GetErrorMsgToolTip)
+																		]
+
+																		// Node Title
+																		+ SHorizontalBox::Slot()
+																		.Padding(FMargin(4.0f, 0.0f, 4.0f, 0.0f))
+																		[
+																			SNew(SVerticalBox)
+																				+ SVerticalBox::Slot()
+																				.AutoHeight()
+																				[
+																					SAssignNew(InlineEditableText, SInlineEditableTextBlock)
+																						.Style(FAppStyle::Get(), "Graph.StateNode.NodeTitleInlineEditableText")
+																						.Text(NodeTitle.Get(), &SNodeTitle::GetHeadTitle)
+																						.OnVerifyTextChanged(this, &SGraphNode_QuestSystemNode::OnVerifyNameTextChanged)
+																						.OnTextCommitted(this, &SGraphNode_QuestSystemNode::OnNameTextCommited)
+																						.IsReadOnly(this, &SGraphNode_QuestSystemNode::IsNameReadOnly)
+																						.IsSelected(this, &SGraphNode_QuestSystemNode::IsSelectedExclusively)
+																				]
+																				+ SVerticalBox::Slot()
+																				.AutoHeight()
+																				[
+																					NodeTitle.ToSharedRef()
+																				]
+																				+ SVerticalBox::Slot()
+																				.AutoHeight()
+																				[
+																					// DESCRIPTION MESSAGE
+																					SAssignNew(DescriptionText, STextBlock)
+																						.Visibility(this, &SGraphNode_QuestSystemNode::GetDescriptionVisibility)
+																						.Text(this, &SGraphNode_QuestSystemNode::GetDescription)
+																				]
+																		]
+																]
+														]
+												]
+											]
 								
-						]
+									]
 
-						// OUTPUT PIN AREA
-						+ SHorizontalBox::Slot()
-						.AutoWidth()
-						[
-							SNew(SBox)
-								.MinDesiredHeight(NodePadding.Bottom)
-								[
-									SAssignNew(RightNodeBox, SVerticalBox)
-										/*+ SVerticalBox::Slot()
-										.HAlign(HAlign_Fill)
-										.VAlign(VAlign_Fill)
-										.Padding(20.0f, 0.0f)
-										.FillHeight(1.0f)
-										[
-											SAssignNew(OutputPinBox, SHorizontalBox)
-										]*/
-								]
-						]
-				]
+									// OUTPUT PIN AREA
+									+ SHorizontalBox::Slot()
+									.AutoWidth()
+									[
+										SNew(SBox)
+											.MinDesiredHeight(NodePadding.Bottom)
+											[
+												SAssignNew(RightNodeBox, SVerticalBox)
+													/*+ SVerticalBox::Slot()
+													.HAlign(HAlign_Fill)
+													.VAlign(VAlign_Fill)
+													.Padding(20.0f, 0.0f)
+													.FillHeight(1.0f)
+													[
+														SAssignNew(OutputPinBox, SHorizontalBox)
+													]*/
+											]
+									]
+							]
 
-				// Drag marker overlay
-				/*+ SOverlay::Slot()
-				.HAlign(HAlign_Fill)
-				.VAlign(VAlign_Top)
-				[
-					SNew(SBorder)
-						.BorderBackgroundColor(QuestSystemColors::Action::DragMarker)
-						.ColorAndOpacity(QuestSystemColors::Action::DragMarker)
-						.BorderImage(FAppStyle::GetBrush("BTEditor.Graph.BTNode.Body"))
-						.Visibility(this, &SGraphNode_QuestSystemNode::GetDragOverMarkerVisibility)
-						[
-							SNew(SBox)
-								.HeightOverride(4)
-						]
-				]*/
+							// Drag marker overlay
+							/*+ SOverlay::Slot()
+							.HAlign(HAlign_Fill)
+							.VAlign(VAlign_Top)
+							[
+								SNew(SBorder)
+									.BorderBackgroundColor(QuestSystemColors::Action::DragMarker)
+									.ColorAndOpacity(QuestSystemColors::Action::DragMarker)
+									.BorderImage(FAppStyle::GetBrush("BTEditor.Graph.BTNode.Body"))
+									.Visibility(this, &SGraphNode_QuestSystemNode::GetDragOverMarkerVisibility)
+									[
+										SNew(SBox)
+											.HeightOverride(4)
+									]
+							]*/
 
-				// Blueprint indicator overlay
-				+ SOverlay::Slot()
-				.HAlign(HAlign_Left)
-				.VAlign(VAlign_Top)
-				[
-					SNew(SImage)
-						.Image(FAppStyle::GetBrush(TEXT("BTEditor.Graph.BTNode.Blueprint")))
-						.Visibility(this, &SGraphNode_QuestSystemNode::GetBlueprintIconVisibility)
-				]
-		]
+							// Blueprint indicator overlay
+							+ SOverlay::Slot()
+							.HAlign(HAlign_Left)
+							.VAlign(VAlign_Top)
+							[
+								SNew(SImage)
+									.Image(FAppStyle::GetBrush(TEXT("BTEditor.Graph.BTNode.Blueprint")))
+									.Visibility(this, &SGraphNode_QuestSystemNode::GetBlueprintIconVisibility)
+							]
+					]
+			]
 	];
 	// Create comment bubble
 	TSharedPtr<SCommentBubble> CommentBubble;
@@ -559,6 +456,24 @@ FSlateColor SGraphNode_QuestSystemNode::GetBorderBackgroundColor() const
 {
 	UEdNode_QuestSystemNode* MyNode = CastChecked<UEdNode_QuestSystemNode>(GraphNode);
 	return MyNode ? MyNode->GetBackgroundColor() : QuestSystemColors::NodeBorder::HighlightAbortRange0;
+}
+
+FSlateColor SGraphNode_QuestSystemNode::GetHighlightColor() const
+{
+	UEdNode_QuestSystemNode* MyNode = CastChecked<UEdNode_QuestSystemNode>(GraphNode);
+	if (MyNode->QuestSystemGraphNode->QuestSystem == nullptr)
+		return QuestSystemColors::NodeBorder::NoHighlight;
+
+
+	if (MyNode->QuestSystemGraphNode->QuestSystem->CurrentNode == MyNode->QuestSystemGraphNode && (GEditor->bIsSimulatingInEditor || GEditor->PlayWorld))
+	{
+		return QuestSystemColors::NodeBorder::HighlightCurrentNode;
+		
+	}
+	else
+	{
+		return QuestSystemColors::NodeBorder::NoHighlight;
+	}
 }
 
 FSlateColor SGraphNode_QuestSystemNode::GetBackgroundColor() const

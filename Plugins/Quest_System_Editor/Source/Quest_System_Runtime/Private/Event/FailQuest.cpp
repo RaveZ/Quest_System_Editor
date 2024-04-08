@@ -2,6 +2,10 @@
 
 
 #include "Event/FailQuest.h"
+#include "QuestSystem.h"
+#include "QuestComponent.h"
+#include "QuestSystemGraph.h"
+#include "QuestSystemGraphNode.h"
 
 UFailQuest::UFailQuest()
 {
@@ -9,4 +13,6 @@ UFailQuest::UFailQuest()
 
 void UFailQuest::BeginEvent_Implementation()
 {
+	GetQuestComponent()->FailQuest(QuestID);
+	
 }

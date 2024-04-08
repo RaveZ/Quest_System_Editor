@@ -40,7 +40,7 @@ void SQuestPaletteItem::Construct(const FArguments& InArgs, FCreateWidgetForActi
 	QuestEditorPtr = InQuestEditor;
 
 	// construct the icon widget
-	FSlateBrush const* IconBrush = FAppStyle::GetBrush(TEXT("NoBrush"));
+	FSlateBrush const* IconBrush = FAppStyle::GetBrush(TEXT("GraphEditor.EventGraph_16x"));
 	FSlateBrush const* SecondaryBrush = FAppStyle::GetBrush(TEXT("NoBrush"));
 	FSlateColor        IconColor = FSlateColor::UseForeground();
 	FSlateColor        SecondaryIconColor = FSlateColor::UseForeground();
@@ -167,8 +167,6 @@ bool SQuestPaletteItem::OnNameTextVerifyChanged(const FText& InNewText, FText& O
 		OriginalName = QuestEdGraph->QuestSystem->QuestID;
 	}
 
-	
-
 	for (TObjectIterator<UQuestSystem> It; It; ++It)
 	{
 		if (UQuestSystem* QuestSystem = Cast<UQuestSystem>(*It))
@@ -194,14 +192,17 @@ bool SQuestPaletteItem::OnNameTextVerifyChanged(const FText& InNewText, FText& O
 
 void SQuestPaletteItem::OnNameTextCommitted(const FText& NewText, ETextCommit::Type InTextCommit)
 {
+
 	const FString NewNameString = NewText.ToString();
 	const FName NewName = *NewNameString;
 
-		FAssetSchemaAction_QuestSystemGraph* QuestGraphAction = (FAssetSchemaAction_QuestSystemGraph*)ActionPtr.Pin().Get();
-		if (UEdGraph_QuestSystemGraph* QuestEdGraph = Cast<UEdGraph_QuestSystemGraph>(QuestGraphAction->EdGraph))
-		{
-			QuestEdGraph->QuestSystem->QuestID = NewName;
-		}
+	FAssetSchemaAction_QuestSystemGraph* QuestGraphAction = (FAssetSchemaAction_QuestSystemGraph*)ActionPtr.Pin().Get();
+	if (UEdGraph_QuestSystemGraph* QuestEdGraph = Cast<UEdGraph_QuestSystemGraph>(QuestGraphAction->EdGraph))
+	{
+		QuestEdGraph->QuestSystem->QuestID = NewName;
+		QuestEdGraph->Rename(*(NewName.ToString()), QuestSystemGraph, REN_DoNotDirty | REN_ForceNoResetLoaders);
+
+	}
 	QuestEditorPtr.Pin()->GetMyQuestWidget()->Refresh();
 
 	QuestEditorPtr.Pin()->GetQuestSystemObj()->Modify();

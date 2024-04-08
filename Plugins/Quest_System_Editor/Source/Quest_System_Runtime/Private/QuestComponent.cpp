@@ -3,9 +3,9 @@
 
 #include "QuestComponent.h"
 #include "QuestSystem.h"
-#include "QuestCondition.h"
+#include "Condition/QuestCondition.h"
 #include "Event/QuestEvent.h"
-#include "QuestTask.h"
+#include "Task/QuestTask.h"
 #include "QuestSaveObject.h"
 #include "QuestSystemGraph.h"
 #include "QuestSystemGraphNode_State.h"
@@ -52,6 +52,9 @@ bool UQuestComponent::RunQuest(UQuestSystemGraph* QuestGraph)
 	{
 		QuestSystemMap.Emplace(QuestSystem->QuestID, QuestSystem);
 	}
+
+	//Add QuestGraph to array
+	QuestGraphs.Add(QuestGraph);
 
 	//Begin the Quest
 	for (UQuestSystem* QuestSystem : QuestGraph->QuestSystems)
@@ -114,8 +117,13 @@ void UQuestComponent::FailQuest(FName QuestID)
 {
 	if (UQuestSystem* QuestSystem = *QuestSystemMap.Find(QuestID))
 	{
-		QuestSystem->QuestState = EQuestState::E_Fail;
+		if (QuestSystem->QuestState != EQuestState::E_Fail)
+		{
+			QuestSystem->QuestState = EQuestState::E_Fail;
+			OnQuestStateUpdated.Broadcast(QuestSystem);
+		}
 		QuestSystem->CurrentNode = nullptr;
+
 	}
 }
 

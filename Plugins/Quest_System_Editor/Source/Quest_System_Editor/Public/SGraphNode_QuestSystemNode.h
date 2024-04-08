@@ -34,6 +34,7 @@ public:
 	FText GetPinTooltip(UEdGraphPin* GraphPinObj) const;
 
 	virtual FSlateColor GetBorderBackgroundColor() const;
+	virtual FSlateColor GetHighlightColor() const;
 	virtual FSlateColor GetBackgroundColor() const;
 
 	virtual EVisibility GetDragOverMarkerVisibility() const;

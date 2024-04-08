@@ -1,7 +1,7 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 
-#include "QuestCondition.h"
+#include "Condition/QuestCondition.h"
 #include "QuestComponent.h"
 #include "QuestSystem.h"
 #include "QuestSystemGraph.h"
@@ -48,6 +48,20 @@ UQuestSystemGraph* UQuestCondition::GetOwningQuestGraph() const
 UQuestSystem* UQuestCondition::GetOwningQuestSystem() const
 {
 	return QuestSystem;
+}
+
+TArray<FName> UQuestCondition::GetAllQuestID()
+{
+	TArray<FName> QuestIDs;
+	for (TObjectIterator<UQuestSystem> It; It; ++It)
+	{
+		if (UQuestSystem* Quest = Cast<UQuestSystem>(*It))
+		{
+			QuestIDs.Add(Quest->QuestID);
+		}
+	}
+
+	return QuestIDs;
 }
 
 #undef LOCTEXT_NAMESPACE

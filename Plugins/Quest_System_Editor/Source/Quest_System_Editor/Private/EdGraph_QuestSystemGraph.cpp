@@ -8,9 +8,9 @@
 #include "QuestSystemGraphEdge.h"
 #include "QuestSystemGraphNode.h"
 #include "QuestSystemGraphNode_TaskManager.h"
-#include "QuestCondition.h"
+#include "Condition/QuestCondition.h"
 #include "Event/QuestEvent.h"
-#include "QuestTask.h"
+#include "Task/QuestTask.h"
 
 
 UEdGraph_QuestSystemGraph::UEdGraph_QuestSystemGraph()

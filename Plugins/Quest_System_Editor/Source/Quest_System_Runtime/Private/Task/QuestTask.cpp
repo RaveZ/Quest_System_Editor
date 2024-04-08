@@ -1,7 +1,7 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 
-#include "QuestTask.h"
+#include "Task/QuestTask.h"
 #include "QuestComponent.h"
 #include "QuestSystem.h"
 #include "QuestSystemGraph.h"

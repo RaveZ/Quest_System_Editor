@@ -2,7 +2,7 @@
 
 
 #include "QuestSystemGraphNode_TaskManager.h"
-#include "QuestTask.h"
+#include "Task/QuestTask.h"
 #include "QuestSystem.h"
 #include "QuestComponent.h"
 

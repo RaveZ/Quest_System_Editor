@@ -98,7 +98,8 @@ UEdGraph* FQuestSystemEditorUtils::CreateNewGraph(UObject* ParentScope, const FN
 	
 	NewGraph->Schema = SchemaClass;
 	NewGraph->GetSchema()->CreateDefaultNodesForGraph(*NewGraph);
-	
+	NewGraph->Rename(*(GraphName.ToString()), ParentScope, REN_DoNotDirty | REN_ForceNoResetLoaders);
+
 	if (UEdGraph_QuestSystemGraph* QuestGraph = Cast<UEdGraph_QuestSystemGraph>(NewGraph))
 	{
 		QuestGraph->QuestSystem = NewObject<UQuestSystem>(ParentScope, UQuestSystem::StaticClass(), NAME_None, RF_Transactional);

@@ -20,7 +20,7 @@
 #include "QuestSystemGraphNode_Root.h"
 #include "QuestSystemGraphNode_State.h"
 #include "QuestSystemGraphNode_TaskManager.h"
-#include "QuestTask.h"
+#include "Task/QuestTask.h"
 
 
 #define LOCTEXT_NAMESPACE "AssetSchema_QuestSystemGraph"
