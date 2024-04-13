@@ -6,7 +6,7 @@
 #include "QuestComponent.h"
 #include "QuestSystemGraph.h"
 #include "QuestSystemGraphNode.h"
-#include "QuestSystemGraphNode_TaskManager.h"
+#include "QuestSystemGraphNode_Objective.h"
 
 URestartQuest::URestartQuest()
 {
@@ -30,7 +30,7 @@ TArray<FName> URestartQuest::GetAllNodeID()
 				{
 					for (UQuestSystemGraphNode* QuestNode : Quest->AllNodes)
 					{
-						if (UQuestSystemGraphNode_TaskManager* TaskNode = Cast<UQuestSystemGraphNode_TaskManager>(QuestNode))
+						if (UQuestSystemGraphNode_Objective* ObjectiveNode = Cast<UQuestSystemGraphNode_Objective>(QuestNode))
 						{
 							NodeIDs.Add(QuestNode->ID);
 						}

@@ -5,7 +5,7 @@
 #include "QuestSystemGraph.h"
 #include "QuestSystemGraphNode.h"
 #include "QuestSystemGraphEdge.h"
-#include "QuestSystemGraphNode_TaskManager.h"
+#include "QuestSystemGraphNode_Objective.h"
 #include "QuestSystemGraphNode_Root.h"
 
 

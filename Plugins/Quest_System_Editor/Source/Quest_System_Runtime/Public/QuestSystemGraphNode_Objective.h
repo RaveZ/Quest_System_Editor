@@ -4,21 +4,21 @@
 
 #include "CoreMinimal.h"
 #include "QuestSystemGraphNode.h"
-#include "QuestSystemGraphNode_TaskManager.generated.h"
+#include "QuestSystemGraphNode_Objective.generated.h"
 
 class UQuestTask;
 
 UCLASS(Blueprintable)
-class QUEST_SYSTEM_RUNTIME_API UQuestSystemGraphNode_TaskManager : public UQuestSystemGraphNode
+class QUEST_SYSTEM_RUNTIME_API UQuestSystemGraphNode_Objective : public UQuestSystemGraphNode
 {
 	GENERATED_BODY()
 
 public:
-	UPROPERTY(Instanced, EditAnywhere, BlueprintReadOnly, Category = "TaskManager")
+	UPROPERTY(Instanced, EditAnywhere, BlueprintReadOnly, Category = "Objective")
 		TArray<UQuestTask*> Tasks;
 	
 
-	UFUNCTION(BlueprintCallable, Category = "TaskManager")
+	UFUNCTION(BlueprintCallable, Category = "Objective")
 		bool IsAllTaskCompleted();
 
 

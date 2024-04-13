@@ -6,7 +6,7 @@
 #include "QuestSystem.h"
 #include "QuestSystemGraph.h"
 #include "QuestSystemGraphNode.h"
-#include "QuestSystemGraphNode_TaskManager.h"
+#include "QuestSystemGraphNode_Objective.h"
 
 
 UQuestEvent::UQuestEvent()

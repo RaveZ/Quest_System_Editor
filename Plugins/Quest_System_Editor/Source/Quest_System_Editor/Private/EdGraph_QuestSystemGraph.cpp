@@ -7,7 +7,7 @@
 #include "EdNode_QuestSystemNode.h"
 #include "QuestSystemGraphEdge.h"
 #include "QuestSystemGraphNode.h"
-#include "QuestSystemGraphNode_TaskManager.h"
+#include "QuestSystemGraphNode_Objective.h"
 #include "Condition/QuestCondition.h"
 #include "Event/QuestEvent.h"
 #include "Task/QuestTask.h"
@@ -84,13 +84,13 @@ void UEdGraph_QuestSystemGraph::RebuildQuestSystemGraph()
 				}
 			}
 
-			if (UQuestSystemGraphNode_TaskManager* TaskManagerNode = Cast<UQuestSystemGraphNode_TaskManager>(QuestSystemGraphNode))
+			if (UQuestSystemGraphNode_Objective* ObjectiveNode = Cast<UQuestSystemGraphNode_Objective>(QuestSystemGraphNode))
 			{
-				for (UQuestTask* Task : TaskManagerNode->Tasks)
+				for (UQuestTask* Task : ObjectiveNode->Tasks)
 				{
 					if (Task != nullptr)
 					{
-						Task->TaskManager = TaskManagerNode;
+						Task->ObjectiveNode = ObjectiveNode;
 						Task->QuestGraph = Graph;
 						Task->QuestSystem = QuestSystem;
 					}

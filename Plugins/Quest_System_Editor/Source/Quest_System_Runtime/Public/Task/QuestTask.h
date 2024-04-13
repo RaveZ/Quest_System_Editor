@@ -10,7 +10,7 @@
 class UQuestSystemGraph;
 class UQuestSystem;
 class UQuestComponent;
-class UQuestSystemGraphNode_TaskManager;
+class UQuestSystemGraphNode_Objective;
 
 
 
@@ -38,28 +38,28 @@ public:
 		UQuestSystem* QuestSystem;
 
 
-	UPROPERTY(BlueprintReadOnly, Category = "Tasks")
-		UQuestSystemGraphNode_TaskManager* TaskManager;
+	UPROPERTY(BlueprintReadOnly, Category = "QuestTask")
+		UQuestSystemGraphNode_Objective* ObjectiveNode;
 
-	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Task")
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "QuestTask")
 		ETaskState TaskState = ETaskState::E_Active;
 
-	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Task")
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "QuestTask")
 		int CurrentAmount;
 
-	UPROPERTY(BlueprintReadWrite, Category = "Task")
+	UPROPERTY(BlueprintReadWrite, Category = "QuestTask")
 		float DistanceToTarget;
 
 	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable, Category = "QuestTask")
 		void TaskBegin();
 
-	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable, Category = "Task")
+	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable, Category = "QuestTask")
 		void TaskTick();
 
-	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable, Category = "Task")
+	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable, Category = "QuestTask")
 		void OnTaskCompleted();
 
-	UFUNCTION(BlueprintCallable, Category = "Task")
+	UFUNCTION(BlueprintCallable, Category = "QuestTask")
 		bool CompleteTask();
 
 	UFUNCTION(BlueprintCallable, Category = "QuestTask")
@@ -77,7 +77,7 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "QuestTask")
 		UQuestSystem* GetOwningQuestSystem() const;
 
-	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "Task")
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "QuestTask")
 		FText GetDescription() const;
 
 

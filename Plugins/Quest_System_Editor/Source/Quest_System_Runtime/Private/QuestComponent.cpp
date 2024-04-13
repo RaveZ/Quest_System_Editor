@@ -10,7 +10,7 @@
 #include "QuestSystemGraph.h"
 #include "QuestSystemGraphNode_State.h"
 #include "QuestSystemGraphNode_Root.h"
-#include "QuestSystemGraphNode_TaskManager.h"
+#include "QuestSystemGraphNode_Objective.h"
 #include "Kismet/GameplayStatics.h"
 
 
@@ -80,21 +80,38 @@ void UQuestComponent::RestartQuest(FName QuestID, FName NodeID, bool bStartFromN
 	{
 		QuestSystem->QuestState = EQuestState::E_Active;
 
+		//reset task data
 		for (UQuestSystemGraphNode* Node : QuestSystem->AllNodes)
 		{
-			if (UQuestSystemGraphNode_TaskManager* TaskManagerNode = Cast<UQuestSystemGraphNode_TaskManager>(Node))
+			if (UQuestSystemGraphNode_Objective* ObjectiveNode = Cast<UQuestSystemGraphNode_Objective>(Node))
 			{
-				for (UQuestTask* Task : TaskManagerNode->Tasks)
+				for (UQuestTask* Task : ObjectiveNode->Tasks)
 				{
 					Task->TaskState = ETaskState::E_Active;
 					Task->CurrentAmount = 0;
 				}
 			}
 		}
+
 		if (bStartFromNodeID)
-		{
+		{	
 			if (UQuestSystemGraphNode* FoundedNode = QuestSystem->NodeMap.FindRef(NodeID))
 			{
+				//reset visited node children where the node started from
+				bool bCanDelete = false;
+				for (int i = 0; i < QuestSystem->VisitedNodeIDs.Num(); i++)
+				{
+					if (bCanDelete)
+					{
+						QuestSystem->VisitedNodeIDs.RemoveAt(i);
+					}
+					else if (QuestSystem->VisitedNodeIDs[i] == NodeID)
+					{
+						QuestSystem->VisitedNodeIDs.RemoveAt(i);
+						bCanDelete = true;
+					}
+				}
+
 				QuestSystem->CurrentNode = FoundedNode;
 			}
 			else
@@ -134,9 +151,9 @@ void UQuestComponent::UpdateQuest()
 		FName Key = It.Key;
 		UQuestSystem* QuestSystem = It.Value;
 
-		if (UQuestSystemGraphNode_TaskManager* NodeTaskManager = Cast<UQuestSystemGraphNode_TaskManager>(QuestSystem->CurrentNode))
+		if (UQuestSystemGraphNode_Objective* ObjectiveNode = Cast<UQuestSystemGraphNode_Objective>(QuestSystem->CurrentNode))
 		{
-			if (NodeTaskManager->IsAllTaskCompleted())
+			if (ObjectiveNode->IsAllTaskCompleted())
 			{
 				//evaluate next node condition
 				EvaluateNextNodeCondition(QuestSystem);
@@ -144,14 +161,7 @@ void UQuestComponent::UpdateQuest()
 		}
 	}
 
-	/*if (UQuestSystemGraphNode_TaskManager* NodeTaskManager = Cast<UQuestSystemGraphNode_TaskManager>(UpdatedQuest->CurrentNode))
-	{
-		if (NodeTaskManager->IsAllTaskCompleted())
-		{
-			//evaluate next node condition
-			EvaluateNextNodeCondition(UpdatedQuest);
-		}
-	}*/
+	
 	
 }
 
@@ -227,9 +237,9 @@ void UQuestComponent::BeginNode(UQuestSystem* QuestParam)
 	}
 
 	//Begin Node Functionality
-	if (UQuestSystemGraphNode_TaskManager* TaskManagerNode = Cast<UQuestSystemGraphNode_TaskManager>(QuestParam->CurrentNode))
+	if (UQuestSystemGraphNode_Objective* ObjectiveNode = Cast<UQuestSystemGraphNode_Objective>(QuestParam->CurrentNode))
 	{
-		for (UQuestTask* Task : TaskManagerNode->Tasks)
+		for (UQuestTask* Task : ObjectiveNode->Tasks)
 		{
 			Task->TaskBegin();
 
@@ -259,9 +269,9 @@ void UQuestComponent::Save_Implementation(const FString& SaveFileName, int SlotI
 				for (UQuestSystemGraphNode* Node : QuestSystem->AllNodes)
 				{
 					TArray<FTaskData> TaskDataArray;
-					if (UQuestSystemGraphNode_TaskManager* TaskNode = Cast<UQuestSystemGraphNode_TaskManager>(Node))
+					if (UQuestSystemGraphNode_Objective* ObjectiveNode = Cast<UQuestSystemGraphNode_Objective>(Node))
 					{
-						for (UQuestTask* Task : TaskNode->Tasks)
+						for (UQuestTask* Task : ObjectiveNode->Tasks)
 						{
 							FTaskData TaskData;
 							TaskData.CurrentAmount = Task->CurrentAmount;
@@ -324,9 +334,9 @@ void UQuestComponent::LoadGameDelegateFunction(const FString& SlotName, const in
 					if (FoundedNode != nullptr)
 					{
 						//Fill Node Data Here
-						if (UQuestSystemGraphNode_TaskManager* TaskManagerNode = Cast<UQuestSystemGraphNode_TaskManager>(FoundedNode))
+						if (UQuestSystemGraphNode_Objective* ObjectiveNode = Cast<UQuestSystemGraphNode_Objective>(FoundedNode))
 						{
-							for (int i = 0; i<TaskManagerNode->Tasks.Num(); i++)
+							for (int i = 0; i< ObjectiveNode->Tasks.Num(); i++)
 							{
 								if (i >= NodeData.TaskDatas.Num() - 1)
 								{
@@ -335,8 +345,8 @@ void UQuestComponent::LoadGameDelegateFunction(const FString& SlotName, const in
 								else
 								{
 									//fill task data here
-									TaskManagerNode->Tasks[i]->CurrentAmount = NodeData.TaskDatas[i].CurrentAmount;
-									TaskManagerNode->Tasks[i]->TaskState = NodeData.TaskDatas[i].TaskState;
+									ObjectiveNode->Tasks[i]->CurrentAmount = NodeData.TaskDatas[i].CurrentAmount;
+									ObjectiveNode->Tasks[i]->TaskState = NodeData.TaskDatas[i].TaskState;
 								}
 							}
 						}

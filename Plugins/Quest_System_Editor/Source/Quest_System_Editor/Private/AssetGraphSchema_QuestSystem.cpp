@@ -19,7 +19,7 @@
 #include "QuestSystemGraphEdge.h"
 #include "QuestSystemGraphNode_Root.h"
 #include "QuestSystemGraphNode_State.h"
-#include "QuestSystemGraphNode_TaskManager.h"
+#include "QuestSystemGraphNode_Objective.h"
 #include "Task/QuestTask.h"
 
 
@@ -360,12 +360,12 @@ void UAssetGraphSchema_QuestSystem::GetGraphContextActions(FGraphContextMenuBuil
 		UEdNode_QuestSystemNode* OpNode = NewObject<UEdNode_QuestSystemNode>(ContextMenuBuilder.OwnerOfTemporaries, GraphNodeClass);
 		OpNode->ClassData = NodeClass;
 		AddOpAction->NodeTemplate = OpNode;
-		AddOpAction->NodeTemplate->QuestSystemGraphNode = NewObject<UQuestSystemGraphNode>(AddOpAction->NodeTemplate, UQuestSystemGraphNode_TaskManager::StaticClass());// NodeClass.GetClass(true));
-		if (UQuestSystemGraphNode_TaskManager* TaskManager = Cast< UQuestSystemGraphNode_TaskManager>(AddOpAction->NodeTemplate->QuestSystemGraphNode))
+		AddOpAction->NodeTemplate->QuestSystemGraphNode = NewObject<UQuestSystemGraphNode>(AddOpAction->NodeTemplate, UQuestSystemGraphNode_Objective::StaticClass());// NodeClass.GetClass(true));
+		if (UQuestSystemGraphNode_Objective* ObjectiveNode = Cast< UQuestSystemGraphNode_Objective>(AddOpAction->NodeTemplate->QuestSystemGraphNode))
 		{
 			if (NodeClass.GetClass(true)->IsChildOf(UQuestTask::StaticClass()))
 			{
-				TaskManager->Tasks.Add(NewObject<UQuestTask>(AddOpAction->NodeTemplate, NodeClass.GetClass(true)));
+				ObjectiveNode->Tasks.Add(NewObject<UQuestTask>(AddOpAction->NodeTemplate, NodeClass.GetClass(true)));
 			}
 			AddOpAction->NodeTemplate->QuestSystemGraphNode->QuestGraph = Graph;
 			AddOpAction->NodeTemplate->QuestSystemGraphNode->ID = FQuestSystemEditorUtils::FindUniqueNodeName("TaskNode");

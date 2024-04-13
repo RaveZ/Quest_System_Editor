@@ -1,7 +1,7 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 
-#include "QuestSystemGraphNode_TaskManager.h"
+#include "QuestSystemGraphNode_Objective.h"
 #include "Task/QuestTask.h"
 #include "QuestSystem.h"
 #include "QuestComponent.h"
@@ -9,7 +9,7 @@
 
 #define LOCTEXT_NAMESPACE "QuestSystemGraphNode_TaskManager"
 
-bool UQuestSystemGraphNode_TaskManager::IsAllTaskCompleted()
+bool UQuestSystemGraphNode_Objective::IsAllTaskCompleted()
 {
     int progress = 0;
     for (UQuestTask* NodeTask : Tasks)
@@ -32,17 +32,17 @@ bool UQuestSystemGraphNode_TaskManager::IsAllTaskCompleted()
 }
 
 #if WITH_EDITOR
-FText UQuestSystemGraphNode_TaskManager::GetNodeTitle() const
+FText UQuestSystemGraphNode_Objective::GetNodeTitle() const
 {
     return FText::FromName(ID).IsEmpty() ? FText::FromString(UQuestSystemGraphNode::GetShortTypeName(this)) : FText::FromName(ID);
 }
 
-void UQuestSystemGraphNode_TaskManager::SetNodeTitle(const FText& NewTitle)
+void UQuestSystemGraphNode_Objective::SetNodeTitle(const FText& NewTitle)
 {
     ID = FName(NewTitle.ToString());
 }
 
-FText UQuestSystemGraphNode_TaskManager::GetNodeDescription() const
+FText UQuestSystemGraphNode_Objective::GetNodeDescription() const
 {
     if (Tasks.Num() == 0)
     {
