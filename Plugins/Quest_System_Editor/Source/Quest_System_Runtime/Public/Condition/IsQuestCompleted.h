@@ -6,9 +6,9 @@
 #include "Condition/QuestCondition.h"
 #include "IsQuestCompleted.generated.h"
 
-/**
- * 
- */
+
+class UQuestSystem;
+
 UCLASS()
 class QUEST_SYSTEM_RUNTIME_API UIsQuestCompleted : public UQuestCondition
 {
@@ -17,6 +17,7 @@ class QUEST_SYSTEM_RUNTIME_API UIsQuestCompleted : public UQuestCondition
 public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "QuestCondition", meta = (GetOptions = "GetAllQuestID"))
 		FName QuestID;
+
 
 	virtual bool IsConditionMet_Implementation() const override;
 };

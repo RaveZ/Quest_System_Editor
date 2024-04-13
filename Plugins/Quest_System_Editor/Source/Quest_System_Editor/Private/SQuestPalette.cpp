@@ -175,6 +175,11 @@ bool SQuestPaletteItem::OnNameTextVerifyChanged(const FText& InNewText, FText& O
 			{
 				return true;
 			}
+			if (FName(InNewText.ToString()).IsNone())
+			{
+				OutErrorMessage = LOCTEXT("RenameFailed_NotValid", "Empty ID is Not Valid.");
+				return false;
+			}
 			if (QuestSystem->QuestID == FName(InNewText.ToString()))
 			{
 				OutErrorMessage = LOCTEXT("RenameFailed_NotValid", "This ID is already used in another Quest.");

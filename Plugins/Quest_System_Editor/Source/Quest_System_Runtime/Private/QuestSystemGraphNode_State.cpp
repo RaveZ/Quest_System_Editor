@@ -10,6 +10,7 @@ void UQuestSystemGraphNode_State::BeginState()
 {
     QuestSystem->QuestState = QuestState;
     QuestSystem->CurrentNode = nullptr;
+    GetQuestComponent()->UpdateQuest();
     GetQuestComponent()->OnQuestStateUpdated.Broadcast(QuestSystem);
 }
 

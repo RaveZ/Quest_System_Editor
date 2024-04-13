@@ -76,7 +76,7 @@ bool UQuestComponent::RunQuest(UQuestSystemGraph* QuestGraph)
 
 void UQuestComponent::RestartQuest(FName QuestID, FName NodeID, bool bStartFromNodeID)
 {
-	if (UQuestSystem* QuestSystem = *QuestSystemMap.Find(QuestID))
+	if (UQuestSystem* QuestSystem = QuestSystemMap.FindRef(QuestID))
 	{
 		QuestSystem->QuestState = EQuestState::E_Active;
 
@@ -93,7 +93,7 @@ void UQuestComponent::RestartQuest(FName QuestID, FName NodeID, bool bStartFromN
 		}
 		if (bStartFromNodeID)
 		{
-			if (UQuestSystemGraphNode* FoundedNode = *QuestSystem->NodeMap.Find(NodeID))
+			if (UQuestSystemGraphNode* FoundedNode = QuestSystem->NodeMap.FindRef(NodeID))
 			{
 				QuestSystem->CurrentNode = FoundedNode;
 			}
@@ -115,7 +115,7 @@ void UQuestComponent::RestartQuest(FName QuestID, FName NodeID, bool bStartFromN
 
 void UQuestComponent::FailQuest(FName QuestID)
 {
-	if (UQuestSystem* QuestSystem = *QuestSystemMap.Find(QuestID))
+	if (UQuestSystem* QuestSystem = QuestSystemMap.FindRef(QuestID))
 	{
 		if (QuestSystem->QuestState != EQuestState::E_Fail)
 		{
@@ -127,7 +127,7 @@ void UQuestComponent::FailQuest(FName QuestID)
 	}
 }
 
-void UQuestComponent::OnUpdateQuest(UQuestSystem* UpdatedQuest)
+void UQuestComponent::UpdateQuest()
 {
 	for (const auto& It : QuestSystemMap)
 	{
@@ -143,6 +143,16 @@ void UQuestComponent::OnUpdateQuest(UQuestSystem* UpdatedQuest)
 			}
 		}
 	}
+
+	/*if (UQuestSystemGraphNode_TaskManager* NodeTaskManager = Cast<UQuestSystemGraphNode_TaskManager>(UpdatedQuest->CurrentNode))
+	{
+		if (NodeTaskManager->IsAllTaskCompleted())
+		{
+			//evaluate next node condition
+			EvaluateNextNodeCondition(UpdatedQuest);
+		}
+	}*/
+	
 }
 
 void UQuestComponent::EvaluateNextNodeCondition(UQuestSystem* QuestParam)
@@ -159,7 +169,7 @@ void UQuestComponent::EvaluateNextNodeCondition(UQuestSystem* QuestParam)
 			int SumConditionMet = 0;
 			for (UQuestCondition* Condition : Node->Conditions)
 			{
-				if (Condition->IsConditionMet())
+				if (Condition && Condition->IsConditionMet())
 				{
 					SumConditionMet++;
 				}
@@ -297,12 +307,12 @@ void UQuestComponent::LoadGameDelegateFunction(const FString& SlotName, const in
 			FName QuestID = QuestIt.Key;
 			FQuestData QuestData = QuestIt.Value;
 
-			UQuestSystem* FoundedQuest = *QuestSystemMap.Find(QuestID);
+			UQuestSystem* FoundedQuest = QuestSystemMap.FindRef(QuestID);
 			if (FoundedQuest != nullptr)
 			{
 				//Fill Quest Data Here
 				FoundedQuest->QuestState = QuestData.QuestState;
-				FoundedQuest->CurrentNode = *FoundedQuest->NodeMap.Find(QuestData.CurrentNodeID);
+				FoundedQuest->CurrentNode = FoundedQuest->NodeMap.FindRef(QuestData.CurrentNodeID);
 				FoundedQuest->VisitedNodeIDs = QuestData.VisitedNodeIDs;
 
 				for (const auto& NodeIt : QuestData.NodeMapData)
@@ -310,7 +320,7 @@ void UQuestComponent::LoadGameDelegateFunction(const FString& SlotName, const in
 					FName NodeID = NodeIt.Key;
 					FNodeData NodeData = NodeIt.Value;
 					
-					UQuestSystemGraphNode* FoundedNode = *FoundedQuest->NodeMap.Find(NodeID);
+					UQuestSystemGraphNode* FoundedNode = FoundedQuest->NodeMap.FindRef(NodeID);
 					if (FoundedNode != nullptr)
 					{
 						//Fill Node Data Here
@@ -343,7 +353,7 @@ void UQuestComponent::BeginPlay()
 {
 	Super::BeginPlay();
 	QuestSystemMap.Empty();
-	OnQuestObjectiveUpdated.AddDynamic(this, &UQuestComponent::OnUpdateQuest);
+	//OnQuestObjectiveUpdated.AddDynamic(this, &UQuestComponent::OnUpdateQuest);
 	// ...
 	
 }

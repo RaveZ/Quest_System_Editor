@@ -39,7 +39,6 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "QuestCondition")
 		UQuestSystem* GetOwningQuestSystem() const;
 
-
 	UFUNCTION(CallInEditor)
 		TArray<FName> GetAllQuestID();
 	

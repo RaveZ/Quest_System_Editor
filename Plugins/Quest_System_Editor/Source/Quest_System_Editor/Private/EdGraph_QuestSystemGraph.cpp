@@ -29,6 +29,11 @@ void UEdGraph_QuestSystemGraph::RebuildQuestSystemGraph()
 
 	Clear();
 
+	if (Graph->CategoryDisplayName.IsEmpty())
+	{
+		Graph->CategoryDisplayName = Graph->GetFName().ToString();
+	}
+
 	for (int i = 0; i < Nodes.Num(); ++i)
 	{
 		if (UEdNode_QuestSystemNode* EdNode = Cast<UEdNode_QuestSystemNode>(Nodes[i]))

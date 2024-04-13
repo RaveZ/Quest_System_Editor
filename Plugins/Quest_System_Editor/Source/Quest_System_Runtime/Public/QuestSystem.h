@@ -25,6 +25,7 @@ class QUEST_SYSTEM_RUNTIME_API UQuestSystem : public UObject
 {
 	GENERATED_BODY()
 public:
+
 	UPROPERTY(VisibleDefaultsOnly, Category = "QuestAssets")
 		UQuestSystemGraph* QuestGraph;
 

@@ -21,8 +21,8 @@ public:
 	UQuestSystemGraph();
 	virtual ~UQuestSystemGraph();
 
-	UPROPERTY(EditDefaultsOnly, Category = "QuestSystemGraph")
-		FString Name;
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "QuestSystemGraph")
+		FString CategoryDisplayName;
 
 	UPROPERTY(EditDefaultsOnly, Category = "QuestSystemGraph")
 		TSubclassOf<UQuestSystemGraphNode> NodeType;

@@ -7,7 +7,7 @@
 
 bool UIsQuestActive::IsConditionMet_Implementation() const
 {
-    if (UQuestSystem* FoundedQuest = *GetQuestComponent()->QuestSystemMap.Find(QuestID))
+    if (UQuestSystem* FoundedQuest = GetQuestComponent()->QuestSystemMap.FindRef(QuestID))
     {
         switch (FoundedQuest->QuestState)
         {

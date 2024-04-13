@@ -58,7 +58,7 @@ public:
 		FQuestStateUpdated OnQuestStateUpdated;
 
 	UFUNCTION(BlueprintCallable, Category = "QuestComponent")
-		void OnUpdateQuest(UQuestSystem* UpdatedQuest);
+		void UpdateQuest();
 
 	UFUNCTION(BlueprintCallable, Category = "QuestComponent")
 		void EvaluateNextNodeCondition(UQuestSystem* QuestParam);

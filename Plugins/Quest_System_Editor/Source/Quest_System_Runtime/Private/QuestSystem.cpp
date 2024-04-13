@@ -11,6 +11,7 @@
 
 #define LOCTEXT_NAMESPACE "QuestSystem"
 
+
 void UQuestSystem::Print(bool ToConsole, bool ToScreen)
 {
 	int Level = 0;
@@ -47,9 +48,6 @@ void UQuestSystem::Print(bool ToConsole, bool ToScreen)
 		++Level;
 	}
 }
-
-
-
 
 int UQuestSystem::GetLevelNum() const
 {
