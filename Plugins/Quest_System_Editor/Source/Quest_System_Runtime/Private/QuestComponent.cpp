@@ -80,52 +80,75 @@ void UQuestComponent::RestartQuest(FName QuestID, FName NodeID, bool bStartFromN
 	{
 		QuestSystem->QuestState = EQuestState::E_Active;
 
-		//reset task data
-		for (UQuestSystemGraphNode* Node : QuestSystem->AllNodes)
-		{
-			if (UQuestSystemGraphNode_Objective* ObjectiveNode = Cast<UQuestSystemGraphNode_Objective>(Node))
-			{
-				for (UQuestTask* Task : ObjectiveNode->Tasks)
-				{
-					Task->TaskState = ETaskState::E_Active;
-					Task->CurrentAmount = 0;
-				}
-			}
-		}
+		
 
+
+		bool bNodeFound = false;
 		if (bStartFromNodeID)
 		{	
 			if (UQuestSystemGraphNode* FoundedNode = QuestSystem->NodeMap.FindRef(NodeID))
 			{
+				bNodeFound = true;
 				//reset visited node children where the node started from
 				bool bCanDelete = false;
 				for (int i = 0; i < QuestSystem->VisitedNodeIDs.Num(); i++)
 				{
+					if (QuestSystem->VisitedNodeIDs[i] == NodeID)
+					{
+						bCanDelete = true;
+					}
 					if (bCanDelete)
 					{
 						QuestSystem->VisitedNodeIDs.RemoveAt(i);
+						i--;//ensure the next element not skipped
 					}
-					else if (QuestSystem->VisitedNodeIDs[i] == NodeID)
+				}
+
+				//reset task data from the founded node
+				TArray<UQuestSystemGraphNode*> NodeStack;
+				NodeStack.Add(FoundedNode);
+				while (NodeStack.Num() > 0)
+				{
+					UQuestSystemGraphNode* CurrentNodeStack = NodeStack.Pop();
+					if (UQuestSystemGraphNode_Objective* ObjectiveNode = Cast<UQuestSystemGraphNode_Objective>(CurrentNodeStack))
 					{
-						QuestSystem->VisitedNodeIDs.RemoveAt(i);
-						bCanDelete = true;
+						for (UQuestTask* Task : ObjectiveNode->Tasks)
+						{
+							Task->TaskState = ETaskState::E_Active;
+							Task->CurrentAmount = 0;
+						}
+					}
+					// Traverse child node
+					for (int i = 0; i < CurrentNodeStack->ChildrenNodes.Num(); i++)
+					{
+						NodeStack.Add(CurrentNodeStack->ChildrenNodes[i]);
 					}
 				}
 
 				QuestSystem->CurrentNode = FoundedNode;
 			}
-			else
-			{
-				QuestSystem->CurrentNode = QuestSystem->RootNodes[0];
-			}
 		}
-		else
+		
+
+		if(!bNodeFound)
 		{
+			//reset all task data
+			for (UQuestSystemGraphNode* Node : QuestSystem->AllNodes)
+			{
+				if (UQuestSystemGraphNode_Objective* ObjectiveNode = Cast<UQuestSystemGraphNode_Objective>(Node))
+				{
+					for (UQuestTask* Task : ObjectiveNode->Tasks)
+					{
+						Task->TaskState = ETaskState::E_Active;
+						Task->CurrentAmount = 0;
+					}
+				}
+			}
+			QuestSystem->VisitedNodeIDs.Empty();
 			QuestSystem->CurrentNode = QuestSystem->RootNodes[0];
 		}
 		
 
-		QuestSystem->VisitedNodeIDs.Empty();
 		BeginNode(QuestSystem);
 	}
 }
