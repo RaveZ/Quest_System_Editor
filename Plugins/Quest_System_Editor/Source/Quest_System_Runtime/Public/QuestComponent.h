@@ -13,8 +13,11 @@ class USaveGame;
 /** This Delegate will be called if a quest objective has been completed*/
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FQuestObjectiveUpdated, UQuestSystem*, UpdatedQuest);
 
-/** This Delegate will be called if a quest is unlocked or has failed. Used for notification widget*/
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FQuestStateUpdated, UQuestSystem*, UpdatedQuest);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FQuestFailed, UQuestSystem*, Quest);
+
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FQuestCompleted, UQuestSystem*, Quest);
+
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FQuestAdded, UQuestSystem*, Quest);
 
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent), Blueprintable, HideDropdown, ClassGroup = "Quest")
 class QUEST_SYSTEM_RUNTIME_API UQuestComponent : public UActorComponent
@@ -42,6 +45,9 @@ public:
 	UPROPERTY(BlueprintReadWrite, Category = "QuestComponent")
 		TMap<FName, UQuestSystem*> QuestSystemMap;
 
+	UPROPERTY(BlueprintReadOnly, Category = "QuestComponent")
+		bool bQuestLoaded = false;
+
 	UFUNCTION(BlueprintCallable, Category = "QuestComponent")
 		bool RunQuest(UQuestSystemGraph* QuestAsset);
 
@@ -55,13 +61,22 @@ public:
 		FQuestObjectiveUpdated OnQuestObjectiveUpdated;
 
 	UPROPERTY(BlueprintAssignable, BlueprintCallable, Category = "QuestComponent")
-		FQuestStateUpdated OnQuestStateUpdated;
+		FQuestFailed OnQuestFailed;
+
+	UPROPERTY(BlueprintAssignable, BlueprintCallable, Category = "QuestComponent")
+		FQuestCompleted OnQuestCompleted;
+
+	UPROPERTY(BlueprintAssignable, BlueprintCallable, Category = "QuestComponent")
+		FQuestAdded OnQuestAdded;
 
 	UFUNCTION(BlueprintCallable, Category = "QuestComponent")
 		void UpdateQuest();
 
 	UFUNCTION(BlueprintCallable, Category = "QuestComponent")
 		void EvaluateNextNodeCondition(UQuestSystem* QuestParam);
+
+	UFUNCTION(BlueprintCallable, Category = "QuestComponent")
+		void EvaluateQuestCondition(UQuestSystem* QuestParam);
 
 	UFUNCTION(BlueprintCallable, Category = "QuestComponent")
 		void GoToNextNode(UQuestSystem* QuestParam, UQuestSystemGraphNode* NodeParam);
@@ -71,18 +86,14 @@ public:
 
 
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
-		void Save(const FString& SaveFileName, int SlotIndex) const;
+		void Save(const FString& SaveFileName, int SlotIndex);
 
-	virtual void Save_Implementation(const FString& SaveFileName, int SlotIndex) const;
+	virtual void Save_Implementation(const FString& SaveFileName, int SlotIndex);
 	
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
-		void Load(const FString& SaveFileName, int SlotIndex) const;
+		void Load(const FString& SaveFileName, int SlotIndex);
 
-	virtual void Load_Implementation(const FString& SaveFileName, int SlotIndex) const;
-
-	
-
-	void LoadGameDelegateFunction(const FString& SlotName, const int32 UserIndex, USaveGame* LoadedGameData) const;
+	virtual void Load_Implementation(const FString& SaveFileName, int SlotIndex);
 
 protected:
 	// Called when the game starts

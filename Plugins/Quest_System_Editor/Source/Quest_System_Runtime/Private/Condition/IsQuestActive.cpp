@@ -13,12 +13,6 @@ bool UIsQuestActive::IsConditionMet_Implementation() const
         {
             case EQuestState::E_Active :
                 return true;
-            case EQuestState::E_Complete:
-                return false;
-            case EQuestState::E_Fail:
-                return false;
-            case EQuestState::E_Inactive:
-                return false;
             default:
                 return false;
         }

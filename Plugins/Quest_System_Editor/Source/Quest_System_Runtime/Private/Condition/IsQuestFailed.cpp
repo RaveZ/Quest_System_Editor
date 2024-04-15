@@ -11,14 +11,8 @@ bool UIsQuestFailed::IsConditionMet_Implementation() const
     {
         switch (FoundedQuest->QuestState)
         {
-        case EQuestState::E_Active:
-            return false;
-        case EQuestState::E_Complete:
-            return false;
         case EQuestState::E_Fail:
             return true;
-        case EQuestState::E_Inactive:
-            return false;
         default:
             return false;
         }

@@ -9,9 +9,15 @@
 void UQuestSystemGraphNode_State::BeginState()
 {
     QuestSystem->QuestState = QuestState;
-    QuestSystem->CurrentNode = nullptr;
     GetQuestComponent()->UpdateQuest();
-    GetQuestComponent()->OnQuestStateUpdated.Broadcast(QuestSystem);
+
+    switch (QuestState)
+    {
+        case EQuestState::E_Complete:
+            GetQuestComponent()->OnQuestCompleted.Broadcast(QuestSystem);
+        case EQuestState::E_Fail:
+            GetQuestComponent()->OnQuestFailed.Broadcast(QuestSystem);
+    }
 }
 
 #if WITH_EDITOR

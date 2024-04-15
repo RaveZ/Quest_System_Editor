@@ -34,6 +34,15 @@ void UEdGraph_QuestSystemGraph::RebuildQuestSystemGraph()
 		Graph->CategoryDisplayName = Graph->GetFName().ToString();
 	}
 
+	for (UQuestCondition* QuestCondition : QuestSystem->Conditions)
+	{
+		if (QuestCondition != nullptr)
+		{
+			QuestCondition->QuestGraph = Graph;
+			QuestCondition->QuestSystem = QuestSystem;
+		}
+	}
+
 	for (int i = 0; i < Nodes.Num(); ++i)
 	{
 		if (UEdNode_QuestSystemNode* EdNode = Cast<UEdNode_QuestSystemNode>(Nodes[i]))

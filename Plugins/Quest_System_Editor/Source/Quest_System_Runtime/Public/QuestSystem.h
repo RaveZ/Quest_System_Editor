@@ -7,6 +7,7 @@
 #include "UObject/NoExportTypes.h"
 #include "QuestSystem.generated.h"
 
+class UQuestCondition;
 class UQuestSystemGraphNode;
 class UQuestSystemGraphEdge;
 class UQuestSystemGraphNode_Root;
@@ -17,7 +18,8 @@ enum class EQuestState : uint8
 	E_Active		UMETA(DisplayName = "ACTIVE"),
 	E_Complete		UMETA(DisplayName = "COMPLETE"),
 	E_Fail			UMETA(DisplayName = "FAIL"),
-	E_Inactive		UMETA(DisplayName = "INACTIVE"),
+	E_Locked		UMETA(DisplayName = "LOCKED"),
+	E_Unlocked		UMETA(DisplayName = "UNLOCKED"),
 };
 
 UCLASS(Blueprintable)
@@ -34,7 +36,19 @@ public:
 		FName QuestID;
 
 	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "QuestSystem")
-		FText Description;
+		FText Description; 
+
+
+	/**
+	* TRUE : After the conditions met, activate this quest. if there are no conditions, activate this quest immediately
+	* FALSE : After the conditions met, unlock this quest.
+	*/
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Conditions")
+		bool bAutoActivateQuest;
+
+	/**Conditions to unlock the Quest*/
+	UPROPERTY(Instanced, EditAnywhere, BlueprintReadOnly, Category = "Conditions")
+		TArray<UQuestCondition*> Conditions;
 
 	/** List of All Visited Node IDs in Sequence*/
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "QuestSystem")

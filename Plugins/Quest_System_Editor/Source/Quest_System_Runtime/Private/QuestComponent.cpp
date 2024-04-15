@@ -51,22 +51,24 @@ bool UQuestComponent::RunQuest(UQuestSystemGraph* QuestGraph)
 	for (UQuestSystem* QuestSystem : QuestGraph->QuestSystems)
 	{
 		QuestSystemMap.Emplace(QuestSystem->QuestID, QuestSystem);
+		if (!bQuestLoaded)
+		{
+			QuestSystem->QuestState = EQuestState::E_Locked;
+			QuestSystem->CurrentNode = nullptr;
+			QuestSystem->VisitedNodeIDs.Empty();
+		}
 	}
 
 	//Add QuestGraph to array
 	QuestGraphs.Add(QuestGraph);
 
-	//Begin the Quest
+	//CheckQuestCondition
 	for (UQuestSystem* QuestSystem : QuestGraph->QuestSystems)
 	{
-		for (UQuestSystemGraphNode* Node : QuestSystem->RootNodes)
-		{
-			if (QuestSystem->QuestState == EQuestState::E_Active)
-			{
-				RestartQuest(QuestSystem->QuestID);
-			}
-		}
+		EvaluateQuestCondition(QuestSystem);
 	}
+
+	
 
 	return bSuccess;
 }
@@ -79,8 +81,6 @@ void UQuestComponent::RestartQuest(FName QuestID, FName NodeID, bool bStartFromN
 	if (UQuestSystem* QuestSystem = QuestSystemMap.FindRef(QuestID))
 	{
 		QuestSystem->QuestState = EQuestState::E_Active;
-
-		
 
 
 		bool bNodeFound = false;
@@ -160,7 +160,7 @@ void UQuestComponent::FailQuest(FName QuestID)
 		if (QuestSystem->QuestState != EQuestState::E_Fail)
 		{
 			QuestSystem->QuestState = EQuestState::E_Fail;
-			OnQuestStateUpdated.Broadcast(QuestSystem);
+			OnQuestFailed.Broadcast(QuestSystem);
 		}
 		QuestSystem->CurrentNode = nullptr;
 
@@ -173,7 +173,8 @@ void UQuestComponent::UpdateQuest()
 	{
 		FName Key = It.Key;
 		UQuestSystem* QuestSystem = It.Value;
-
+		
+		EvaluateQuestCondition(QuestSystem);
 		if (UQuestSystemGraphNode_Objective* ObjectiveNode = Cast<UQuestSystemGraphNode_Objective>(QuestSystem->CurrentNode))
 		{
 			if (ObjectiveNode->IsAllTaskCompleted())
@@ -183,9 +184,6 @@ void UQuestComponent::UpdateQuest()
 			}
 		}
 	}
-
-	
-	
 }
 
 void UQuestComponent::EvaluateNextNodeCondition(UQuestSystem* QuestParam)
@@ -229,6 +227,41 @@ void UQuestComponent::EvaluateNextNodeCondition(UQuestSystem* QuestParam)
 		//Go to next node if exist or condition met
 		GoToNextNode(QuestParam, NextNode);
 
+	}
+	
+}
+
+void UQuestComponent::EvaluateQuestCondition(UQuestSystem* QuestParam)
+{
+	if (QuestParam->QuestState == EQuestState::E_Locked)
+	{
+		int SumConditionMet = 0;
+		for (UQuestCondition* Condition : QuestParam->Conditions)
+		{
+			if (Condition && Condition->IsConditionMet())
+			{
+				SumConditionMet++;
+			}
+		}
+
+		if (SumConditionMet >= QuestParam->Conditions.Num())
+		{
+			if (QuestParam->bAutoActivateQuest)
+			{
+				QuestParam->QuestState = EQuestState::E_Active;
+				if (bQuestLoaded && QuestParam->CurrentNode != nullptr)
+				{
+					BeginNode(QuestParam);
+				}
+				else
+				{
+					RestartQuest(QuestParam->QuestID);
+				}
+				OnQuestAdded.Broadcast(QuestParam);
+				return;
+			}
+			QuestParam->QuestState = EQuestState::E_Unlocked;
+		}
 	}
 	
 }
@@ -278,7 +311,7 @@ void UQuestComponent::BeginNode(UQuestSystem* QuestParam)
 
 
 
-void UQuestComponent::Save_Implementation(const FString& SaveFileName, int SlotIndex) const
+void UQuestComponent::Save_Implementation(const FString& SaveFileName, int SlotIndex)
 {
 	//Create New Save
 	if (UQuestSaveObject* QuestSaveObject = Cast<UQuestSaveObject>(UGameplayStatics::CreateSaveGameObject(UQuestSaveObject::StaticClass())))
@@ -316,31 +349,33 @@ void UQuestComponent::Save_Implementation(const FString& SaveFileName, int SlotI
 			
 		}
 
-		UGameplayStatics::AsyncSaveGameToSlot(QuestSaveObject, SaveFileName, SlotIndex);
+		UGameplayStatics::SaveGameToSlot(QuestSaveObject, SaveFileName, SlotIndex);
 	}
 	
 
 
 }
 
-void UQuestComponent::Load_Implementation(const FString& SaveFileName, int SlotIndex) const
+void UQuestComponent::Load_Implementation(const FString& SaveFileName, int SlotIndex) 
 {
-	FAsyncLoadGameFromSlotDelegate LoadedDelegate;
-	// USomeUObjectClass::LoadGameDelegateFunction is a void function that takes the following parameters: const FString& SlotName, const int32 UserIndex, USaveGame* LoadedGameData
-	LoadedDelegate.BindUObject(this, &UQuestComponent::LoadGameDelegateFunction);
-	UGameplayStatics::AsyncLoadGameFromSlot(SaveFileName, SlotIndex, LoadedDelegate);
-}
-
-void UQuestComponent::LoadGameDelegateFunction(const FString& SlotName, const int32 UserIndex, USaveGame* LoadedGameData) const
-{
-	if (UQuestSaveObject* LoadedData = Cast<UQuestSaveObject>(LoadedGameData))
+	TMap<FName, UQuestSystem*> QuestMap;
+	for (TObjectIterator<UQuestSystemGraph> It; It; ++It)
 	{
+		for (UQuestSystem* Quest : It->QuestSystems)
+		{
+			QuestMap.Add(Quest->QuestID, Quest);
+		}
+	}
+
+	if (UQuestSaveObject* LoadedData = Cast<UQuestSaveObject>(UGameplayStatics::LoadGameFromSlot(SaveFileName, SlotIndex)))
+	{
+		bQuestLoaded = true;
 		for (const auto& QuestIt : LoadedData->QuestMapData)
 		{
 			FName QuestID = QuestIt.Key;
 			FQuestData QuestData = QuestIt.Value;
 
-			UQuestSystem* FoundedQuest = QuestSystemMap.FindRef(QuestID);
+			UQuestSystem* FoundedQuest = QuestMap.FindRef(QuestID);
 			if (FoundedQuest != nullptr)
 			{
 				//Fill Quest Data Here
@@ -352,20 +387,16 @@ void UQuestComponent::LoadGameDelegateFunction(const FString& SlotName, const in
 				{
 					FName NodeID = NodeIt.Key;
 					FNodeData NodeData = NodeIt.Value;
-					
+
 					UQuestSystemGraphNode* FoundedNode = FoundedQuest->NodeMap.FindRef(NodeID);
 					if (FoundedNode != nullptr)
 					{
 						//Fill Node Data Here
 						if (UQuestSystemGraphNode_Objective* ObjectiveNode = Cast<UQuestSystemGraphNode_Objective>(FoundedNode))
 						{
-							for (int i = 0; i< ObjectiveNode->Tasks.Num(); i++)
+							for (int i = 0; i < ObjectiveNode->Tasks.Num(); i++)
 							{
-								if (i >= NodeData.TaskDatas.Num() - 1)
-								{
-									break;
-								}
-								else
+								if (ObjectiveNode->Tasks[i] != nullptr)
 								{
 									//fill task data here
 									ObjectiveNode->Tasks[i]->CurrentAmount = NodeData.TaskDatas[i].CurrentAmount;

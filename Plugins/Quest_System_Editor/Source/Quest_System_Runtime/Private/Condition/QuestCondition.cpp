@@ -53,9 +53,9 @@ UQuestSystem* UQuestCondition::GetOwningQuestSystem() const
 TArray<FName> UQuestCondition::GetAllQuestID()
 {
 	TArray<FName> QuestIDs;
-	for (TObjectIterator<UQuestSystem> It; It; ++It)
+	for (TObjectIterator<UQuestSystemGraph> It; It; ++It)
 	{
-		if (UQuestSystem* Quest = Cast<UQuestSystem>(*It))
+		for (UQuestSystem* Quest : It->QuestSystems)
 		{
 			QuestIDs.Add(Quest->QuestID);
 		}
