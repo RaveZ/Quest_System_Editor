@@ -4,20 +4,35 @@
 #include "QuestSystemGraphNode_State.h"
 #include "QuestComponent.h"
 #include "QuestSystem.h"
+#include "Event/QuestEvent.h"
 
 
 void UQuestSystemGraphNode_State::BeginState()
 {
     QuestSystem->QuestState = QuestState;
-    GetQuestComponent()->UpdateQuest();
+
+    //End of a Node, Launch Event with the End and Both Type
+    for (UQuestEvent* Event : QuestSystem->CurrentNode->Events)
+    {
+        if (Event->EventRunType == EEventRunType::E_Both || Event->EventRunType == EEventRunType::E_End)
+        {
+            Event->BeginEvent();
+        }
+    }
 
     switch (QuestState)
     {
-        case EQuestState::E_Complete:
-            GetQuestComponent()->OnQuestCompleted.Broadcast(QuestSystem);
-        case EQuestState::E_Fail:
-            GetQuestComponent()->OnQuestFailed.Broadcast(QuestSystem);
+    case EQuestState::E_Complete:
+        GetQuestComponent()->OnQuestCompleted.Broadcast(QuestSystem);
+        break;
+    case EQuestState::E_Fail:
+        GetQuestComponent()->OnQuestFailed.Broadcast(QuestSystem);
+        break;
     }
+
+    GetQuestComponent()->UpdateQuest();
+
+    
 }
 
 #if WITH_EDITOR

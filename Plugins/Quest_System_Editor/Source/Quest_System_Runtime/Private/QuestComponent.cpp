@@ -66,6 +66,14 @@ bool UQuestComponent::RunQuest(UQuestSystemGraph* QuestGraph)
 	for (UQuestSystem* QuestSystem : QuestGraph->QuestSystems)
 	{
 		EvaluateQuestCondition(QuestSystem);
+		if (QuestSystem->CurrentNode != nullptr)
+		{
+			BeginNode(QuestSystem);
+		}
+		else if (QuestSystem->QuestState == EQuestState::E_Active && QuestSystem->CurrentNode == nullptr)
+		{
+			RestartQuest(QuestSystem->QuestID);
+		}
 	}
 
 	
@@ -84,6 +92,9 @@ void UQuestComponent::RestartQuest(FName QuestID, FName NodeID, bool bStartFromN
 
 
 		bool bNodeFound = false;
+		if (NodeID.IsNone())
+			bStartFromNodeID = false;
+
 		if (bStartFromNodeID)
 		{	
 			if (UQuestSystemGraphNode* FoundedNode = QuestSystem->NodeMap.FindRef(NodeID))
@@ -175,14 +186,22 @@ void UQuestComponent::UpdateQuest()
 		UQuestSystem* QuestSystem = It.Value;
 		
 		EvaluateQuestCondition(QuestSystem);
-		if (UQuestSystemGraphNode_Objective* ObjectiveNode = Cast<UQuestSystemGraphNode_Objective>(QuestSystem->CurrentNode))
+		if (QuestSystem->CurrentNode != nullptr)
 		{
-			if (ObjectiveNode->IsAllTaskCompleted())
+			if (UQuestSystemGraphNode_Objective* ObjectiveNode = Cast<UQuestSystemGraphNode_Objective>(QuestSystem->CurrentNode))
 			{
-				//evaluate next node condition
-				EvaluateNextNodeCondition(QuestSystem);
+				if (ObjectiveNode->IsAllTaskCompleted())
+				{
+					//evaluate next node condition
+					EvaluateNextNodeCondition(QuestSystem);
+				}
 			}
 		}
+		else if (QuestSystem->QuestState == EQuestState::E_Active && QuestSystem->CurrentNode == nullptr)
+		{
+			RestartQuest(QuestSystem->QuestID);
+		}
+		
 	}
 }
 
@@ -233,36 +252,30 @@ void UQuestComponent::EvaluateNextNodeCondition(UQuestSystem* QuestParam)
 
 void UQuestComponent::EvaluateQuestCondition(UQuestSystem* QuestParam)
 {
-	if (QuestParam->QuestState == EQuestState::E_Locked)
+	int SumConditionMet = 0;
+	switch(QuestParam->QuestState)
 	{
-		int SumConditionMet = 0;
-		for (UQuestCondition* Condition : QuestParam->Conditions)
-		{
-			if (Condition && Condition->IsConditionMet())
+		case EQuestState::E_Locked:
+			for (UQuestCondition* Condition : QuestParam->Conditions)
 			{
-				SumConditionMet++;
+				if (Condition && Condition->IsConditionMet())
+				{
+					SumConditionMet++;
+				}
 			}
-		}
 
-		if (SumConditionMet >= QuestParam->Conditions.Num())
-		{
-			if (QuestParam->bAutoActivateQuest)
+			if (SumConditionMet >= QuestParam->Conditions.Num())
 			{
-				QuestParam->QuestState = EQuestState::E_Active;
-				if (bQuestLoaded && QuestParam->CurrentNode != nullptr)
+				if (QuestParam->bAutoActivateQuest)
 				{
-					BeginNode(QuestParam);
+					QuestParam->QuestState = EQuestState::E_Active;
+					OnQuestAdded.Broadcast(QuestParam);
+					return;
 				}
-				else
-				{
-					RestartQuest(QuestParam->QuestID);
-				}
-				OnQuestAdded.Broadcast(QuestParam);
-				return;
+				QuestParam->QuestState = EQuestState::E_Unlocked;
 			}
-			QuestParam->QuestState = EQuestState::E_Unlocked;
-		}
 	}
+	
 	
 }
 
@@ -341,7 +354,10 @@ void UQuestComponent::Save_Implementation(const FString& SaveFileName, int SlotI
 					NodeMapData.Emplace(Node->ID, NodeData);
 				}
 				FQuestData QuestData;
-				QuestData.CurrentNodeID = QuestSystem->CurrentNode->ID;
+				if (QuestSystem->CurrentNode)
+				{
+					QuestData.CurrentNodeID = QuestSystem->CurrentNode->ID;
+				}
 				QuestData.QuestState = QuestSystem->QuestState;
 				QuestData.NodeMapData = NodeMapData;
 				QuestData.VisitedNodeIDs = QuestSystem->VisitedNodeIDs;

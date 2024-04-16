@@ -13,8 +13,11 @@ class UQuestSystem;
 UENUM(BlueprintType)
 enum class EEventRunType : uint8
 {
+	/** will trigger at the beggining of the node */
 	E_Start			UMETA(DisplayName = "START"),
+	/** will trigger if next node conditions met || at the end of state node */
 	E_End			UMETA(DisplayName = "END"),
+	/** will trigger twice at start and end of node */
 	E_Both			UMETA(DisplayName = "BOTH"),
 };
 
