@@ -15,7 +15,7 @@ bool UQuestTask::CompleteTask()
     TaskState = ETaskState::E_Complete;
     OnTaskCompleted();
 	GetQuestComponent()->UpdateQuest();
-    GetQuestComponent()->OnQuestObjectiveUpdated.Broadcast(QuestSystem);
+    GetQuestComponent()->OnQuestObjectiveUpdated.Broadcast();
     
 	return true;
 }

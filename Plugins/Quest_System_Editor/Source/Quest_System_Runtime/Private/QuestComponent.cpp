@@ -25,7 +25,7 @@ UQuestComponent::UQuestComponent()
 	// ...
 }
 
-bool UQuestComponent::RunQuest(UQuestSystemGraph* QuestGraph)
+bool UQuestComponent::RunQuestGraph(UQuestSystemGraph* QuestGraph)
 {
 	if (QuestGraph == NULL)
 	{
@@ -77,8 +77,23 @@ bool UQuestComponent::RunQuest(UQuestSystemGraph* QuestGraph)
 	}
 
 	
-
+	OnQuestObjectiveUpdated.Broadcast();
 	return bSuccess;
+}
+
+void UQuestComponent::ActivateQuest(FName QuestID)
+{
+	if (UQuestSystem* QuestSystem = QuestSystemMap.FindRef(QuestID))
+	{
+		if (QuestSystem->QuestState != EQuestState::E_Active)
+		{
+			QuestSystem->QuestState = EQuestState::E_Active;
+			OnQuestAdded.Broadcast(QuestSystem);
+			RestartQuest(QuestSystem->QuestID);
+		}
+		QuestSystem->CurrentNode = nullptr;
+
+	}
 }
 
 
@@ -253,17 +268,17 @@ void UQuestComponent::EvaluateNextNodeCondition(UQuestSystem* QuestParam)
 void UQuestComponent::EvaluateQuestCondition(UQuestSystem* QuestParam)
 {
 	int SumConditionMet = 0;
+	for (UQuestCondition* Condition : QuestParam->Conditions)
+	{
+		if (Condition && Condition->IsConditionMet())
+		{
+			SumConditionMet++;
+		}
+	}
+
 	switch(QuestParam->QuestState)
 	{
 		case EQuestState::E_Locked:
-			for (UQuestCondition* Condition : QuestParam->Conditions)
-			{
-				if (Condition && Condition->IsConditionMet())
-				{
-					SumConditionMet++;
-				}
-			}
-
 			if (SumConditionMet >= QuestParam->Conditions.Num())
 			{
 				if (QuestParam->bAutoActivateQuest)
@@ -274,6 +289,17 @@ void UQuestComponent::EvaluateQuestCondition(UQuestSystem* QuestParam)
 				}
 				QuestParam->QuestState = EQuestState::E_Unlocked;
 			}
+		case EQuestState::E_Unlocked:
+			if (SumConditionMet >= QuestParam->Conditions.Num())
+			{
+				if (QuestParam->bAutoActivateQuest)
+				{
+					QuestParam->QuestState = EQuestState::E_Active;
+					OnQuestAdded.Broadcast(QuestParam);
+					return;
+				}
+			}
+
 	}
 	
 	

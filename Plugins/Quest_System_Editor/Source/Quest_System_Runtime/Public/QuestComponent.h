@@ -11,7 +11,7 @@ class USaveGame;
 
 //Delegate
 /** This Delegate will be called if a quest objective has been completed*/
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FQuestObjectiveUpdated, UQuestSystem*, UpdatedQuest);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FQuestObjectiveUpdated);
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FQuestFailed, UQuestSystem*, Quest);
 
@@ -49,7 +49,10 @@ public:
 		bool bQuestLoaded = false;
 
 	UFUNCTION(BlueprintCallable, Category = "QuestComponent")
-		bool RunQuest(UQuestSystemGraph* QuestAsset);
+		bool RunQuestGraph(UQuestSystemGraph* QuestAsset);
+
+	UFUNCTION(BlueprintCallable, Category = "QuestComponent")
+		void ActivateQuest(FName QuestID);
 
 	UFUNCTION(BlueprintCallable, Category = "QuestComponent")
 		void RestartQuest(FName QuestID, FName NodeID = NAME_None, bool bStartFromNodeID = false);

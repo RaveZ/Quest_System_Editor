@@ -15,10 +15,15 @@ class UQuestSystemGraphNode_Root;
 UENUM(BlueprintType)
 enum class EQuestState : uint8
 {
+	/**Quest is Active*/
 	E_Active		UMETA(DisplayName = "ACTIVE"),
+	/**Quest is Completed*/
 	E_Complete		UMETA(DisplayName = "COMPLETE"),
+	/**Quest is Fail*/
 	E_Fail			UMETA(DisplayName = "FAIL"),
+	/**Quest is Locked, Waiting to be Unlocked*/
 	E_Locked		UMETA(DisplayName = "LOCKED"),
+	/**Quest is Unlocked, Waiting to be Activated*/
 	E_Unlocked		UMETA(DisplayName = "UNLOCKED"),
 };
 
@@ -55,7 +60,7 @@ public:
 		TArray<FName> VisitedNodeIDs;
 	
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "QuestSystem")
-		EQuestState QuestState = EQuestState::E_Active;
+		EQuestState QuestState = EQuestState::E_Locked;
 	
 	UPROPERTY(BlueprintReadWrite, Category = "QuestSystem")
 		UQuestSystemGraphNode* CurrentNode;
