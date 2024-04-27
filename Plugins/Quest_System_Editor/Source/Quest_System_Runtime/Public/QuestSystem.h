@@ -44,12 +44,14 @@ public:
 		FText Description; 
 
 
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Conditions")
+		bool bCanQuestBeAborted = false;
 	/**
 	* TRUE : After the conditions met, activate this quest. if there are no conditions, activate this quest immediately
 	* FALSE : After the conditions met, unlock this quest.
 	*/
 	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Conditions")
-		bool bAutoActivateQuest;
+		bool bAutoActivateQuest = false;
 
 	/**Conditions to unlock the Quest*/
 	UPROPERTY(Instanced, EditAnywhere, BlueprintReadOnly, Category = "Conditions")
