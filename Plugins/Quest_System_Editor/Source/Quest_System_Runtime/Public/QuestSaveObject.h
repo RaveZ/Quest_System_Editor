@@ -15,10 +15,10 @@ struct FTaskData
 	GENERATED_BODY()
 public:
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, meta = (DisplayName = "CurrentAmount", MakeStructureDefaultValue = "0"))
-	int CurrentAmount;
+	int CurrentAmount = 0;
 
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
-	ETaskState TaskState;
+	ETaskState TaskState = ETaskState::E_Active;
 };
 
 /** Node Data To Be Saved */
@@ -44,7 +44,7 @@ public:
 		FName CurrentNodeID;
 
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, meta = (DisplayName = "QuestState"))
-		EQuestState QuestState;
+		EQuestState QuestState = EQuestState::E_Locked;
 	
 	/** Map of Node ID and it's Node Data Struct */
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, meta = (DisplayName = "NodeMapData"))

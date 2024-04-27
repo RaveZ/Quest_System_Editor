@@ -45,7 +45,7 @@ public:
 		ETaskState TaskState = ETaskState::E_Active;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "QuestTask")
-		int CurrentAmount;
+		int CurrentAmount = 0;
 
 	UPROPERTY(BlueprintReadWrite, Category = "QuestTask")
 		float DistanceToTarget;
