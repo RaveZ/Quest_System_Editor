@@ -2,6 +2,7 @@
 
 
 #include "Condition/QuestCondition.h"
+#include "UObject/UObjectIterator.h"
 #include "QuestComponent.h"
 #include "QuestSystem.h"
 #include "QuestSystemGraph.h"

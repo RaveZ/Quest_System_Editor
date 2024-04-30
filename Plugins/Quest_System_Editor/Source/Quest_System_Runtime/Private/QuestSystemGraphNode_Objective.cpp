@@ -14,7 +14,7 @@ bool UQuestSystemGraphNode_Objective::IsAllTaskCompleted()
     int progress = 0;
     for (UQuestTask* NodeTask : Tasks)
     {
-        if (NodeTask->TaskState == ETaskState::E_Complete)
+        if (NodeTask && NodeTask->TaskState == ETaskState::E_Complete)
         {
             progress++;
         }

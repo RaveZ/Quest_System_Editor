@@ -14,7 +14,7 @@ class QUEST_SYSTEM_RUNTIME_API UQuestSystemGraphNode_State : public UQuestSystem
 	GENERATED_BODY()
 public:
 
-    UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "State")
+    UPROPERTY(BlueprintReadWrite, Category = "State")
         EQuestState QuestState;
 
     UFUNCTION(BlueprintCallable, Category = "State")

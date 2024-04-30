@@ -9,6 +9,8 @@
 #include "AssetGraphSchema_QuestSystem.h"
 #include "EdGraph_QuestSystemGraph.h"
 #include "QuestSystemGraph.h"
+#include "Condition/QuestCondition.h"
+#include "Event/QuestEvent.h"
 
 
 #define LOCTEXT_NAMESPACE "QuestPaletteItem"
@@ -200,13 +202,35 @@ void SQuestPaletteItem::OnNameTextCommitted(const FText& NewText, ETextCommit::T
 
 	const FString NewNameString = NewText.ToString();
 	const FName NewName = *NewNameString;
+	FName OriginalName;
 
 	FAssetSchemaAction_QuestSystemGraph* QuestGraphAction = (FAssetSchemaAction_QuestSystemGraph*)ActionPtr.Pin().Get();
 	if (UEdGraph_QuestSystemGraph* QuestEdGraph = Cast<UEdGraph_QuestSystemGraph>(QuestGraphAction->EdGraph))
 	{
+		OriginalName = QuestEdGraph->QuestSystem->QuestID;
 		QuestEdGraph->QuestSystem->QuestID = NewName;
 		QuestEdGraph->Rename(*(NewName.ToString()), QuestSystemGraph, REN_DoNotDirty | REN_ForceNoResetLoaders);
+		for (TObjectIterator<UQuestCondition> It; It; ++It)
+		{
+			if (UQuestCondition* QuestCondition = Cast<UQuestCondition>(*It))
+			{
+				if (QuestCondition->QuestID == OriginalName)
+				{
+					QuestCondition->QuestID = NewName;
+				}
+			}
+		}
 
+		for (TObjectIterator<UQuestEvent> It; It; ++It)
+		{
+			if (UQuestEvent* QuestEvent = Cast<UQuestEvent>(*It))
+			{
+				if (QuestEvent->QuestID == OriginalName)
+				{
+					QuestEvent->QuestID = NewName;
+				}
+			}
+		}
 	}
 	QuestEditorPtr.Pin()->GetMyQuestWidget()->Refresh();
 

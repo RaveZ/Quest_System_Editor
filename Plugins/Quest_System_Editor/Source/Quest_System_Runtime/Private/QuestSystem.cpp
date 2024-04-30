@@ -12,42 +12,6 @@
 #define LOCTEXT_NAMESPACE "QuestSystem"
 
 
-void UQuestSystem::Print(bool ToConsole, bool ToScreen)
-{
-	int Level = 0;
-	TArray<UQuestSystemGraphNode*> CurrLevelNodes = RootNodes;
-	TArray<UQuestSystemGraphNode*> NextLevelNodes;
-
-	while (CurrLevelNodes.Num() != 0)
-	{
-		for (int i = 0; i < CurrLevelNodes.Num(); ++i)
-		{
-			UQuestSystemGraphNode* Node = CurrLevelNodes[i];
-			check(Node != nullptr);
-
-			FString Message = FString::Printf(TEXT("%s, Level %d"), *Node->GetDescription().ToString(), Level);
-
-			if (ToConsole)
-			{
-				//LOG_INFO(TEXT("%s"), *Message);
-			}
-
-			if (ToScreen && GEngine != nullptr)
-			{
-				GEngine->AddOnScreenDebugMessage(-1, 15.f, FColor::Blue, Message);
-			}
-
-			for (int j = 0; j < Node->ChildrenNodes.Num(); ++j)
-			{
-				NextLevelNodes.Add(Node->ChildrenNodes[j]);
-			}
-		}
-
-		CurrLevelNodes = NextLevelNodes;
-		NextLevelNodes.Reset();
-		++Level;
-	}
-}
 
 int UQuestSystem::GetLevelNum() const
 {

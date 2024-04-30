@@ -5,6 +5,11 @@
 #include "QuestComponent.h"
 #include "QuestSystem.h"
 
+UIsQuestCompleted::UIsQuestCompleted()
+{
+    bUseQuestID = true;
+}
+
 bool UIsQuestCompleted::IsConditionMet_Implementation() const
 {
     if (UQuestSystem* FoundedQuest = GetQuestComponent()->QuestSystemMap.FindRef(QuestID))

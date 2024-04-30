@@ -15,8 +15,7 @@ class QUEST_SYSTEM_RUNTIME_API UIsQuestActive : public UQuestCondition
 	GENERATED_BODY()
 
 public:
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "QuestCondition", meta = (GetOptions = "GetAllQuestID"))
-		FName QuestID;
+	UIsQuestActive();
 
 	virtual bool IsConditionMet_Implementation() const override;
 };

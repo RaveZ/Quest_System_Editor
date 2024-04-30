@@ -6,12 +6,14 @@
 #include "Condition/QuestCondition.h"
 #include "Event/QuestEvent.h"
 #include "Task/QuestTask.h"
+#include "UObject/UObjectIterator.h"
 #include "QuestSaveObject.h"
 #include "QuestSystemGraph.h"
 #include "QuestSystemGraphNode_State.h"
 #include "QuestSystemGraphNode_Root.h"
 #include "QuestSystemGraphNode_Objective.h"
 #include "Kismet/GameplayStatics.h"
+
 
 
 
@@ -47,6 +49,7 @@ bool UQuestComponent::RunQuestGraph(UQuestSystemGraph* QuestGraph)
 
 	bool bSuccess = true;
 	
+
 	//Add All Quest To QuestSystemMap
 	for (UQuestSystem* QuestSystem : QuestGraph->QuestSystems)
 	{
@@ -140,8 +143,12 @@ void UQuestComponent::RestartQuest(FName QuestID, FName NodeID, bool bStartFromN
 					{
 						for (UQuestTask* Task : ObjectiveNode->Tasks)
 						{
-							Task->TaskState = ETaskState::E_Active;
-							Task->CurrentAmount = 0;
+							if (Task)
+							{
+								Task->TaskState = ETaskState::E_Active;
+								Task->CurrentAmount = 0;
+							}
+							
 						}
 					}
 					// Traverse child node
@@ -165,8 +172,12 @@ void UQuestComponent::RestartQuest(FName QuestID, FName NodeID, bool bStartFromN
 				{
 					for (UQuestTask* Task : ObjectiveNode->Tasks)
 					{
-						Task->TaskState = ETaskState::E_Active;
-						Task->CurrentAmount = 0;
+						if (Task)
+						{
+							Task->TaskState = ETaskState::E_Active;
+							Task->CurrentAmount = 0;
+						}
+						
 					}
 				}
 			}
@@ -336,7 +347,10 @@ void UQuestComponent::BeginNode(UQuestSystem* QuestParam)
 	{
 		for (UQuestTask* Task : ObjectiveNode->Tasks)
 		{
-			Task->TaskBegin();
+			if (Task)
+			{
+				Task->TaskBegin();
+			}
 
 		}
 	}

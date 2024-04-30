@@ -2,6 +2,7 @@
 
 
 #include "Event/QuestEvent.h"
+#include "UObject/UObjectIterator.h"
 #include "QuestComponent.h"
 #include "QuestSystem.h"
 #include "QuestSystemGraph.h"
@@ -67,4 +68,3 @@ TArray<FName> UQuestEvent::GetAllQuestID()
 
 	return QuestIDs;
 }
-

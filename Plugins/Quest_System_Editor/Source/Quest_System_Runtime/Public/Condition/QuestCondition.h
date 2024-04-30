@@ -17,6 +17,12 @@ public:
 		UQuestSystemGraph* QuestGraph;
 
 	UPROPERTY(BlueprintReadOnly, Category = "QuestCondition")
+		bool bUseQuestID = false;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "QuestCondition", meta = (GetOptions = "GetAllQuestID", EditCondition = "bUseQuestID == true", HideEditConditionToggle, EditConditionHides))
+		FName QuestID;
+	
+	UPROPERTY(BlueprintReadOnly, Category = "QuestCondition")
 		UQuestSystem* QuestSystem;
 
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "QuestCondition")

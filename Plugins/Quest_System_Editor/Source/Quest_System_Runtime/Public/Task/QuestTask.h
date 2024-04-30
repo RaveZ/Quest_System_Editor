@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "Tickable.h"
 #include "UObject/NoExportTypes.h"
 #include "QuestTask.generated.h"
 
@@ -28,7 +29,7 @@ class QUEST_SYSTEM_RUNTIME_API UQuestTask : public UObject, public FTickableGame
 
 public:
 
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Detail")
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Task")
 		FText Description;
 
 	UPROPERTY(BlueprintReadOnly, Category = "QuestTask")
@@ -41,10 +42,10 @@ public:
 	UPROPERTY(BlueprintReadOnly, Category = "QuestTask")
 		UQuestSystemGraphNode_Objective* ObjectiveNode;
 
-	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "QuestTask")
+	UPROPERTY(BlueprintReadWrite, Category = "QuestTask")
 		ETaskState TaskState = ETaskState::E_Active;
 
-	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "QuestTask")
+	UPROPERTY(BlueprintReadWrite, Category = "QuestTask")
 		int CurrentAmount = 0;
 
 	UPROPERTY(BlueprintReadWrite, Category = "QuestTask")
@@ -79,7 +80,6 @@ public:
 
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "QuestTask")
 		FText GetDescription() const;
-
 
 	virtual FText GetDescription_Implementation() const;
 

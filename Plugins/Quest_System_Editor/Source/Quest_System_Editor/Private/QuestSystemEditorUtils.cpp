@@ -2,6 +2,7 @@
 
 #include "QuestSystemEditorUtils.h"
 #include "QuestSystemGraphNode.h"
+#include "AssetRegistry/AssetRegistryModule.h"
 #include "QuestSystemGraph.h"
 
 
@@ -109,6 +110,7 @@ UEdGraph* FQuestSystemEditorUtils::CreateNewGraph(UObject* ParentScope, const FN
 		{
 			QuestSystemGraph->QuestSystems.Add(QuestGraph->QuestSystem);
 		}
+
 	}
 
 	

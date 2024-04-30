@@ -16,8 +16,5 @@ class QUEST_SYSTEM_RUNTIME_API UFailQuest : public UQuestEvent
 public:
 	UFailQuest();
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "QuestEvent", meta = (GetOptions = "GetAllQuestID"))
-		FName QuestID;
-
 	virtual void BeginEvent_Implementation() override;
 };

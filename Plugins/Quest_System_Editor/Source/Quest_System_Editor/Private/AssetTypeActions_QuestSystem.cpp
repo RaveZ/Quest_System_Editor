@@ -14,7 +14,7 @@ FAssetTypeActions_QuestSystem::FAssetTypeActions_QuestSystem(EAssetTypeCategorie
 
 FText FAssetTypeActions_QuestSystem::GetName() const
 {
-    return LOCTEXT("FQuestSystemAssetTypeActionsName", "QuestSystemGraph");
+    return LOCTEXT("FQuestSystemAssetTypeActionsName", "Quest Builder Editor");
 }
 
 FColor FAssetTypeActions_QuestSystem::GetTypeColor() const

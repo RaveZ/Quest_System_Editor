@@ -88,12 +88,12 @@ public:
 		void BeginNode(UQuestSystem* QuestParam);
 
 
-	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "QuestComponent")
 		void Save(const FString& SaveFileName, int SlotIndex);
 
 	virtual void Save_Implementation(const FString& SaveFileName, int SlotIndex);
 	
-	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "QuestComponent")
 		void Load(const FString& SaveFileName, int SlotIndex);
 
 	virtual void Load_Implementation(const FString& SaveFileName, int SlotIndex);

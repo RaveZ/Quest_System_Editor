@@ -9,6 +9,7 @@
 
 UFailQuest::UFailQuest()
 {
+	bUseQuestID = true;
 }
 
 void UFailQuest::BeginEvent_Implementation()

@@ -58,10 +58,10 @@ public:
 		TArray<UQuestCondition*> Conditions;
 
 	/** List of All Visited Node IDs in Sequence*/
-	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "QuestSystem")
+	UPROPERTY(BlueprintReadWrite, Category = "QuestSystem")
 		TArray<FName> VisitedNodeIDs;
 	
-	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "QuestSystem")
+	UPROPERTY(BlueprintReadWrite, Category = "QuestSystem")
 		EQuestState QuestState = EQuestState::E_Locked;
 	
 	UPROPERTY(BlueprintReadWrite, Category = "QuestSystem")
@@ -75,10 +75,6 @@ public:
 
 	UPROPERTY(BlueprintReadOnly, Category = "QuestSystem")
 		TMap<FName, UQuestSystemGraphNode*> NodeMap;
-
-
-	UFUNCTION(BlueprintCallable, Category = "QuestSystem")
-		void Print(bool ToConsole = true, bool ToScreen = true);
 
 
 	UFUNCTION(BlueprintCallable, Category = "QuestSystem")
