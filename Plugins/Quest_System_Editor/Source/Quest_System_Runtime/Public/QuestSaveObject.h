@@ -21,6 +21,19 @@ public:
 	ETaskState TaskState = ETaskState::E_Active;
 };
 
+/** Event Data To Be Saved */
+USTRUCT(BlueprintType)
+struct FEventData
+{
+	GENERATED_BODY()
+public:
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, meta = (DisplayName = "StartLaunched?"), Category = EventData)
+	bool StartLaunched = false;
+
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, meta = (DisplayName = "EndLaunched?"), Category = EventData)
+	bool EndLaunched = false;
+};
+
 /** Node Data To Be Saved */
 USTRUCT(BlueprintType)
 struct FNodeData
@@ -30,9 +43,15 @@ public:
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, meta = (DisplayName = "NodeID", MakeStructureDefaultValue = "None"), Category = NodeData)
 		FName NodeID;
 
+
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, meta = (DisplayName = "EventDatas"), Category = NodeData)
+		TArray<FEventData> EventDatas;
+
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, meta = (DisplayName = "TaskDatas"), Category = NodeData)
 		TArray<FTaskData> TaskDatas;
 };
+
+
 
 /** Quest Data To Be Saved */
 USTRUCT(BlueprintType)

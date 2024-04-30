@@ -40,20 +40,35 @@ bool UQuestComponent::RunQuestGraph(UQuestSystemGraph* QuestGraph)
 	OwningPawn = OwningController->K2_GetPawn();
 	QuestComponent = this;
 
+	for (TObjectIterator<UQuestSystemGraph> It; It; ++It)
+	{
+		if (It->OwningController == nullptr)
+			It->OwningController = OwningController;
 
-	//Set Quest Asset Dependency
-	QuestGraph->OwningController = OwningController;
-	QuestGraph->OwningPawn = OwningPawn;
-	QuestGraph->QuestComponent = QuestComponent;
+		if (It->OwningPawn == nullptr)
+			It->OwningPawn = OwningPawn;
+
+		if (It->QuestComponent == nullptr)
+			It->QuestComponent = QuestComponent;
+	}
 
 
 	bool bSuccess = true;
+
+
+	
+	for (TObjectIterator<UQuestSystemGraph> It; It; ++It)
+	{
+		for (UQuestSystem* Quest : It->QuestSystems)
+		{
+			QuestSystemMap.Emplace(Quest->QuestID, Quest);
+		}
+	}
 	
 
 	//Add All Quest To QuestSystemMap
 	for (UQuestSystem* QuestSystem : QuestGraph->QuestSystems)
 	{
-		QuestSystemMap.Emplace(QuestSystem->QuestID, QuestSystem);
 		if (!bQuestLoaded)
 		{
 			QuestSystem->QuestState = EQuestState::E_Locked;
@@ -148,7 +163,14 @@ void UQuestComponent::RestartQuest(FName QuestID, FName NodeID, bool bStartFromN
 								Task->TaskState = ETaskState::E_Active;
 								Task->CurrentAmount = 0;
 							}
-							
+						}
+					}
+					for (UQuestEvent* Event : CurrentNodeStack->Events)
+					{
+						if (Event)
+						{
+							Event->StartLaunched = false;
+							Event->EndLaunched = false;
 						}
 					}
 					// Traverse child node
@@ -178,6 +200,14 @@ void UQuestComponent::RestartQuest(FName QuestID, FName NodeID, bool bStartFromN
 							Task->CurrentAmount = 0;
 						}
 						
+					}
+				}
+				for (UQuestEvent* Event : Node->Events)
+				{
+					if (Event)
+					{
+						Event->StartLaunched = false;
+						Event->EndLaunched = false;
 					}
 				}
 			}
@@ -266,7 +296,11 @@ void UQuestComponent::EvaluateNextNodeCondition(UQuestSystem* QuestParam)
 		{
 			if (Event->EventRunType == EEventRunType::E_Both || Event->EventRunType == EEventRunType::E_End)
 			{
-				Event->BeginEvent();
+				if (!Event->EndLaunched)
+				{
+					Event->BeginEvent();
+					Event->EndLaunched = true;
+				}
 			}
 		}
 		//Go to next node if exist or condition met
@@ -338,7 +372,11 @@ void UQuestComponent::BeginNode(UQuestSystem* QuestParam)
 	{
 		if (Event->EventRunType == EEventRunType::E_Both || Event->EventRunType == EEventRunType::E_Start)
 		{
-			Event->BeginEvent();
+			if (!Event->StartLaunched)
+			{
+				Event->BeginEvent();
+				Event->StartLaunched = true;
+			}
 		}
 	}
 
@@ -388,9 +426,20 @@ void UQuestComponent::Save_Implementation(const FString& SaveFileName, int SlotI
 							TaskDataArray.Add(TaskData);
 						}
 					}
+
+					TArray<FEventData> EventDataArray;
+					for (UQuestEvent* Event : Node->Events)
+					{
+						FEventData EventData;
+						EventData.StartLaunched = Event->StartLaunched;
+						EventData.EndLaunched = Event->EndLaunched;
+						EventDataArray.Add(EventData);
+					}
+
 					FNodeData NodeData;
 					NodeData.NodeID = Node->ID;
 					NodeData.TaskDatas = TaskDataArray;
+					NodeData.EventDatas = EventDataArray;
 					NodeMapData.Emplace(Node->ID, NodeData);
 				}
 				FQuestData QuestData;
@@ -452,12 +501,22 @@ void UQuestComponent::Load_Implementation(const FString& SaveFileName, int SlotI
 						{
 							for (int i = 0; i < ObjectiveNode->Tasks.Num(); i++)
 							{
-								if (ObjectiveNode->Tasks[i] != nullptr)
+								if (ObjectiveNode->Tasks[i] != nullptr && i < NodeData.TaskDatas.Num())
 								{
 									//fill task data here
 									ObjectiveNode->Tasks[i]->CurrentAmount = NodeData.TaskDatas[i].CurrentAmount;
 									ObjectiveNode->Tasks[i]->TaskState = NodeData.TaskDatas[i].TaskState;
 								}
+							}
+						}
+
+						for (int i = 0; i < FoundedNode->Events.Num(); i++)
+						{
+							if (FoundedNode->Events[i] != nullptr && i < NodeData.EventDatas.Num())
+							{
+								//fill event data here
+								FoundedNode->Events[i]->StartLaunched = NodeData.EventDatas[i].StartLaunched;
+								FoundedNode->Events[i]->EndLaunched = NodeData.EventDatas[i].EndLaunched;
 							}
 						}
 					}

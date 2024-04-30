@@ -37,6 +37,12 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "QuestEvent", meta = (GetOptions = "GetAllQuestID", EditCondition = "bUseQuestID == true", HideEditConditionToggle, EditConditionHides))
 		FName QuestID;
 
+	UPROPERTY(BlueprintReadWrite, Category = "QuestEvent")
+		bool StartLaunched = false;
+
+	UPROPERTY(BlueprintReadWrite, Category = "QuestEvent")
+		bool EndLaunched = false;
+
 	UPROPERTY(BlueprintReadOnly, Category = "QuestEvent")
 		UQuestSystem* QuestSystem;
 
