@@ -2,6 +2,7 @@
 
 
 #include "SQuestPalette.h"
+#include "Quest_System_EditorStyle.h"
 #include "SlateOptMacros.h"	
 #include "TutorialMetaData.h"
 #include "SMyQuest.h"
@@ -57,6 +58,7 @@ void SQuestPaletteItem::Construct(const FArguments& InArgs, FCreateWidgetForActi
 		TagMeta.Tag = *FString::Printf(TEXT("PaletteItem,%s,%d"), *GraphAction->GetMenuDescription().ToString(), GraphAction->GetSectionID());
 		TagMeta.FriendlyName = GraphAction->GetMenuDescription().ToString();
 	}
+
 	// construct the text widget
 	bool bIsReadOnly = false;
 	TSharedRef<SWidget> NameSlotWidget = CreateTextSlotWidget(InCreateData, bIsReadOnly);

@@ -35,7 +35,7 @@ void FQuest_System_EditorModule::StartupModule()
 	//register asset type to advanced asset(may be able to create new asset in content drawer)
 	IAssetTools& AssetTools = FModuleManager::LoadModuleChecked<FAssetToolsModule>("AssetTools").Get();
 
-	QuestEditorAssetCategoryBit = AssetTools.RegisterAdvancedAssetCategory(FName(TEXT("Quest Builder")), LOCTEXT("QuestSystemAssetCategory", "QuestSystemGraph"));
+	QuestEditorAssetCategoryBit = AssetTools.RegisterAdvancedAssetCategory(FName(TEXT("Quest Builder")), LOCTEXT("QuestBuilderAssetCategory", "Quest Builder"));
 
 	RegisterAssetTypeAction(AssetTools, MakeShareable(new FAssetTypeActions_QuestSystem(QuestEditorAssetCategoryBit)));
 

@@ -24,13 +24,13 @@ public:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "QuestSystemGraph")
 		FString CategoryDisplayName;
 
-	UPROPERTY(EditDefaultsOnly, Category = "QuestSystemGraph")
+	UPROPERTY(BlueprintReadOnly, Category = "QuestSystemGraph")
 		TSubclassOf<UQuestSystemGraphNode> NodeType;
 
-	UPROPERTY(EditDefaultsOnly, Category = "QuestSystemGraph")
+	UPROPERTY(BlueprintReadOnly, Category = "QuestSystemGraph")
 		TSubclassOf<UQuestSystemGraphEdge> EdgeType;
 
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "QuestSystemGraph")
+	UPROPERTY(BlueprintReadOnly, BlueprintReadOnly, Category = "QuestSystemGraph")
 		FGameplayTagContainer GraphTags;
 
 
@@ -38,7 +38,7 @@ public:
 	UPROPERTY(BlueprintReadOnly, Category = "QuestSystemGraph")
 		TArray<UQuestSystem*> QuestSystems;
 
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "QuestSystemGraph")
+	UPROPERTY(BlueprintReadOnly, BlueprintReadOnly, Category = "QuestSystemGraph")
 		bool bEdgeEnabled;
 
 	UPROPERTY(BlueprintReadWrite, Category = "QuestSystemGraph")
@@ -57,10 +57,10 @@ public:
 	TArray<TObjectPtr<UEdGraph>> QuestGraphPages;
 
 
-	UPROPERTY(EditDefaultsOnly, Category = "QuestSystemGraph")
+	UPROPERTY(BlueprintReadOnly, Category = "QuestSystemGraph")
 		bool bCanRenameNode;
 
-	UPROPERTY(EditDefaultsOnly, Category = "QuestSystemGraph")
+	UPROPERTY(BlueprintReadOnly, Category = "QuestSystemGraph")
 		bool bCanBeCyclical;
 
 	/** Set of documents that were being edited in this blueprint, so we can open them right away */

@@ -27,77 +27,59 @@ UQuestComponent::UQuestComponent()
 	// ...
 }
 
-bool UQuestComponent::RunQuestGraph(UQuestSystemGraph* QuestGraph)
+bool UQuestComponent::RunQuestGraphs(TArray<UQuestSystemGraph*> QuestAssets)
 {
-	if (QuestGraph == NULL)
-	{
-		UE_LOG(LogTemp, Warning, TEXT("RunQuest: Unable to run NULL Quest Graph"));
-		return false;
-	}
 
 	//Set Dependency
 	OwningController = Cast<AController>(GetOwner());
 	OwningPawn = OwningController->K2_GetPawn();
 	QuestComponent = this;
 
-	for (TObjectIterator<UQuestSystemGraph> It; It; ++It)
+	for (UQuestSystemGraph* QuestGraph : QuestAssets)
 	{
-		if (It->OwningController == nullptr)
-			It->OwningController = OwningController;
+		QuestGraph->OwningController = OwningController;
+		QuestGraph->OwningPawn = OwningPawn;
+		QuestGraph->QuestComponent = QuestComponent;
 
-		if (It->OwningPawn == nullptr)
-			It->OwningPawn = OwningPawn;
+		//Add QuestGraph to array
+		QuestGraphs.Add(QuestGraph);
 
-		if (It->QuestComponent == nullptr)
-			It->QuestComponent = QuestComponent;
-	}
-
-
-	bool bSuccess = true;
-
-
-	
-	for (TObjectIterator<UQuestSystemGraph> It; It; ++It)
-	{
-		for (UQuestSystem* Quest : It->QuestSystems)
+		for (UQuestSystem* Quest : QuestGraph->QuestSystems)
 		{
 			QuestSystemMap.Emplace(Quest->QuestID, Quest);
+			
+			if (!bQuestLoaded)
+			{
+				Quest->QuestState = EQuestState::E_Locked;
+				Quest->CurrentNode = nullptr;
+				Quest->VisitedNodeIDs.Empty();
+			}
 		}
 	}
+	bool bSuccess = true;
 	
-
-	//Add All Quest To QuestSystemMap
-	for (UQuestSystem* QuestSystem : QuestGraph->QuestSystems)
-	{
-		if (!bQuestLoaded)
-		{
-			QuestSystem->QuestState = EQuestState::E_Locked;
-			QuestSystem->CurrentNode = nullptr;
-			QuestSystem->VisitedNodeIDs.Empty();
-		}
-	}
-
-	//Add QuestGraph to array
-	QuestGraphs.Add(QuestGraph);
 
 	//CheckQuestCondition
-	for (UQuestSystem* QuestSystem : QuestGraph->QuestSystems)
+	for (UQuestSystemGraph* QuestGraph : QuestGraphs)
 	{
-		EvaluateQuestCondition(QuestSystem);
-		if (QuestSystem->CurrentNode != nullptr)
+		for (UQuestSystem* QuestSystem : QuestGraph->QuestSystems)
 		{
-			BeginNode(QuestSystem);
-		}
-		else if (QuestSystem->QuestState == EQuestState::E_Active && QuestSystem->CurrentNode == nullptr)
-		{
-			RestartQuest(QuestSystem->QuestID);
+			EvaluateQuestCondition(QuestSystem);
+			if (QuestSystem->CurrentNode != nullptr)
+			{
+				BeginNode(QuestSystem);
+			}
+			else if (QuestSystem->QuestState == EQuestState::E_Active && QuestSystem->CurrentNode == nullptr)
+			{
+				RestartQuest(QuestSystem->QuestID);
+			}
 		}
 	}
-
 	
-	OnQuestObjectiveUpdated.Broadcast();
+	//OnQuestObjectiveUpdated.Broadcast();
 	return bSuccess;
 }
+
 
 void UQuestComponent::ActivateQuest(FName QuestID)
 {
@@ -523,8 +505,8 @@ void UQuestComponent::Load_Implementation(const FString& SaveFileName, int SlotI
 				}
 			}
 		}
-
 	}
+
 }
 
 // Called when the game starts

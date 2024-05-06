@@ -8,6 +8,11 @@
 #include "Styling/SlateStyleMacros.h"
 
 #define RootToContentDir Style->RootToContentDir
+#define IMAGE_BRUSH( RelativePath, ... ) FSlateImageBrush( StyleSet->RootToContentDir( RelativePath, TEXT(".png") ), __VA_ARGS__ )
+#define BOX_BRUSH( RelativePath, ... ) FSlateBoxBrush( StyleSet->RootToContentDir( RelativePath, TEXT(".png") ), __VA_ARGS__ )
+#define BORDER_BRUSH( RelativePath, ... ) FSlateBorderBrush( StyleSet->RootToContentDir( RelativePath, TEXT(".png") ), __VA_ARGS__ )
+#define TTF_FONT( RelativePath, ... ) FSlateFontInfo( StyleSet->RootToContentDir( RelativePath, TEXT(".ttf") ), __VA_ARGS__ )
+#define OTF_FONT( RelativePath, ... ) FSlateFontInfo( StyleSet->RootToContentDir( RelativePath, TEXT(".otf") ), __VA_ARGS__ )
 
 TSharedPtr<FSlateStyleSet> FQuest_System_EditorStyle::StyleInstance = nullptr;
 
@@ -35,6 +40,8 @@ FName FQuest_System_EditorStyle::GetStyleSetName()
 
 const FVector2D Icon16x16(16.0f, 16.0f);
 const FVector2D Icon20x20(20.0f, 20.0f);
+const FVector2D Icon40x40(40.0f, 40.0f);
+const FVector2D Icon64x64(64.0f, 64.0f);
 
 TSharedRef< FSlateStyleSet > FQuest_System_EditorStyle::Create()
 {
@@ -42,7 +49,8 @@ TSharedRef< FSlateStyleSet > FQuest_System_EditorStyle::Create()
 	Style->SetContentRoot(IPluginManager::Get().FindPlugin("Quest_System_Editor")->GetBaseDir() / TEXT("Resources"));
 
 	Style->Set("Quest_System_Editor.OpenPluginWindow", new IMAGE_BRUSH_SVG(TEXT("PlaceholderButtonIcon"), Icon20x20));
-
+	Style->Set("Quest_System_Editor.questicon", new IMAGE_BRUSH_SVG(TEXT("questicon"), Icon40x40));
+	Style->Set("Quest_System_Editor.questicon.small", new IMAGE_BRUSH_SVG(TEXT("questicon"), Icon20x20));
 	return Style;
 }
 

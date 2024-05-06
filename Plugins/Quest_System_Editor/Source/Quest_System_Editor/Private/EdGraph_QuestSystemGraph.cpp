@@ -208,6 +208,7 @@ void UEdGraph_QuestSystemGraph::PostEditUndo()
 void UEdGraph_QuestSystemGraph::Clear()
 {
 	QuestSystem->ClearGraph();
+	QuestSystem->NodeMap.Reset();
 	NodeMap.Reset();
 	EdgeMap.Reset();
 

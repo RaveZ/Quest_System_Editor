@@ -38,6 +38,14 @@ void UQuestSystemGraphNode_State::BeginState()
 #if WITH_EDITOR
 FText UQuestSystemGraphNode_State::GetNodeTitle() const
 {
+    return FText::FromName(ID).IsEmpty() ? FText::FromString(UQuestSystemGraphNode::GetShortTypeName(this)) : FText::FromName(ID);
+}
+void UQuestSystemGraphNode_State::SetNodeTitle(const FText& NewTitle)
+{
+    ID = FName(NewTitle.ToString());
+}
+FText UQuestSystemGraphNode_State::GetNodeDescription() const
+{
     switch (QuestState)
     {
     case EQuestState::E_Complete:

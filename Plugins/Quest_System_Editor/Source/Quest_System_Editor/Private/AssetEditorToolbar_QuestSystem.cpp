@@ -42,7 +42,7 @@ void FAssetEditorToolbar_QuestSystem::FillQuestSystemToolbar(FToolBarBuilder& To
 	{
 		const FText NewConditionLabel = LOCTEXT("NewQuestCondition_Label", "New Quest Condition");
 		const FText NewConditionTooltip = LOCTEXT("NewQuestCondition_ToolTip", "Create a new Quest Condition Blueprint from a base class");
-		const FSlateIcon NewConditionIcon = FSlateIcon(FAppStyle::GetAppStyleSetName(), "BTEditor.Graph.NewTask");
+		const FSlateIcon NewConditionIcon = FSlateIcon(FAppStyle::GetAppStyleSetName(), "BTEditor.Graph.BTNode.Decorator.Conditional.Icon");
 
 
 		ToolbarBuilder.AddToolBarButton(FQuest_System_EditorCommands::Get().NewQuestCondition,
@@ -58,7 +58,7 @@ void FAssetEditorToolbar_QuestSystem::FillQuestSystemToolbar(FToolBarBuilder& To
 	{
 		const FText NewEventLabel = LOCTEXT("NewQuestEvent_Label", "New Quest Event");
 		const FText NewEventTooltip = LOCTEXT("NewQuestEvent_ToolTip", "Create a new Quest Event Blueprint from a base class");
-		const FSlateIcon NewEventIcon = FSlateIcon(FAppStyle::GetAppStyleSetName(), "BTEditor.Graph.NewTask");
+		const FSlateIcon NewEventIcon = FSlateIcon(FAppStyle::GetAppStyleSetName(), "GraphEditor.CustomEvent_16x");
 
 
 		ToolbarBuilder.AddToolBarButton(FQuest_System_EditorCommands::Get().NewQuestEvent,
@@ -72,8 +72,8 @@ void FAssetEditorToolbar_QuestSystem::FillQuestSystemToolbar(FToolBarBuilder& To
 
 	ToolbarBuilder.BeginSection("Quest System");
 	{
-		const FText QuestSettingLabel = LOCTEXT("QuestSetting_Label", "Quest Setting");
-		const FText QuestSettingTooltip = LOCTEXT("QuestSetting_ToolTip", "Access Quest Graph Setting");
+		const FText QuestSettingLabel = LOCTEXT("QuestSetting_Label", "Quest Builder Setting");
+		const FText QuestSettingTooltip = LOCTEXT("QuestSetting_ToolTip", "Access Quest Builder Setting");
 		const FSlateIcon QuestSettingIcon = FSlateIcon(FAppStyle::GetAppStyleSetName(), "ProjectSettings.TabIcon");
 
 
@@ -85,6 +85,8 @@ void FAssetEditorToolbar_QuestSystem::FillQuestSystemToolbar(FToolBarBuilder& To
 		);
 	}
 	ToolbarBuilder.EndSection();
+
+	
 }
 
 

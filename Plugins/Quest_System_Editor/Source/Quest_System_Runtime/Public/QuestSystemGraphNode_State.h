@@ -22,8 +22,8 @@ public:
 
 #if WITH_EDITOR
     virtual FText GetNodeTitle() const override;
-
-    //virtual FText GetNodeDescription() const override;
+    virtual void SetNodeTitle(const FText& NewTitle);
+    virtual FText GetNodeDescription() const override;
 
     virtual FLinearColor GetBackgroundColor() const override;
 #endif
