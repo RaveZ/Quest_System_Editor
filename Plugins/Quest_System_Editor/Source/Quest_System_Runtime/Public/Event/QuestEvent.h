@@ -31,7 +31,7 @@ public:
 	UPROPERTY(BlueprintReadOnly, Category = "QuestEvent")
 		UQuestSystemGraph* QuestGraph;
 		
-	UPROPERTY(BlueprintReadOnly, Category = "QuestEvent")
+	UPROPERTY(BlueprintReadWrite, Category = "QuestEvent")
 		bool bUseQuestID = false;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "QuestEvent", meta = (GetOptions = "GetAllQuestID", EditCondition = "bUseQuestID == true", HideEditConditionToggle, EditConditionHides))

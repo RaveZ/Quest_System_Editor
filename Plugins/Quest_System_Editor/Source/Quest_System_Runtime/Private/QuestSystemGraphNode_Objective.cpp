@@ -12,15 +12,21 @@
 bool UQuestSystemGraphNode_Objective::IsAllTaskCompleted()
 {
     int progress = 0;
-    for (UQuestTask* NodeTask : Tasks)
+    int completeSum = 0;
+    for (UQuestTask* Task : Tasks)
     {
-        if (NodeTask && NodeTask->TaskState == ETaskState::E_Complete)
+        if (Task && !Task->bOptional)
+        {
+            completeSum++;
+        }
+        if (Task && !Task->bOptional && Task->TaskState == ETaskState::E_Complete)
         {
             progress++;
+            
         }
     }
 
-    if (progress >= Tasks.Num())
+    if (progress >= completeSum)
     {
         return true;
     }

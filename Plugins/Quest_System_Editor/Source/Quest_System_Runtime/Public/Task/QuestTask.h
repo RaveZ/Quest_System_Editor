@@ -32,6 +32,10 @@ public:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Task")
 		FText Description;
 
+	//mark the task as optional and skip this task if the other non-optional task has been completed
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Task")
+		bool bOptional = false;
+
 	UPROPERTY(BlueprintReadOnly, Category = "QuestTask")
 		UQuestSystemGraph* QuestGraph;
 

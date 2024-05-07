@@ -76,7 +76,7 @@ bool UQuestComponent::RunQuestGraphs(TArray<UQuestSystemGraph*> QuestAssets)
 		}
 	}
 	
-	//OnQuestObjectiveUpdated.Broadcast();
+	OnQuestObjectiveUpdated.Broadcast();
 	return bSuccess;
 }
 
@@ -91,7 +91,6 @@ void UQuestComponent::ActivateQuest(FName QuestID)
 			OnQuestAdded.Broadcast(QuestSystem);
 			RestartQuest(QuestSystem->QuestID);
 		}
-		QuestSystem->CurrentNode = nullptr;
 
 	}
 }
@@ -403,8 +402,11 @@ void UQuestComponent::Save_Implementation(const FString& SaveFileName, int SlotI
 						for (UQuestTask* Task : ObjectiveNode->Tasks)
 						{
 							FTaskData TaskData;
-							TaskData.CurrentAmount = Task->CurrentAmount;
-							TaskData.TaskState = Task->TaskState;
+							if (Task)
+							{
+								TaskData.CurrentAmount = Task->CurrentAmount;
+								TaskData.TaskState = Task->TaskState;
+							}
 							TaskDataArray.Add(TaskData);
 						}
 					}
@@ -413,15 +415,21 @@ void UQuestComponent::Save_Implementation(const FString& SaveFileName, int SlotI
 					for (UQuestEvent* Event : Node->Events)
 					{
 						FEventData EventData;
-						EventData.StartLaunched = Event->StartLaunched;
-						EventData.EndLaunched = Event->EndLaunched;
+						if (Event)
+						{
+							EventData.StartLaunched = Event->StartLaunched;
+							EventData.EndLaunched = Event->EndLaunched;
+						}
 						EventDataArray.Add(EventData);
 					}
 
 					FNodeData NodeData;
-					NodeData.NodeID = Node->ID;
-					NodeData.TaskDatas = TaskDataArray;
-					NodeData.EventDatas = EventDataArray;
+					if (Node)
+					{
+						NodeData.NodeID = Node->ID;
+						NodeData.TaskDatas = TaskDataArray;
+						NodeData.EventDatas = EventDataArray;
+					}
 					NodeMapData.Emplace(Node->ID, NodeData);
 				}
 				FQuestData QuestData;

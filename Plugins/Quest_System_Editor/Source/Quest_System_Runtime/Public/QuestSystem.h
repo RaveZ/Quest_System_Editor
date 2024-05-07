@@ -27,6 +27,25 @@ enum class EQuestState : uint8
 	E_Unlocked		UMETA(DisplayName = "UNLOCKED"),
 };
 
+/** Reward Data for Quest*/
+USTRUCT(BlueprintType)
+struct FRewardData
+{
+	GENERATED_BODY()
+public:
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, meta = (DisplayName = "Reward Tag"), Category = RewardData)
+		FString RewardTag;
+
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, meta = (DisplayName = "Reward Name"), Category = RewardData)
+		FString RewardName;
+
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, meta = (DisplayName = "Reward Quantity"), Category = RewardData)
+		int RewardQuantity = 0;
+
+};
+
+
+
 UCLASS(Blueprintable)
 class QUEST_SYSTEM_RUNTIME_API UQuestSystem : public UObject
 {
@@ -43,6 +62,8 @@ public:
 	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "QuestSystem")
 		FText Description; 
 
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "QuestSystem")
+		TArray<FRewardData> Rewards;
 
 	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Conditions")
 		bool bCanQuestBeAborted = false;
@@ -56,6 +77,7 @@ public:
 	/**Conditions to unlock the Quest*/
 	UPROPERTY(Instanced, EditAnywhere, BlueprintReadOnly, Category = "Conditions")
 		TArray<UQuestCondition*> Conditions;
+
 
 	/** List of All Visited Node IDs in Sequence*/
 	UPROPERTY(BlueprintReadWrite, Category = "QuestSystem")
