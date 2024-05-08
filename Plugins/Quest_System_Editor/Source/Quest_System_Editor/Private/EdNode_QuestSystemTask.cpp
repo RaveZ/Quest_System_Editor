@@ -7,6 +7,7 @@
 FText UEdNode_QuestSystemTask::GetNodeTitle(ENodeTitleType::Type TitleType) const
 {
 	const UQuestSystemGraphNode* MyNode = Cast<UQuestSystemGraphNode>(QuestSystemGraphNode);
+
 	if (MyNode != NULL)
 	{
 		return MyNode->GetNodeTitle();
