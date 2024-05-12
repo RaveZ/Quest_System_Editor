@@ -20,6 +20,8 @@ void UQuestSystemGraphNode_State::BeginState()
         }
     }
 
+    GetQuestComponent()->UpdateQuest();
+
     switch (QuestState)
     {
     case EQuestState::E_Complete:
@@ -30,7 +32,6 @@ void UQuestSystemGraphNode_State::BeginState()
         break;
     }
 
-    GetQuestComponent()->UpdateQuest();
 
     
 }
