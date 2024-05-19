@@ -10,14 +10,12 @@ public class Quest_System_Runtime : ModuleRules
 
         PublicIncludePaths.AddRange(
             new string[] {
-				// ... add public include paths required here ...
 			}
             );
 
         PrivateIncludePaths.AddRange(
             new string[] {
                 "Quest_System_Runtime/Private",
-				// ... add other private include paths required here ...
 			}
             );
 
@@ -27,14 +25,12 @@ public class Quest_System_Runtime : ModuleRules
                 "Core",
                 "CoreUObject",
                 "Engine",
-				// ... add other public dependencies that you statically link with here ...
 			}
             );
 
         PrivateDependencyModuleNames.AddRange(
             new string[]
             {
-				// ... add private dependencies that you statically link with here ...
                 "Slate",
                 "SlateCore",
                 "GameplayTags",
@@ -44,7 +40,6 @@ public class Quest_System_Runtime : ModuleRules
         DynamicallyLoadedModuleNames.AddRange(
             new string[]
             {
-				// ... add any modules that your module loads dynamically here ...
 			}
             );
     }

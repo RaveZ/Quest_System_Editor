@@ -70,9 +70,6 @@ public:
 		AController* GetOwningController() const;
 
 	UFUNCTION(BlueprintCallable, Category = "QuestSystemGraphNode")
-		APawn* GetOwningPawn() const;
-
-	UFUNCTION(BlueprintCallable, Category = "QuestSystemGraphNode")
 		UQuestComponent* GetQuestComponent() const;
 
 	UFUNCTION(BlueprintCallable, Category = "QuestSystemGraphNode")

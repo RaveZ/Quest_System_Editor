@@ -29,11 +29,11 @@
 #include "SMyQuest.h"
 #include "Task/QuestTask.h"
 #include "Quest_System_Editor.h"
+#include <ContentBrowserModule.h>
 #include <ContentBrowserFrontEndFilterExtension.h>
 #include "Kismet2/KismetDebugUtilities.h"
 #include "WorkflowOrientedApp/WorkflowUObjectDocuments.h"
 #include "WorkflowOrientedApp/WorkflowCentricApplication.h"
-#include <ContentBrowserModule.h>
 #include "Framework/Notifications/NotificationManager.h"
 #include "Widgets/Notifications/SNotificationList.h"
 #include <Kismet2/KismetEditorUtilities.h>

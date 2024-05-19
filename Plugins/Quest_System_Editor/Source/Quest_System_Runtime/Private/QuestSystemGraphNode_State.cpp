@@ -11,17 +11,6 @@ void UQuestSystemGraphNode_State::BeginState()
 {
     QuestSystem->QuestState = QuestState;
 
-    //End of a Node, Launch Event with the End and Both Type
-    for (UQuestEvent* Event : QuestSystem->CurrentNode->Events)
-    {
-        if (Event->EventRunType == EEventRunType::E_Both || Event->EventRunType == EEventRunType::E_End)
-        {
-            Event->BeginEvent();
-        }
-    }
-
-    GetQuestComponent()->UpdateQuest();
-
     switch (QuestState)
     {
     case EQuestState::E_Complete:
@@ -32,6 +21,16 @@ void UQuestSystemGraphNode_State::BeginState()
         break;
     }
 
+    //End of a Node, Launch Event with the End and Both Type
+    for (UQuestEvent* Event : QuestSystem->CurrentNode->Events)
+    {
+        if (Event->EventRunType == EEventRunType::E_Both || Event->EventRunType == EEventRunType::E_End)
+        {
+            Event->BeginEvent();
+        }
+    }
+
+    GetQuestComponent()->UpdateQuest();
 
     
 }

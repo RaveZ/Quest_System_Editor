@@ -109,9 +109,6 @@ public:
 		AController* GetOwningController();
 
 	UFUNCTION(BlueprintCallable, Category = "QuestSystem")
-		APawn* GetOwningPawn();
-
-	UFUNCTION(BlueprintCallable, Category = "QuestSystem")
 		UQuestComponent* GetQuestComponent();
 
 	UFUNCTION(BlueprintCallable, Category = "QuestSystem")

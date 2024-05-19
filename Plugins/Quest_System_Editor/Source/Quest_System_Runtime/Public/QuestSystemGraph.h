@@ -45,9 +45,6 @@ public:
 		AController* OwningController;
 
 	UPROPERTY(BlueprintReadWrite, Category = "QuestSystemGraph")
-		APawn* OwningPawn;
-
-	UPROPERTY(BlueprintReadWrite, Category = "QuestSystemGraph")
 		UQuestComponent* QuestComponent;
 
 

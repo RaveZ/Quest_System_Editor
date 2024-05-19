@@ -138,14 +138,6 @@ AController* UQuestSystemGraphNode::GetOwningController() const
 	return QuestGraph->OwningController;
 }
 
-APawn* UQuestSystemGraphNode::GetOwningPawn() const
-{
-	if (!QuestGraph)
-		return nullptr;
-
-	return QuestGraph->OwningPawn;
-}
-
 UQuestComponent* UQuestSystemGraphNode::GetQuestComponent() const
 {
 	if (!QuestGraph)

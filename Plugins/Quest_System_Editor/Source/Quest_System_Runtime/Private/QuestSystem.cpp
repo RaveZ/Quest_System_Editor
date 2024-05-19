@@ -77,14 +77,6 @@ AController* UQuestSystem::GetOwningController()
 	return QuestGraph->OwningController;
 }
 
-APawn* UQuestSystem::GetOwningPawn()
-{
-	if (!QuestGraph)
-		return nullptr;
-
-	return QuestGraph->OwningPawn;
-}
-
 UQuestComponent* UQuestSystem::GetQuestComponent()
 {
 	if (!QuestGraph)

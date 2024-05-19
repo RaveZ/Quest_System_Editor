@@ -13,6 +13,7 @@
 #include "QuestSystemGraphNode_Root.h"
 #include "QuestSystemGraphNode_Objective.h"
 #include "Kismet/GameplayStatics.h"
+#include "GameFramework/Controller.h"
 
 
 
@@ -29,30 +30,34 @@ UQuestComponent::UQuestComponent()
 
 bool UQuestComponent::RunQuestGraphs(TArray<UQuestSystemGraph*> QuestAssets)
 {
+	if (QuestAssets.IsEmpty())
+	{
+		return false;
+	}
 
 	//Set Dependency
 	OwningController = Cast<AController>(GetOwner());
-	OwningPawn = OwningController->K2_GetPawn();
-	QuestComponent = this;
 
 	for (UQuestSystemGraph* QuestGraph : QuestAssets)
 	{
-		QuestGraph->OwningController = OwningController;
-		QuestGraph->OwningPawn = OwningPawn;
-		QuestGraph->QuestComponent = QuestComponent;
-
-		//Add QuestGraph to array
-		QuestGraphs.Add(QuestGraph);
-
-		for (UQuestSystem* Quest : QuestGraph->QuestSystems)
+		if (QuestGraph)
 		{
-			QuestSystemMap.Emplace(Quest->QuestID, Quest);
-			
-			if (!bQuestLoaded)
+			QuestGraph->OwningController = OwningController;
+			QuestGraph->QuestComponent = this;
+
+			//Add QuestGraph to array
+			QuestGraphs.Add(QuestGraph);
+
+			for (UQuestSystem* Quest : QuestGraph->QuestSystems)
 			{
-				Quest->QuestState = EQuestState::E_Locked;
-				Quest->CurrentNode = nullptr;
-				Quest->VisitedNodeIDs.Empty();
+				QuestSystemMap.Emplace(Quest->QuestID, Quest);
+
+				if (!bQuestLoaded)
+				{
+					Quest->QuestState = EQuestState::E_Locked;
+					Quest->CurrentNode = nullptr;
+					Quest->VisitedNodeIDs.Empty();
+				}
 			}
 		}
 	}
@@ -65,13 +70,16 @@ bool UQuestComponent::RunQuestGraphs(TArray<UQuestSystemGraph*> QuestAssets)
 		for (UQuestSystem* QuestSystem : QuestGraph->QuestSystems)
 		{
 			EvaluateQuestCondition(QuestSystem);
-			if (QuestSystem->CurrentNode != nullptr)
+			if (QuestSystem->QuestState == EQuestState::E_Active)
 			{
-				BeginNode(QuestSystem);
-			}
-			else if (QuestSystem->QuestState == EQuestState::E_Active && QuestSystem->CurrentNode == nullptr)
-			{
-				RestartQuest(QuestSystem->QuestID);
+				if (QuestSystem->CurrentNode != nullptr)
+				{
+					BeginNode(QuestSystem);
+				}
+				else if (QuestSystem->CurrentNode == nullptr)
+				{
+					RestartQuest(QuestSystem->QuestID);
+				}
 			}
 		}
 	}

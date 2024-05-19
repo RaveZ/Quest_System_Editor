@@ -22,7 +22,7 @@ enum class ETaskState : uint8
 	E_Active		UMETA(DisplayName = "ACTIVE"),
 	E_Complete		UMETA(DisplayName = "COMPLETE"),
 };
-UCLASS(Blueprintable, EditInlineNew, HideDropdown)
+UCLASS(Blueprintable, EditInlineNew, HideDropdown, HideCategories = ("Hidden"))
 class QUEST_SYSTEM_RUNTIME_API UQuestTask : public UObject, public FTickableGameObject
 {
 	GENERATED_BODY()
@@ -35,6 +35,13 @@ public:
 	//mark the task as optional and skip this task if the other non-optional task has been completed
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Task")
 		bool bOptional = false;
+	
+	/**This task use amount required to complete task?*/
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Task", meta = (DisplayName = "bUseAmount?"))
+		bool bUseAmount = false;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Task", meta = (EditCondition = "bUseAmount == true", EditConditionHides))
+		int RequiredAmount = 1;
 
 	UPROPERTY(BlueprintReadOnly, Category = "QuestTask")
 		UQuestSystemGraph* QuestGraph;
@@ -71,9 +78,6 @@ public:
 		AController* GetOwningController() const;
 
 	UFUNCTION(BlueprintCallable, Category = "QuestTask")
-		APawn* GetOwningPawn() const;
-
-	UFUNCTION(BlueprintCallable, Category = "QuestTask")
 		UQuestComponent* GetQuestComponent() const;
 
 	UFUNCTION(BlueprintCallable, Category = "QuestTask")
@@ -81,6 +85,10 @@ public:
 
 	UFUNCTION(BlueprintCallable, Category = "QuestTask")
 		UQuestSystem* GetOwningQuestSystem() const;
+
+	/**Add amount and check if the required amount has fulfilled, then complete the task*/
+	UFUNCTION(BlueprintCallable, Category = "QuestTask")
+		void AddAmount(int AmountToAdd);
 
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "QuestTask")
 		FText GetDescription() const;

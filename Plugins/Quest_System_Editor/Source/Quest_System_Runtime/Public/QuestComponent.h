@@ -29,13 +29,7 @@ public:
 	UQuestComponent();
 
 	UPROPERTY(BlueprintReadOnly, Category = "QuestComponent")
-		UQuestComponent* QuestComponent;
-
-	UPROPERTY(BlueprintReadOnly, Category = "QuestComponent")
 		AController* OwningController;
-
-	UPROPERTY(BlueprintReadOnly, Category = "QuestComponent")
-		APawn* OwningPawn;
 
 	/** Array of QuestGraph that is Running*/
 	UPROPERTY(BlueprintReadWrite, Category = "QuestComponent")
@@ -50,8 +44,6 @@ public:
 
 	UFUNCTION(BlueprintCallable, Category = "QuestComponent")
 		bool RunQuestGraphs(TArray<UQuestSystemGraph*>  QuestAssets);
-
-
 
 	UFUNCTION(BlueprintCallable, Category = "QuestComponent")
 		void ActivateQuest(FName QuestID);

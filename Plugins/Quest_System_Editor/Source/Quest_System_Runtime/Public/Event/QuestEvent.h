@@ -59,9 +59,6 @@ public:
 		AController* GetOwningController() const;
 
 	UFUNCTION(BlueprintCallable, Category = "QuestEvent")
-		APawn* GetOwningPawn() const;
-
-	UFUNCTION(BlueprintCallable, Category = "QuestEvent")
 		UQuestComponent* GetQuestComponent() const;
 
 	UFUNCTION(BlueprintCallable, Category = "QuestEvent")

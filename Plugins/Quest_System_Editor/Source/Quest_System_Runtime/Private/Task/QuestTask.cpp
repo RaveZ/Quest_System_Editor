@@ -28,14 +28,6 @@ AController* UQuestTask::GetOwningController() const
 	return QuestGraph->OwningController;
 }
 
-APawn* UQuestTask::GetOwningPawn() const
-{
-	if (!QuestGraph)
-		return nullptr;
-
-	return QuestGraph->OwningPawn;
-}
-
 UQuestComponent* UQuestTask::GetQuestComponent() const
 {
 	if (!QuestGraph)
@@ -55,6 +47,15 @@ UQuestSystemGraph* UQuestTask::GetOwningQuestGraph() const
 UQuestSystem* UQuestTask::GetOwningQuestSystem() const
 {
 	return QuestSystem;
+}
+
+void UQuestTask::AddAmount(int AmountToAdd)
+{
+	CurrentAmount = FMath::Clamp(CurrentAmount + AmountToAdd, 0, RequiredAmount);
+	if (CurrentAmount >= RequiredAmount)
+	{
+		CompleteTask();
+	}
 }
 
 FText UQuestTask::GetDescription_Implementation() const
