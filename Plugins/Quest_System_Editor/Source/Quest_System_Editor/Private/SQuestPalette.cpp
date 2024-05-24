@@ -247,7 +247,7 @@ TSharedPtr<SToolTip> SQuestPaletteItem::ConstructToolTipWidget() const
 
 FText SQuestPaletteItem::GetToolTipText() const
 {
-	return FText::FromString(TEXT("Ahoy"));
+	return FText::FromString(TEXT(""));
 }
 
 void SQuestPalette::Construct(const FArguments& InArgs, TWeakPtr<FAssetEditor_QuestSystem> InQuestEditor)

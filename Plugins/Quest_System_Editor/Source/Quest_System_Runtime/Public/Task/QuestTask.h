@@ -66,7 +66,7 @@ public:
 		void TaskBegin();
 
 	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable, Category = "QuestTask")
-		void TaskTick();
+		void TaskTick(float DeltaTime);
 
 	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable, Category = "QuestTask")
 		void OnTaskCompleted();

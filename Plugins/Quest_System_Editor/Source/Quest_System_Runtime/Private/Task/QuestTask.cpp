@@ -68,6 +68,6 @@ void UQuestTask::Tick(float DeltaTime)
 	if (LastFrameNumberWeTicked == GFrameCounter)
 		return;
 	//Do The Tick Logic
-	TaskTick();
+	TaskTick(DeltaTime);
 	LastFrameNumberWeTicked = GFrameCounter;
 }

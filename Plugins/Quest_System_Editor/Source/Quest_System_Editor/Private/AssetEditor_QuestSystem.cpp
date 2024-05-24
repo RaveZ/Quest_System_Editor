@@ -218,11 +218,6 @@ void FAssetEditor_QuestSystem::RegisterTabSpawners(const TSharedRef<FTabManager>
 		.SetDisplayName(LOCTEXT("DetailsTab", "Property"))
 		.SetGroup(WorkspaceMenuCategoryRef)
 		.SetIcon(FSlateIcon(FAppStyle::GetAppStyleSetName(), "LevelEditor.Tabs.Details"));
-
-	/*InTabManager->RegisterTabSpawner(FQuestSystemAssetEditorTabs::GenericGraphEditorSettingsID, FOnSpawnTab::CreateSP(this, &FAssetEditor_QuestSystem::SpawnTab_EditorSettings))
-		.SetDisplayName(LOCTEXT("EditorSettingsTab", "Generic Graph Editor Setttings"))
-		.SetGroup(WorkspaceMenuCategoryRef)
-		.SetIcon(FSlateIcon(FAppStyle::GetAppStyleSetName(), "LevelEditor.Tabs.Details"));*/
 }
 
 void FAssetEditor_QuestSystem::UnregisterTabSpawners(const TSharedRef<FTabManager>& InTabManager)
@@ -1371,13 +1366,6 @@ bool FAssetEditor_QuestSystem::CanRenameNodes() const
 	}
 	return false;
 
-	/*UEdGraph_QuestSystemGraph* EdGraph = Cast<UEdGraph_QuestSystemGraph>(EditingQuestGraph->EdGraph);
-	check(EdGraph != nullptr);
-
-	UQuestSystemGraph* Graph = EdGraph->GetQuestSystemGraph();
-	check(Graph != nullptr)
-
-		return Graph->bCanRenameNode && GetSelectedNodes().Num() == 1;*/
 }
 void FAssetEditor_QuestSystem::OnSelectedNodesChanged(const TSet<class UObject*>& NewSelection)
 {

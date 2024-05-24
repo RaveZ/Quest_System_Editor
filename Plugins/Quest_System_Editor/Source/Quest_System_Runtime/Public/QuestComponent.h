@@ -13,6 +13,8 @@ class USaveGame;
 /** This Delegate will be called if a quest objective has been completed*/
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FQuestObjectiveUpdated);
 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FStartNavigateQuest);
+
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FQuestFailed, UQuestSystem*, Quest);
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FQuestCompleted, UQuestSystem*, Quest);
@@ -58,6 +60,9 @@ public:
 		FQuestObjectiveUpdated OnQuestObjectiveUpdated;
 
 	UPROPERTY(BlueprintAssignable, BlueprintCallable, Category = "QuestComponent")
+		FStartNavigateQuest OnStartNavigateQuest;
+
+	UPROPERTY(BlueprintAssignable, BlueprintCallable, Category = "QuestComponent")
 		FQuestFailed OnQuestFailed;
 
 	UPROPERTY(BlueprintAssignable, BlueprintCallable, Category = "QuestComponent")
@@ -67,6 +72,16 @@ public:
 		FQuestAdded OnQuestAdded;
 
 	UFUNCTION(BlueprintCallable, Category = "QuestComponent")
+		UQuestSystem* FindQuestFromNodeID(FName NodeIDParam) const;
+
+	UFUNCTION(BlueprintCallable, Category = "QuestComponent")
+		bool IsQuestActiveFromNodeID(FName NodeID) const;
+
+
+	UFUNCTION(BlueprintCallable, Category = "QuestComponent")
+		bool IsQuestActiveFromQuestID(FName QuestID) const;
+
+		UFUNCTION(BlueprintCallable, Category = "QuestComponent")
 		void UpdateQuest();
 
 	UFUNCTION(BlueprintCallable, Category = "QuestComponent")
@@ -80,6 +95,7 @@ public:
 
 	UFUNCTION(BlueprintCallable, Category = "QuestComponent")
 		void BeginNode(UQuestSystem* QuestParam);
+
 
 
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "QuestComponent")

@@ -223,6 +223,50 @@ void UQuestComponent::FailQuest(FName QuestID)
 	}
 }
 
+UQuestSystem* UQuestComponent::FindQuestFromNodeID(FName NodeIDParam) const
+{
+	UQuestSystem* FoundedQuest = nullptr;
+	for (const auto& It : QuestSystemMap)
+	{
+		FName Key = It.Key;
+		UQuestSystem* QuestSystem = It.Value;
+
+		if (UQuestSystemGraphNode* QuestNode = QuestSystem->NodeMap.FindRef(NodeIDParam))
+		{
+			FoundedQuest = QuestSystem;
+		}
+	}
+
+	return FoundedQuest;
+
+}
+
+bool UQuestComponent::IsQuestActiveFromNodeID(FName NodeID) const
+{
+	if (UQuestSystem* FoundedQuest = FindQuestFromNodeID(NodeID))
+	{
+		if (FoundedQuest->QuestState == EQuestState::E_Active)
+		{
+			return true;
+		}
+	}
+
+	return false;
+}
+
+bool UQuestComponent::IsQuestActiveFromQuestID(FName QuestID) const
+{
+	if (UQuestSystem* FoundedQuest = QuestSystemMap.FindRef(QuestID))
+	{
+		if (FoundedQuest->QuestState == EQuestState::E_Active)
+		{
+			return true;
+		}
+	}
+
+	return false;
+}
+
 void UQuestComponent::UpdateQuest()
 {
 	for (const auto& It : QuestSystemMap)

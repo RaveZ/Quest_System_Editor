@@ -409,10 +409,6 @@ void SMyQuest::ExecuteAction(TSharedPtr<FEdGraphSchemaAction> InAction)
 				QuestEditorPtr.Pin()->JumpToHyperlink(GraphAction->EdGraph);
 
 				TSharedPtr<FAssetEditor_QuestSystem> QuestEditor = QuestEditorPtr.Pin();
-				/*if (UEdGraph_QuestSystemGraph* QuestGraph = Cast<UEdGraph_QuestSystemGraph>(QuestEditor->FocusedEdGraph))
-				{
-					QuestEditor->PropertyWidget->SetObject(QuestGraph->QuestSystem);
-				}*/
 
 				if (UEdGraph_QuestSystemGraph* QuestGraph = Cast<UEdGraph_QuestSystemGraph>(QuestEditor->ViewportWidget->GetCurrentGraph()))
 				{
