@@ -104,6 +104,15 @@ void UEdGraph_QuestSystemGraph::RebuildQuestSystemGraph()
 						Task->QuestSystem = QuestSystem;
 					}
 				}
+				for (UQuestEvent* QuestEvent : ObjectiveNode->ObjectiveFailedEvents)
+				{
+					if (QuestEvent != nullptr)
+					{
+						QuestEvent->OwningNode = ObjectiveNode;
+						QuestEvent->QuestGraph = Graph;
+						QuestEvent->QuestSystem = QuestSystem;
+					}
+				}
 			}
 
 			for (UQuestCondition* QuestCondition : QuestSystemGraphNode->Conditions)
@@ -119,6 +128,7 @@ void UEdGraph_QuestSystemGraph::RebuildQuestSystemGraph()
 			{
 				if (QuestEvent != nullptr)
 				{
+					QuestEvent->OwningNode = QuestSystemGraphNode;
 					QuestEvent->QuestGraph = Graph;
 					QuestEvent->QuestSystem = QuestSystem;
 				}

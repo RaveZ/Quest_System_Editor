@@ -8,6 +8,7 @@
 
 UIsObjectiveCompleted::UIsObjectiveCompleted()
 {
+
 }
 
 bool UIsObjectiveCompleted::IsConditionMet_Implementation() const

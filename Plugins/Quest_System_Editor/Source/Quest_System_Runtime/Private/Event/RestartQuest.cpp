@@ -15,6 +15,9 @@ URestartQuest::URestartQuest()
 
 void URestartQuest::BeginEvent_Implementation()
 {
-	GetQuestComponent()->RestartQuest(QuestID, NodeID, bStartFromNodeID);
+	if (!QuestID.IsNone())
+	{
+		GetQuestComponent()->RestartQuest(QuestID, NodeID, bStartFromNodeID);
+	}
 }
 

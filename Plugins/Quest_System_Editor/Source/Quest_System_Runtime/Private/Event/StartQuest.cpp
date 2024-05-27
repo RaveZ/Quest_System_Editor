@@ -14,5 +14,8 @@ UStartQuest::UStartQuest()
 
 void UStartQuest::BeginEvent_Implementation()
 {
-	GetQuestComponent()->ActivateQuest(QuestID);
+	if (!QuestID.IsNone())
+	{
+		GetQuestComponent()->ActivateQuest(QuestID);
+	}
 }

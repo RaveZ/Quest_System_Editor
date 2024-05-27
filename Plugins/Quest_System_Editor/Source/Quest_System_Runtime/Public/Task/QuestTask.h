@@ -32,9 +32,13 @@ public:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Task")
 		FText Description;
 
-	//mark the task as optional and skip this task if the other non-optional task has been completed
+	/**mark the task as optional and skip this task if the other non - optional task has been completed */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Task")
 		bool bOptional = false;
+
+	/**Hide the task from widget*/
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Task")
+		bool bHidden = false;
 	
 	/**This task use amount required to complete task?*/
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Task", meta = (DisplayName = "bUseAmount?"))
@@ -71,8 +75,15 @@ public:
 	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable, Category = "QuestTask")
 		void OnTaskCompleted();
 
+	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable, Category = "QuestTask")
+		void OnObjectiveFailed();
+
 	UFUNCTION(BlueprintCallable, Category = "QuestTask")
 		bool CompleteTask();
+
+	/**Fail The objective node*/
+	UFUNCTION(BlueprintCallable, Category = "QuestTask")
+		void FailObjective();
 
 	UFUNCTION(BlueprintCallable, Category = "QuestTask")
 		AController* GetOwningController() const;

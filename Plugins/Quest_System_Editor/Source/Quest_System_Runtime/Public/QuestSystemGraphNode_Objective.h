@@ -18,6 +18,10 @@ public:
 		TArray<UQuestTask*> Tasks;
 	
 
+	/**This events will be triggered if you failed the objective node. Ignoring The EventRunType*/
+	UPROPERTY(Instanced, EditAnywhere, BlueprintReadOnly, Category = "Events", meta = (DisplayName = "Events (If Objective Failed)"))
+		TArray<UQuestEvent*> ObjectiveFailedEvents;
+
 	UFUNCTION(BlueprintCallable, Category = "Objective")
 		bool IsAllTaskCompleted();
 

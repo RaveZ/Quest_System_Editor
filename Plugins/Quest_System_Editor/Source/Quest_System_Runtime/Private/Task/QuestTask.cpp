@@ -4,8 +4,10 @@
 #include "Task/QuestTask.h"
 #include "QuestComponent.h"
 #include "QuestSystem.h"
+#include "Event/QuestEvent.h"
 #include "QuestSystemGraph.h"
 #include "QuestSystemGraphNode.h"
+#include "QuestSystemGraphNode_Objective.h"
 
 bool UQuestTask::CompleteTask()
 {	
@@ -18,6 +20,18 @@ bool UQuestTask::CompleteTask()
     GetQuestComponent()->OnQuestObjectiveUpdated.Broadcast();
     
 	return true;
+}
+
+void UQuestTask::FailObjective()
+{
+	OnObjectiveFailed();
+
+	//Launch ObjectiveFailedEvents
+	for (UQuestEvent* Event : ObjectiveNode->ObjectiveFailedEvents)
+	{
+		Event->BeginEvent();
+	}
+	GetQuestComponent()->OnQuestObjectiveUpdated.Broadcast();
 }
 
 AController* UQuestTask::GetOwningController() const
@@ -56,6 +70,7 @@ void UQuestTask::AddAmount(int AmountToAdd)
 	{
 		CompleteTask();
 	}
+	GetQuestComponent()->OnQuestObjectiveUpdated.Broadcast();
 }
 
 FText UQuestTask::GetDescription_Implementation() const

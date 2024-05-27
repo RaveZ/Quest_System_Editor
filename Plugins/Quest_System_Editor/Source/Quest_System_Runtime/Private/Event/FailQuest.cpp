@@ -14,6 +14,9 @@ UFailQuest::UFailQuest()
 
 void UFailQuest::BeginEvent_Implementation()
 {
-	GetQuestComponent()->FailQuest(QuestID);
+	if (!QuestID.IsNone())
+	{
+		GetQuestComponent()->FailQuest(QuestID);
+	}
 	
 }
