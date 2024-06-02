@@ -56,6 +56,9 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "QuestComponent")
 		void FailQuest(FName QuestID);
 
+	UFUNCTION(BlueprintCallable, Category = "QuestComponent")
+		void CompleteQuest(FName QuestID);
+
 	UPROPERTY(BlueprintAssignable, BlueprintCallable, Category = "QuestComponent")
 		FQuestObjectiveUpdated OnQuestObjectiveUpdated;
 

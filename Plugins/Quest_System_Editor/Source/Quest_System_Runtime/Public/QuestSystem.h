@@ -59,12 +59,17 @@ public:
 	UPROPERTY(BlueprintReadOnly, VisibleDefaultsOnly, Category = "QuestSystem")
 		FName QuestID;
 
+
+	/** Description for your quest*/
 	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "QuestSystem")
 		FText Description; 
 
+
+	/** Reward for your Quest*/
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "QuestSystem")
 		TArray<FRewardData> Rewards;
 
+	/**Make your quest can be aborted*/
 	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Conditions")
 		bool bCanQuestBeAborted = false;
 	/**
@@ -82,7 +87,8 @@ public:
 	/** List of All Visited Node IDs in Sequence*/
 	UPROPERTY(BlueprintReadWrite, Category = "QuestSystem")
 		TArray<FName> VisitedNodeIDs;
-	
+
+	/**Your quest state, will be changed based on condition*/
 	UPROPERTY(BlueprintReadWrite, Category = "QuestSystem")
 		EQuestState QuestState = EQuestState::E_Locked;
 	

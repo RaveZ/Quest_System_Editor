@@ -223,6 +223,20 @@ void UQuestComponent::FailQuest(FName QuestID)
 	}
 }
 
+void UQuestComponent::CompleteQuest(FName QuestID)
+{
+	if (UQuestSystem* QuestSystem = QuestSystemMap.FindRef(QuestID))
+	{
+		if (QuestSystem->QuestState != EQuestState::E_Complete)
+		{
+			QuestSystem->QuestState = EQuestState::E_Complete;
+			OnQuestCompleted.Broadcast(QuestSystem);
+		}
+		QuestSystem->CurrentNode = nullptr;
+
+	}
+}
+
 UQuestSystem* UQuestComponent::FindQuestFromNodeID(FName NodeIDParam) const
 {
 	UQuestSystem* FoundedQuest = nullptr;
@@ -327,14 +341,18 @@ void UQuestComponent::EvaluateNextNodeCondition(UQuestSystem* QuestParam)
 		//End of a Node, Launch Event with the End and Both Type
 		for (UQuestEvent* Event : QuestParam->CurrentNode->Events)
 		{
-			if (Event->EventRunType == EEventRunType::E_Both || Event->EventRunType == EEventRunType::E_End)
+			if (Event)
 			{
-				if (!Event->EndLaunched)
+				if (Event->EventRunType == EEventRunType::E_Both || Event->EventRunType == EEventRunType::E_End)
 				{
-					Event->BeginEvent();
-					Event->EndLaunched = true;
+					if (!Event->EndLaunched)
+					{
+						Event->BeginEvent();
+						Event->EndLaunched = true;
+					}
 				}
 			}
+			
 		}
 		//Go to next node if exist or condition met
 		GoToNextNode(QuestParam, NextNode);
@@ -403,12 +421,15 @@ void UQuestComponent::BeginNode(UQuestSystem* QuestParam)
 	//Start of the Node, Launch Event with the Start and Both Type
 	for (UQuestEvent* Event : QuestParam->CurrentNode->Events)
 	{
-		if (Event->EventRunType == EEventRunType::E_Both || Event->EventRunType == EEventRunType::E_Start)
+		if (Event)
 		{
-			if (!Event->StartLaunched)
+			if (Event->EventRunType == EEventRunType::E_Both || Event->EventRunType == EEventRunType::E_Start)
 			{
-				Event->BeginEvent();
-				Event->StartLaunched = true;
+				if (!Event->StartLaunched)
+				{
+					Event->BeginEvent();
+					Event->StartLaunched = true;
+				}
 			}
 		}
 	}

@@ -21,6 +21,7 @@ public:
 	UQuestSystemGraph();
 	virtual ~UQuestSystemGraph();
 
+	/**This data will be displayed on the category for your quest log*/
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "QuestSystemGraph")
 		FString CategoryDisplayName;
 

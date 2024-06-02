@@ -35,6 +35,7 @@ public:
 	UPROPERTY(BlueprintReadOnly, Category = "QuestTask")
 		UQuestSystemGraphNode* OwningNode;
 
+	/**Display quest ID in property panel?*/
 	UPROPERTY(BlueprintReadWrite, Category = "QuestEvent")
 		bool bUseQuestID = false;
 

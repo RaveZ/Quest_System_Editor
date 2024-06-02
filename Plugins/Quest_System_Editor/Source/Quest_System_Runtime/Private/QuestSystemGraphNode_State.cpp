@@ -24,9 +24,12 @@ void UQuestSystemGraphNode_State::BeginState()
     //End of a Node, Launch Event with the End and Both Type
     for (UQuestEvent* Event : QuestSystem->CurrentNode->Events)
     {
-        if (Event->EventRunType == EEventRunType::E_Both || Event->EventRunType == EEventRunType::E_End)
+        if (Event)
         {
-            Event->BeginEvent();
+            if (Event->EventRunType == EEventRunType::E_Both || Event->EventRunType == EEventRunType::E_End)
+            {
+                Event->BeginEvent();
+            }
         }
     }
 

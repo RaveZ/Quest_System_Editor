@@ -14,6 +14,7 @@ class QUEST_SYSTEM_RUNTIME_API UQuestSystemGraphNode_Objective : public UQuestSy
 	GENERATED_BODY()
 
 public:
+	/**List of task for your objective*/
 	UPROPERTY(Instanced, EditAnywhere, BlueprintReadOnly, Category = "Objective")
 		TArray<UQuestTask*> Tasks;
 	

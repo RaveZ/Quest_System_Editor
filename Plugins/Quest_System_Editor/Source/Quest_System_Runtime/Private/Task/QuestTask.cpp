@@ -31,7 +31,6 @@ void UQuestTask::FailObjective()
 	{
 		Event->BeginEvent();
 	}
-	GetQuestComponent()->OnQuestObjectiveUpdated.Broadcast();
 }
 
 AController* UQuestTask::GetOwningController() const
@@ -83,6 +82,8 @@ void UQuestTask::Tick(float DeltaTime)
 	if (LastFrameNumberWeTicked == GFrameCounter)
 		return;
 	//Do The Tick Logic
+	
 	TaskTick(DeltaTime);
+	
 	LastFrameNumberWeTicked = GFrameCounter;
 }

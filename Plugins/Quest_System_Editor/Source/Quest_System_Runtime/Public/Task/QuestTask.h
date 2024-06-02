@@ -44,73 +44,81 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Task", meta = (DisplayName = "bUseAmount?"))
 		bool bUseAmount = false;
 
+	/**Amount required for your task*/
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Task", meta = (EditCondition = "bUseAmount == true", EditConditionHides))
 		int RequiredAmount = 1;
 
-	UPROPERTY(BlueprintReadOnly, Category = "QuestTask")
+	/**Is Task Tickable?*/
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Task", meta = (DisplayName = "TaskTickable?"))
+		bool bIsTaskTickable = false;
+
+	UPROPERTY(BlueprintReadOnly, Category = "Task")
 		UQuestSystemGraph* QuestGraph;
 
-	UPROPERTY(BlueprintReadOnly, Category = "QuestTask")
+	UPROPERTY(BlueprintReadOnly, Category = "Task")
 		UQuestSystem* QuestSystem;
 
 
-	UPROPERTY(BlueprintReadOnly, Category = "QuestTask")
+	UPROPERTY(BlueprintReadOnly, Category = "Task")
 		UQuestSystemGraphNode_Objective* ObjectiveNode;
 
-	UPROPERTY(BlueprintReadWrite, Category = "QuestTask")
+	UPROPERTY(BlueprintReadWrite, Category = "Task")
 		ETaskState TaskState = ETaskState::E_Active;
 
-	UPROPERTY(BlueprintReadWrite, Category = "QuestTask")
+	UPROPERTY(BlueprintReadWrite, Category = "Task")
 		int CurrentAmount = 0;
 
-	UPROPERTY(BlueprintReadWrite, Category = "QuestTask")
+	UPROPERTY(BlueprintReadWrite, Category = "Task")
 		float DistanceToTarget;
 
-	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable, Category = "QuestTask")
+	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable, Category = "Task")
 		void TaskBegin();
 
-	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable, Category = "QuestTask")
+	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable, Category = "Task")
 		void TaskTick(float DeltaTime);
 
-	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable, Category = "QuestTask")
+	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable, Category = "Task")
 		void OnTaskCompleted();
 
-	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable, Category = "QuestTask")
+	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable, Category = "Task")
 		void OnObjectiveFailed();
 
-	UFUNCTION(BlueprintCallable, Category = "QuestTask")
+	UFUNCTION(BlueprintCallable, Category = "Task")
 		bool CompleteTask();
 
 	/**Fail The objective node*/
-	UFUNCTION(BlueprintCallable, Category = "QuestTask")
+	UFUNCTION(BlueprintCallable, Category = "Task")
 		void FailObjective();
 
-	UFUNCTION(BlueprintCallable, Category = "QuestTask")
+	UFUNCTION(BlueprintCallable, Category = "Task")
 		AController* GetOwningController() const;
 
-	UFUNCTION(BlueprintCallable, Category = "QuestTask")
+	UFUNCTION(BlueprintCallable, Category = "Task")
 		UQuestComponent* GetQuestComponent() const;
 
-	UFUNCTION(BlueprintCallable, Category = "QuestTask")
+	UFUNCTION(BlueprintCallable, Category = "Task")
 		UQuestSystemGraph* GetOwningQuestGraph() const;
 
-	UFUNCTION(BlueprintCallable, Category = "QuestTask")
+	UFUNCTION(BlueprintCallable, Category = "Task")
 		UQuestSystem* GetOwningQuestSystem() const;
 
 	/**Add amount and check if the required amount has fulfilled, then complete the task*/
-	UFUNCTION(BlueprintCallable, Category = "QuestTask")
+	UFUNCTION(BlueprintCallable, Category = "Task")
 		void AddAmount(int AmountToAdd);
 
-	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "QuestTask")
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "Task")
 		FText GetDescription() const;
 
 	virtual FText GetDescription_Implementation() const;
 
 	// FTickableGameObject Begin
 	virtual void Tick(float DeltaTime) override;
+
+	virtual bool IsTickable() const override { return bIsTaskTickable; }
+
 	virtual ETickableTickType GetTickableTickType() const override
 	{
-		return ETickableTickType::Always;
+		return ETickableTickType::Conditional;
 	}
 	virtual TStatId GetStatId() const override
 	{
