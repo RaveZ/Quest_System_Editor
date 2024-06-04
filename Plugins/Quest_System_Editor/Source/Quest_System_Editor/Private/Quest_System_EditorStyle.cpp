@@ -1,4 +1,4 @@
-// Copyright Epic Games, Inc. All Rights Reserved.
+// Copyright 2024 Ivan Chandra. All Rights Reserved.
 
 #include "Quest_System_EditorStyle.h"
 #include "Styling/SlateStyleRegistry.h"

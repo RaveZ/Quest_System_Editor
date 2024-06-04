@@ -1,4 +1,4 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+// Copyright 2024 Ivan Chandra. All Rights Reserved.
 
 
 #include "AssetGraphSchema_QuestSystem.h"
@@ -498,9 +498,6 @@ const FPinConnectionResponse UAssetGraphSchema_QuestSystem::CanCreateConnection(
 	{
 		return FPinConnectionResponse(CONNECT_RESPONSE_MAKE, LOCTEXT("PinConnect", "Connect nodes"));
 	}
-
-
-	return FPinConnectionResponse(CONNECT_RESPONSE_MAKE, LOCTEXT("PinConnect", "Connect nodes"));
 }
 
 bool UAssetGraphSchema_QuestSystem::TryCreateConnection(UEdGraphPin* A, UEdGraphPin* B) const

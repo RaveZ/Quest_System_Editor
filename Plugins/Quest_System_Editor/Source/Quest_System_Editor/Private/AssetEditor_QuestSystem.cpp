@@ -1,4 +1,4 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+// Copyright 2024 Ivan Chandra. All Rights Reserved.
 
 
 #include "AssetEditor_QuestSystem.h"
@@ -523,6 +523,11 @@ void FAssetEditor_QuestSystem::AddReferencedObjects(FReferenceCollector& Collect
 	}
 
 	Collector.AddReferencedObject(EditingQuestGraph);*/
+}
+
+FString FAssetEditor_QuestSystem::GetReferencerName() const
+{
+	return FString();
 }
 
 UQuestSystemGraph* FAssetEditor_QuestSystem::GetQuestSystemObj() const

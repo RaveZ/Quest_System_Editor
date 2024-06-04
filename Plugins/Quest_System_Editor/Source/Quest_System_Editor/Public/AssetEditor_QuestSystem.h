@@ -1,4 +1,4 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+// Copyright 2024 Ivan Chandra. All Rights Reserved.
 
 #pragma once
 
@@ -80,6 +80,7 @@ public:
 	
 	// FSerializableObject interface
 	virtual void AddReferencedObjects(FReferenceCollector& Collector) override;
+	virtual FString GetReferencerName() const override;
 	// End of FSerializableObject interface
 
 	/** Returns a pointer to the Quest graph object we are currently editing, as long as we are editing exactly one */

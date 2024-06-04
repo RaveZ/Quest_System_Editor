@@ -1,4 +1,4 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+// Copyright 2024 Ivan Chandra. All Rights Reserved.
 
 #pragma once
 
@@ -68,7 +68,7 @@ public:
 protected:
 	virtual TAttribute<FText> ConstructTabNameForObject(UEdGraph* DocumentID) const override
 	{
-		return TAttribute<FText>::Create(TAttribute<FText>::FGetter::CreateStatic<const UEdGraph*>(&FLocalKismetCallbacks::GetGraphDisplayName, DocumentID));
+		return TAttribute<FText>();
 	}
 
 	virtual TSharedRef<SWidget> CreateTabBodyForObject(const FWorkflowTabSpawnInfo& Info, UEdGraph* DocumentID) const override;

@@ -1,3 +1,5 @@
+// Copyright 2024 Ivan Chandra. All Rights Reserved.
+
 #pragma once
 #include <EdGraphUtilities.h>
 #include <EdGraph/EdGraphNode.h>

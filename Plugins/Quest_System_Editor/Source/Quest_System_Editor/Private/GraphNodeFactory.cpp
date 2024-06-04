@@ -1,3 +1,5 @@
+// Copyright 2024 Ivan Chandra. All Rights Reserved.
+
 #include "GraphNodeFactory.h"
 #include <EdGraph/EdGraphNode.h>
 

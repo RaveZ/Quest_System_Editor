@@ -1,3 +1,5 @@
+// Copyright 2024 Ivan Chandra. All Rights Reserved.
+
 #include "Quest_System_Runtime.h"
 
 
