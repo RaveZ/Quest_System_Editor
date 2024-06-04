@@ -61,7 +61,7 @@ FText UQuestSystemGraphNode_Objective::GetNodeDescription() const
     {
         if (Task)
         {
-            BulletedList += TEXT("• ");
+            BulletedList += TEXT("- ");
             BulletedList += Task->GetDescription().ToString();
             BulletedList += TEXT("\n");
         }

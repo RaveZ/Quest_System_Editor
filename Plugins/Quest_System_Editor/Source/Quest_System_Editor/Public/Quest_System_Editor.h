@@ -44,20 +44,6 @@ public:
 
 	virtual void PasteNodesHere(class UEdGraph* Graph, const FVector2D& Location) = 0;
 
-	//virtual bool GetBoundsForSelectedNodes(class FSlateRect& Rect, float Padding) = 0;
-
-	/** Util to get the currently selected Subobject editor tree Nodes */
-	//virtual TArray<TSharedPtr<FSubobjectEditorTreeNode>> GetSelectedSubobjectEditorTreeNodes() const = 0;
-
-	/** Get number of currently selected nodes in the SCS editor tree */
-	//virtual int32 GetNumberOfSelectedNodes() const = 0;
-
-	/** Find and select a specific SCS editor tree node associated with the given component */
-	//virtual TSharedPtr<FSubobjectEditorTreeNode> FindAndSelectSubobjectEditorTreeNode(const class UActorComponent* InComponent, bool IsCntrlDown) = 0;
-
-	/** Used to track node create/delete events for Analytics */
-	//virtual void AnalyticsTrackNodeEvent(UBlueprint* Blueprint, UEdGraphNode* GraphNode, bool bNodeDelete = false) const = 0;
-
 	/** Return the class viewer filter associated with the current set of imported namespaces within this editor context. Default is NULL (no filter). */
 	virtual TSharedPtr<class IClassViewerFilter> GetImportedClassViewerFilter() const { return nullptr; }
 
@@ -74,10 +60,6 @@ public:
 	/** Return whether the given object (referenced by path) falls outside the scope of the current set of imported namespaces within this editor context. Default is FALSE (imported). */
 	virtual bool IsNonImportedObject(const FSoftObjectPath& InObject) const { return false; }
 
-	//UE_DEPRECATED(5.0, "GetSelectedSCSEditorTreeNodes has been deprecated. Use GetSelectedSubobjectEditorTreeNodes instead.")
-		//virtual TArray<TSharedPtr<class FSCSEditorTreeNode> >  GetSelectedSCSEditorTreeNodes() const = 0;
-	//UE_DEPRECATED(5.0, "FindAndSelectSCSEditorTreeNode has been deprecated. Use FindAndSelectSubobjectEditorTreeNode instead.")
-		//virtual TSharedPtr<class FSCSEditorTreeNode> FindAndSelectSCSEditorTreeNode(const class UActorComponent* InComponent, bool IsCntrlDown) = 0;
 };
 
 
