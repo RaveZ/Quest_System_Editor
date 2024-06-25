@@ -203,7 +203,6 @@ UEdGraphNode* FAssetSchemaAction_QuestSystem_NewEdge::PerformAction(UEdGraph* Pa
 void FAssetSchemaAction_QuestSystem_NewEdge::AddReferencedObjects(FReferenceCollector& Collector)
 {
 	FEdGraphSchemaAction::AddReferencedObjects(Collector);
-	Collector.AddReferencedObject(NodeTemplate);
 }
 
 
@@ -276,10 +275,6 @@ void UAssetGraphSchema_QuestSystem::GetGraphContextActions(FGraphContextMenuBuil
 {
 	UQuestSystemGraph* Graph = CastChecked<UQuestSystemGraph>(ContextMenuBuilder.CurrentGraph->GetOuter());
 
-	if (Graph->NodeType == nullptr)
-	{
-		return;
-	}
 
 	const bool bNoParent = (ContextMenuBuilder.FromPin == NULL);
 
@@ -558,7 +553,7 @@ bool UAssetGraphSchema_QuestSystem::CreateAutomaticConversionNodeAndConnections(
 
 	FAssetSchemaAction_QuestSystem_NewEdge Action;
 	Action.NodeTemplate = NewObject<UEdNode_QuestSystemEdge>(NodeA->GetGraph());
-	Action.NodeTemplate->SetEdge(NewObject<UQuestSystemGraphEdge>(Action.NodeTemplate, Graph->EdgeType));
+	Action.NodeTemplate->SetEdge(NewObject<UQuestSystemGraphEdge>(Action.NodeTemplate, UQuestSystemGraphEdge::StaticClass()));
 	UEdNode_QuestSystemEdge* EdgeNode = Cast<UEdNode_QuestSystemEdge>(Action.PerformAction(NodeA->GetGraph(), nullptr, InitPos, false));
 
 	// Always create connections from node A to B, don't allow adding in reverse

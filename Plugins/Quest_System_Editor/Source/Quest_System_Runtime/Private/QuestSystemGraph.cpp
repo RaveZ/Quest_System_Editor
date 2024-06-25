@@ -11,9 +11,6 @@
 
 UQuestSystemGraph::UQuestSystemGraph()
 {
-	NodeType = UQuestSystemGraphNode::StaticClass();
-	EdgeType = UQuestSystemGraphEdge::StaticClass();
-
 	bEdgeEnabled = false;
 #if WITH_EDITORONLY_DATA
 
@@ -28,9 +25,9 @@ UQuestSystemGraph::~UQuestSystemGraph()
 
 
 
+#if WITH_EDITORONLY_DATA
 void UQuestSystemGraph::GetAllGraphs(TArray<UEdGraph*>& Graphs) const
 {
-#if WITH_EDITORONLY_DATA
 	
 
 	for (int32 i = 0; i < QuestGraphPages.Num(); ++i)
@@ -43,7 +40,7 @@ void UQuestSystemGraph::GetAllGraphs(TArray<UEdGraph*>& Graphs) const
 		}
 	}
 	
-#endif // WITH_EDITORONLY_DATA
 }
+#endif // WITH_EDITORONLY_DATA
 
 #undef LOCTEXT_NAMESPACE

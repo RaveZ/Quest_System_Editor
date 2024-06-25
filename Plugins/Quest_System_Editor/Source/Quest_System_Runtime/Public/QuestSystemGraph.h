@@ -11,6 +11,7 @@ class UQuestSystem;
 class UQuestComponent;
 class UQuestSystemGraphNode;
 class UQuestSystemGraphEdge;
+class AController;
 
 
 UCLASS(Blueprintable)
@@ -24,12 +25,6 @@ public:
 	/**This data will be displayed on the category for your quest log*/
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "QuestSystemGraph")
 		FString CategoryDisplayName;
-
-	UPROPERTY(BlueprintReadOnly, Category = "QuestSystemGraph")
-		TSubclassOf<UQuestSystemGraphNode> NodeType;
-
-	UPROPERTY(BlueprintReadOnly, Category = "QuestSystemGraph")
-		TSubclassOf<UQuestSystemGraphEdge> EdgeType;
 
 	UPROPERTY(BlueprintReadOnly, BlueprintReadOnly, Category = "QuestSystemGraph")
 		FGameplayTagContainer GraphTags;
@@ -68,9 +63,11 @@ public:
 	/** Whether or not this blueprint is newly created, and hasn't been opened in an editor yet */
 	UPROPERTY(/*transient*/ BlueprintReadOnly, Category = "QuestSystemGraph")
 	bool bIsNewlyCreated = true;
-#endif
+
 
 	/** Get all graphs in this QuestEditor */
 	void GetAllGraphs(TArray<UEdGraph*>& Graphs) const;
+#endif
+
 };
 

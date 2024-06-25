@@ -1,3 +1,4 @@
+// Copyright 2024 Ivan Chandra. All Rights Reserved.
 using UnrealBuildTool;
 
 public class Quest_System_Runtime : ModuleRules

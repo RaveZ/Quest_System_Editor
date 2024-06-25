@@ -8,6 +8,7 @@
 
 class UQuestSaveObject;
 class USaveGame;
+class AController;
 
 //Delegate
 /** This Delegate will be called if a quest objective has been completed*/
