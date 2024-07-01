@@ -29,7 +29,7 @@ class QUEST_SYSTEM_RUNTIME_API UQuestTask : public UObject, public FTickableGame
 
 public:
 
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Task")
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Task", meta = (MultiLine = true))
 		FText Description;
 
 	/**mark the task as optional and skip this task if the other non - optional task has been completed */

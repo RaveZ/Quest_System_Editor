@@ -2,9 +2,8 @@
 	"FileVersion": 3,
 	"Version": 1,
 	"VersionName": "1.0",
-	"EngineVersion": [ "5.1.0", "5.2.0", "5.3.0", "5.4.0" ],
-	"FriendlyName": "Quest Editor Plugin",
-	"Description": "The Quest Editor is a powerful tool using node graph based editor that enables you to craft engaging, immersive, and dynamic quests for your players.",
+	"FriendlyName": "Quest Builder Plugin",
+	"Description": "The Quest Builder is a powerful tool using node graph based editor that enables you to craft engaging, immersive, and dynamic quests for your players.",
 	"Category": "Quest",
 	"CreatedBy": "IC",
 	"CreatedByURL": "",
@@ -21,13 +20,17 @@
 			"Name": "Quest_System_Editor",
 			"Type": "Editor",
 			"LoadingPhase": "Default",
-			"WhitelistPlatforms": [ "Win64", "Linux", "Mac" ]
+			"PlatformAllowList": [
+				"Win64",
+				"Linux",
+				"Mac"
+			]
 		},
 		{
 			"Name": "Quest_System_Runtime",
 			"Type": "Runtime",
 			"LoadingPhase": "PreDefault",
-			"WhitelistPlatforms": [
+			"PlatformAllowList": [
 				"Win64",
 				"Linux",
 				"Mac",
@@ -36,6 +39,5 @@
 				"TVOS"
 			]
 		}
-
 	]
 }

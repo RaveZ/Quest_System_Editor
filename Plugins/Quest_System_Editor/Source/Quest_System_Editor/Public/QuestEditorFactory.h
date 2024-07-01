@@ -68,7 +68,13 @@ public:
 protected:
 	virtual TAttribute<FText> ConstructTabNameForObject(UEdGraph* DocumentID) const override
 	{
-		return TAttribute<FText>();
+		// Extract the name of the graph from DocumentID (replace with your logic)
+		FString GraphName = DocumentID->GetName();
+		// Create FText with the extracted name
+		FText TabName = FText::FromString(GraphName);
+
+		// Return TAttribute containing the constructed FText
+		return TAttribute<FText>(TabName);
 	}
 
 	virtual TSharedRef<SWidget> CreateTabBodyForObject(const FWorkflowTabSpawnInfo& Info, UEdGraph* DocumentID) const override;
